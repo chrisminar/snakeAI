@@ -1,8 +1,10 @@
-#write a thing that takes the best thing every 
+#make neural network vis show more shit
 #change the values to not be negative numbers for certain square types -1,0,1 -> 1,2,3
-#change get random neurons to get recursive neurons
-  #could just throw away any attempted new connection that causes a recurse
-  #computationally hard to generate the depth chart
+#add more genes at start
+#if all genomes are tied for the same shitty score, none get deleted?
+#I'm not convinced its showing the best genome
+
+#WHY DO SOME GENOMES TAKE SO MUCH LONGER TO EVALUATE
 
 #todo write load function
 #todo make an gui for the AI snake
@@ -49,7 +51,8 @@ BiasMutationChance = 0.40
 StepSize = 0.1
 DisableMutationChance = 0.4
 EnableMutationChance = 0.2
-
+startGenes = 10
+startNeurons = 3
 innovation = 0
 
 buttons = {0: "up",
@@ -209,6 +212,7 @@ class genome():
                           "enable": EnableMutationChance,
                           "disable": DisableMutationChance,
                           "step": StepSize}
+    self.initGenes()
     self.initNeurons()
     self.mutate() #mutate new genome
     return
@@ -252,6 +256,18 @@ class genome():
         neuron_.bias = random()*4-2 #reset to new random value
     return
 
+  ## for any given geneid, trace the longest gene path to an input layer
+  def recurseToInput(self, geneIdx:int, isCandidate: List[bool]):
+    inNeuronLayer = self.genes[geneIdx].in_Idx[0] #input neuron layer
+    inNeuronId    = self.genes[geneIdx].in_Idx[1] #input neruon id
+    isCandidate[self.genes[geneIdx].out_Idx[1]] = False#set output node to not be a candidate
+    if inNeuronLayer == 0: #you have reached the input layer, return
+      return
+    numGenesToInNeuron = len(self.neurons[inNeuronLayer][inNeuronId].inputs) #number of genes coming into the input neuron
+    for i in range(numGenesToInNeuron): #step through input genes to input neuron
+      self.recurseToInput(self.neurons[inNeuronLayer][inNeuronId].inputs[i], isCandidate) # call on next level down
+    return
+
   ## return a random input and output neruon from this genome
   def randomNeurons(self):
     #get an input index, can not include outputs
@@ -261,16 +277,27 @@ class genome():
       input = (0,tempId) #output type, id 
     else: #id is hidden neuron
       input = (1,tempId-len(self.neurons[0]))
-    maxID = len(self.neurons[1]) + len(self.neurons[2])# hidden+output
-    doneFlag = False
-    while not doneFlag: #get a random input until we don't recurse ##???
+    
+    #output index
+    outPutCandidate = [True]*len(self.neurons[1]) #depth of each neuron
+    if input[0] == 1: #input is hidden layer
+      for i in self.neurons[input[0]][input[1]].inputs: ## find all inputs to input neuron, mark as not candidates
+        self.recurseToInput(i,outPutCandidate)
+
+      validHidden = sum(outPutCandidate) #total valid neurons
+      maxID = validHidden + len(self.neurons[2]) # valid hidden+output
+      tempId = randint(0,maxID-1)#get random id
+      if tempId < validHidden: #id is hidden neuron
+        output = (1,np.argwhere(outPutCandidate)[tempId][0])
+      else: #id is output neuron
+        output = (2,tempId-validHidden)
+    else: #input layer is an input layer, every hidden neuron is valid
+      maxID = len(self.neurons[1]) + len(self.neurons[2]) # valid hidden+output
       tempId = randint(0,maxID-1)#get random id
       if tempId < len(self.neurons[1]): #id is hidden neuron
         output = (1,tempId)
       else: #id is output neuron
         output = (2,tempId-len(self.neurons[1]))
-      if output != input:
-        doneFlag = True
     return input,output
 
   ## check if link exists in genome
@@ -338,6 +365,14 @@ class genome():
     self.neurons[gene2_.out_Idx[0]][gene2_.out_Idx[1]].inputs.append(len(self.genes)-1)
 
     return
+
+  def initGenes(self):
+    global startGenes
+    global startNeurons
+    for i in range(startGenes):
+      self.addGeneMutate()
+    for i in range(startNeurons):
+      self.addNeuronMutate()
 
   ## check if gene/neuron sturcture is ok
   def checkIntegrity(self):
@@ -539,6 +574,7 @@ class pool():
     ratioG = self.currentGenome/len(self.species[self.currentSpecies].genomes) #ration of genomes completed of species
     pg.draw.rect(self.DISPLAY, (100,100,100), (415, 70, 370*ratioG, 20)) #draw genome progress square
     self.drawText('{:0.2f}%'.format(ratioG*100), (600,80)) #draw genome progress %
+    pg.event.pump()
     pg.display.update() #update what is shown
     return
 
@@ -552,6 +588,7 @@ class pool():
     ratioS = self.currentSpecies/len(self.species) #ration of species completed out of genome
     pg.draw.rect(self.DISPLAY, (100,100,100), (410, 40, 380*ratioS, 20)) #draw species progress square
     self.drawText('{:0.2f}%'.format(ratioS*100), (600,50)) #draw species progress %
+    pg.event.pump()
     pg.display.update() #update display
     return
 
@@ -688,6 +725,7 @@ class pool():
       snakeInstance.aiRunStep(newGeneration)
       self.drawGame(snakeInstance.grid) #draw grid
       self.drawNetwork(snakeInstance.gridNum2Color,species_.genomes[0].network) #draw network
+      pg.event.pump()
       pg.display.update()
       pg.time.wait(500)
     self.updateGenerationGUI
