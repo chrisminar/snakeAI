@@ -1,10 +1,9 @@
 #make neural network vis show more shit
-#change the values to not be negative numbers for certain square types -1,0,1 -> 1,2,3
-#add more genes at start
-#if all genomes are tied for the same shitty score, none get deleted?
-#I'm not convinced its showing the best genome
-
-#WHY DO SOME GENOMES TAKE SO MUCH LONGER TO EVALUATE
+  #rewind, forward button
+  #indicators for outputs
+  #active lines darker, inactive lines lighter
+#if a fitness is negative, delete it and replace with a new random genome
+#set git credentials
 
 #todo write load function
 #todo make an gui for the AI snake
@@ -51,8 +50,8 @@ BiasMutationChance = 0.40
 StepSize = 0.1
 DisableMutationChance = 0.4
 EnableMutationChance = 0.2
-startGenes = 10
-startNeurons = 3
+startGenes = 30
+startNeurons = 10
 innovation = 0
 
 buttons = {0: "up",
@@ -369,6 +368,44 @@ class genome():
   def initGenes(self):
     global startGenes
     global startNeurons
+    global innovation
+    #top right bot left
+    for x in range(self.gridX):
+      for y in range(self.gridY):
+        os = [0,0,0,0]
+        addGene = False
+        if x == 0: #left
+          addGene = True
+          os[3] = -1*(random())-1
+        else:
+          os[3] = random() + 1
+        if x == self.gridX-1: #right
+          addGene = True
+          os[1] = -1*(random())-1
+        else:
+          os[1] = random() + 1
+        if y == 0: #top
+          addGene = True
+          os[0] = -1*(random())-1
+        else:
+          os[0] = random() + 1
+        if y == self.gridY-1: #bot
+          addGene = True
+          os[2] = -1*(random())-1
+        else:
+          os[2] = random() + 1
+        #add genes
+        if addGene:
+          for i in range(4):
+            newLink = gene()
+            newLink.in_Idx = (0,y*gridX+x)
+            newLink.out_Idx = (2,i) #up
+            newLink.addedFrom = "initGenes"
+            innovation += 1
+            newLink.id = innovation
+            newLink.weight = os[i] #force negative
+            self.genes.append(newLink)
+            self.neurons[2][i].inputs.append(len(self.genes)-1)
     for i in range(startGenes):
       self.addGeneMutate()
     for i in range(startNeurons):
@@ -467,7 +504,7 @@ class genome():
 
 class species():
   def __init__(self):
-    self.topFitness = 0 #best genome fitness of species
+    self.topFitness = -1000 #best genome fitness of species
     self.staleness = 0 #how many generations since species improvement
     self.genomes = [] #genome list
     self.averageFitness = 0 #average fitness of genome
@@ -658,9 +695,8 @@ class pool():
     else:#background
       return (200, 200, 200)
 
-  #draw neuron netowrk
+  #draw neural netowrk
   def drawNetwork(self, grid, network_:network):
-    levelCounter = []
     xlev = [[],[],[]]
     ylev = [[],[],[]]
     #add input layer x+y
@@ -669,12 +705,23 @@ class pool():
         xlev[0].append(i*21+800)
         ylev[0].append(j*21)
 
-    #draw hidden layer neuron squares
+    maxHiddenLevel = -1
     for i in range(len(network_.neurons[1])):
-      if len(levelCounter) <= network_.nodeLevels[i]:
-        levelCounter.append(0)
-      else:
-        levelCounter[network_.nodeLevels[i]] += 1
+      if network_.nodeLevels[i]>maxHiddenLevel:
+        maxHiddenLevel=network_.nodeLevels[i]
+
+    # figure out what color each should be
+    # color 1 = everything connected to the triggered output
+    # color 2 = other stuff
+    neuronColor = [[0]*len(xlev[0]),[0]*len(xlev[1]),[0]*(xlev[2])]
+    geneColor   = [[0]*len(xlev[0]),[0]*len(xlev[1]),[0]*(xlev[2])]
+    #find correct output square, then traverse down to the inputs
+    #YOU ARE HERE
+
+    #draw hidden layer neuron squares
+    levelCounter = [0]*(maxHiddenLevel+1)
+    for i in range(len(network_.neurons[1])):
+      levelCounter[network_.nodeLevels[i]] += 1
       xl=network_.nodeLevels[i]
       yl=levelCounter[network_.nodeLevels[i]]
       xlev[1].append(30*xl+1300)
@@ -693,7 +740,7 @@ class pool():
     for i in range(len(network_.neurons[2])):
       xlev[2].append(30*xl+1300)
       ylev[2].append(21*i)
-      if i== maxval:
+      if i == maxval:
         col = (230,230,230)
       else:
         col = (100,100,100)
@@ -735,7 +782,7 @@ class pool():
   def evaluateFitnessOfGenome(self, genome_: genome):
     genome_.generateNetwork() #generate neural network in feedforward format
     values = np.zeros(10)
-    for i in range(10):
+    for i in range(1):
       snakeInstance = snake(False, gridX, gridY) #make new snake ai game instance
       while not snakeInstance.gameover: #while the game has not ended
         genome_.network.setInputs(snakeInstance) #convert snake to neural net inputs
@@ -824,11 +871,11 @@ class pool():
   def removeWeakSpecies(self):
     global populationSize
     sumFit = self.sumAverageFitness() #sum the fitness of all species
-    for species_ in reversed(self.species): #for all species
+    for i in reversed(range(len(self.species))): #for all species
       avgFit = sumFit/populationSize #average species fitness
-      breed = np.floor( species_.averageFitness /avgFit ) #ratio of current species fitness to average species fitness
+      breed = np.floor( self.species[i].averageFitness /avgFit ) #ratio of current species fitness to average species fitness
       if breed < 1: #if belove average
-        del species_ #cull
+        del self.species[i] #cull
     return
 
   ## number of genes that don't match between genomes / number of genes in genome
@@ -944,6 +991,7 @@ class pool():
     while self.maxFitness < 10000: #end condition
       generationStartTime = time.time() #start timing this generation
       self.evaluateFitnessOfAll() #evaluate fitness of all genomes
+      print(self.maxFitness)
       self.drawBestGenome()
       self.newGeneration() #breed new generation
       self.generationTime = time.time()-generationStartTime #end generation time
