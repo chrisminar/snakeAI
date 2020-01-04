@@ -1,15 +1,11 @@
 #make neural network vis show more shit
   #rewind, forward button
   #indicators for outputs
-  #active lines darker, inactive lines lighter
+  #way to see how each input is effecting everything
 #if a fitness is negative, delete it and replace with a new random genome
-#set git credentials
 
 #todo write load function
-#todo make an gui for the AI snake
 #write funciton doesnt work
-
-#fitness should be run multiple times per genome
 
 #todo is score of 10000 an appropriate exit condition?
   #consider changing the snake scoring
@@ -33,7 +29,7 @@ from random import randint
 gridX = 8
 gridY = 8
 seed(np.floor(time.time()))
-populationSize = 300
+populationSize = 100
 
 DeltaDisjoint = 2.0
 DeltaWeights = 0.4
@@ -57,8 +53,7 @@ innovation = 0
 buttons = {0: "up",
            1: "right",
            2: "down",
-           3: "left",
-           4: "none"}
+           3: "left"}
 
 class node():
   def __init__(self):
@@ -69,7 +64,7 @@ class neuron():
   def __init__(self):
     self.inputs = [] #list of gene input indexes
     self.ID = (0,0) #(layer,index)
-    self.bias = random()*4-2 #random bias
+    self.bias = random()-0.5 #random bias
     return
 
   def setValues(self, ID:Tuple[int]):
@@ -139,6 +134,18 @@ class network():
         maxLevel = lenToInput #set it
     return maxLevel
 
+  ## for any given geneid, trace the longest gene path to an input layer
+  def recurseToInputAndMark(self, geneIdx:int, neuronList, geneList):
+    geneList[geneIdx] = 1 #mark as input
+    inNeuronLayer = self.genes[geneIdx].in_Idx[0] #input neuron layer
+    inNeuronId    = self.genes[geneIdx].in_Idx[1] #input neruon id
+    neuronList[inNeuronLayer][inNeuronId] = 1 #mark as input
+    if inNeuronLayer == 0: #you have reached the input layer, return
+      return
+    for i in range(len(self.neurons[inNeuronLayer][inNeuronId].inputs)): #step through input genes to input neuron
+      self.recurseToInputAndMark(self.neurons[inNeuronLayer][inNeuronId].inputs[i], neuronList, geneList) #you must go deeper
+    return
+
   ## sigmoid function
   def sigmoid(self, x:float):
     return 2/(1+np.exp(-4.9*x))-1
@@ -180,13 +187,13 @@ class network():
       for j in range(gridY):
         idx = i*gridX+j
         if snakeInstance.grid[i][j] == -1: #empty
-          self.nodes[0][idx].value = 0
+          self.nodes[0][idx].value = 0 #a value of 1 means a positive weight will pull it in this direction
         elif snakeInstance.grid[i][j] > 0: #snake body
-          self.nodes[0][idx].value = 2 #food is -1, empty is 0, body is 1 to n
+          self.nodes[0][idx].value = 2 #a value of -1 means a positive weight will push it from this direction
         elif snakeInstance.grid[i][j] == 0: #head
-          self.nodes[0][idx].value = 1
+          self.nodes[0][idx].value = 1 #1 will allow a head square to have a positive weight that pushes in the desired direction
         else: #food
-          self.nodes[0][idx].value =-1
+          self.nodes[0][idx].value = -1 #2 pulls towords the food
 
 class genome():
   def __init__(self, gx:int, gy:int):
@@ -594,10 +601,14 @@ class pool():
     return
 
   ## write pygame text
-  def drawText(self, txt:str, pos:Tuple[int], color=(0,0,0)):
+  def drawText(self, txt:str, pos:Tuple[int], color=(0,0,0), leftAligned=False):
     text = self.font.render(txt, True, color) #set text
     textRect = text.get_rect()
-    textRect.center = (pos) #change position of text
+    if leftAligned:
+      textRect.left = pos[0]
+      textRect.centery = pos[1]
+    else:
+      textRect.center = (pos) #change position of text
     self.DISPLAY.blit(text,textRect) #display text
     return
 
@@ -651,8 +662,12 @@ class pool():
     for i in range(len(self.fitnessHistory)-1):#draw fitness
       x1 = i/maxX
       x2 = (i+1)/maxX
-      y1 = (self.fitnessHistory[i]-minY)/(maxY-minY)
-      y2 = (self.fitnessHistory[i+1]-minY)/(maxY-minY)
+      if maxY==minY:
+        y1=self.fitnessHistory[i]
+        y2=self.fitnessHistory[i]
+      else:
+        y1 = (self.fitnessHistory[i]-minY)/(maxY-minY)
+        y2 = (self.fitnessHistory[i+1]-minY)/(maxY-minY)
       X1,X2 = self.convertXToPix(x1,x2, lpix,rpix)
       Y1,Y2 = self.convertXToPix(y1,y2, bpix,tpix)
       pg.draw.line(self.DISPLAY, color, (X1,Y1), (X2, Y2)) #lines
@@ -670,7 +685,7 @@ class pool():
 
   ## update generation part of gui
   def updateGenerationGUI(self):
-    self.DISPLAY.fill((255,255,255)) #fill with white
+    pg.draw.rect(self.DISPLAY, (255,255,255), (0, 0, 800,400)) #reset area
     pg.draw.rect(self.DISPLAY, (200,200,200), (20,  10, 190,  20)) #draw generation text background square
     pg.draw.rect(self.DISPLAY, (200,200,200), (210, 10, 190,  20)) #draw generation time background square
     self.drawText('Generation #{}'.format(self.generation), (105,20)) #draw current generation #
@@ -713,38 +728,47 @@ class pool():
     # figure out what color each should be
     # color 1 = everything connected to the triggered output
     # color 2 = other stuff
-    neuronColor = [[0]*len(xlev[0]),[0]*len(xlev[1]),[0]*(xlev[2])]
-    geneColor   = [[0]*len(xlev[0]),[0]*len(xlev[1]),[0]*(xlev[2])]
-    #find correct output square, then traverse down to the inputs
-    #YOU ARE HERE
+    neuronColor = [[0]*len(network_.neurons[0]),[0]*len(network_.neurons[1]),[0]*len(network_.neurons[2])]
+    geneColor   = [0]*len(network_.genes)
+    #find correct output square, then traverse and mark all inputs
+    maxOutput = 0
+    for i in range(len(network_.neurons[2])):
+      if  network_.nodes[2][maxOutput].value < network_.nodes[2][i].value:
+        maxOutput = i
+    neuronColor[2][maxOutput] = 1
+    #step through input genes
+    for geneID in network_.neurons[2][maxOutput].inputs:
+      network_.recurseToInputAndMark(geneID,neuronColor,geneColor)
 
     #draw hidden layer neuron squares
     levelCounter = [0]*(maxHiddenLevel+1)
     for i in range(len(network_.neurons[1])):
-      levelCounter[network_.nodeLevels[i]] += 1
       xl=network_.nodeLevels[i]
       yl=levelCounter[network_.nodeLevels[i]]
-      xlev[1].append(30*xl+1300)
+      xlev[1].append(30*xl+800+self.gridX*21+20)
       ylev[1].append(21*yl)
-      pg.draw.rect(self.DISPLAY, (100,100,100), (xlev[1][-1], ylev[1][-1], 20,20))
+      if neuronColor[1][i] == 1: #activated
+        blockColor = (50,200,50)
+      else: #not activated
+        blockColor = (220,220,220)
+      pg.draw.rect(self.DISPLAY, blockColor, (xlev[1][-1], ylev[1][-1], 20,20))
+      levelCounter[network_.nodeLevels[i]] += 1
 
     #draw output layer squares
     if len(network_.nodeLevels) == 0:
       xl = 1
     else:
       xl = max(network_.nodeLevels) + 1
-    maxval = 0
+    
     for i in range(len(network_.neurons[2])):
-      if  network_.nodes[2][maxval].value < network_.nodes[2][i].value:
-        maxval = i
-    for i in range(len(network_.neurons[2])):
-      xlev[2].append(30*xl+1300)
+      xlev[2].append(30*xl++800+self.gridX*21+20)
       ylev[2].append(21*i)
-      if i == maxval:
-        col = (230,230,230)
-      else:
-        col = (100,100,100)
-      pg.draw.rect(self.DISPLAY, col, (xlev[2][-1], ylev[2][-1], 20,20))
+      if neuronColor[2][i] == 1: #activated
+        blockColor = (50,200,50)
+      else: #not activated
+        blockColor = (220,220,220)
+      pg.draw.rect(self.DISPLAY, blockColor, (xlev[2][-1], ylev[2][-1], 20,20))
+      self.drawText('{}:  {:0.2f}'.format(buttons[i],network_.nodes[2][i].value),(xlev[2][-1]+40,ylev[2][-1]+10),(0,0,0), True)
 
     #draw genes
     for i in range(len(network_.genes)):
@@ -756,7 +780,12 @@ class pool():
       y1 = ylev[inLayer][inID]
       x2 = xlev[outLayer][outID]
       y2 = ylev[outLayer][outID]
-      pg.draw.line(self.DISPLAY, (100,200,100), (x1+10,y1+10),(x2+10,y2+10))
+      if geneColor[i] == 1:
+        lineColor = (20,20,20)
+        pg.draw.line(self.DISPLAY, lineColor, (x1+10,y1+10),(x2+10,y2+10))
+      else:
+        lineColor = (240,240,240, 10)
+      
 
 
   ## draw genome
@@ -764,9 +793,10 @@ class pool():
     self.species.sort(key=operator.attrgetter('topFitness'), reverse=True) #sort species by fitness (highest first)
     species_ = self.species[0]
     snakeInstance = snake(False, self.gridX, self.gridY)
-    self.drawGame(snakeInstance.grid) #draw grid
+    
     self.drawNetwork(snakeInstance.gridNum2Color,species_.genomes[0].network) #draw network
     while not snakeInstance.gameover:
+      pg.draw.rect(self.DISPLAY, (255,255,255), (800, 0, 800,400)) #reset area
       species_.genomes[0].network.setInputs(snakeInstance)
       newGeneration = species_.genomes[0].network.evaluate()
       snakeInstance.aiRunStep(newGeneration)
@@ -992,7 +1022,8 @@ class pool():
       generationStartTime = time.time() #start timing this generation
       self.evaluateFitnessOfAll() #evaluate fitness of all genomes
       print(self.maxFitness)
-      self.drawBestGenome()
+      if self.generation%50 == 0:
+        self.drawBestGenome()
       self.newGeneration() #breed new generation
       self.generationTime = time.time()-generationStartTime #end generation time
       self.updateGenerationGUI() #update gui

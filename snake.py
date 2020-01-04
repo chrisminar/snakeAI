@@ -25,9 +25,10 @@ class snake():
     #scoring
     self.score = 0                           #current score
     self.score_per_food = 100                #point modification for eating food
-    self.score_per_move = -1                 #point modificaiton for moving
-    self.gameoverThreshold = -600
-
+    self.score_per_move = 0                 #point modificaiton for moving
+    self.gameoverThreshold = -self.sizeX*self.sizeY*2
+    self.moveThreshold = self.sizeX*self.sizeY*2
+    self.moves = 0
     currentstate = random.getstate()         #set random seed without ruining the other seed
     random.seed(0)
     self.randomState = random.getstate()
@@ -92,6 +93,7 @@ class snake():
 
   def aiRunStep(self, dir: str): 
     if not self.gameover:
+      self.moves+=1
       if dir == buttons[3]: #left
         self.runSingle(-1, 0)
       elif dir == buttons[1]: #right
@@ -150,6 +152,7 @@ class snake():
       self.grid[self.foodX][self.foodY] = -2
       self.score += (self.score_per_food*self.length)
       ateThisTurn = True
+      self.moves = 0
       if self.length > 398: #if snake is max length, the game has been won
         self.score+= 10000
         self.gameover = True
@@ -203,7 +206,7 @@ class snake():
 
   def check_game_over(self):
     #check if we ran into a wall
-    if (self.X < 0) or (self.X >= self.sizeX) or self.score < self.gameoverThreshold:
+    if (self.X < 0) or (self.X >= self.sizeX) or self.score < self.gameoverThreshold or self.moves > self.moveThreshold:
       return True
     elif (self.Y < 0) or (self.Y >= self.sizeY):
       return True
