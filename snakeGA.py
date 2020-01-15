@@ -3,15 +3,15 @@
   #indicators for outputs
   #way to see how each input is effecting everything
 #if a fitness is negative, delete it and replace with a new random genome
+#ideas to improve -> change the randomness
+  # add push/pull neuron/gene combinations
+  # try to add genomes where the snake died
+  # change the inital thing that pushes away from walls to be neurons
+  # change the interpreted numbers that the feed into the neural net
 
 #todo write load function
 #write funciton doesnt work
-
-#todo is score of 10000 an appropriate exit condition?
-  #consider changing the snake scoring
-#todo consider giving snake body length information
-#todo parallelize the main evaluation loop
-#rotate y axis text
+#bumper initialization donest work
 
 from typing import List,Tuple
 import typing
@@ -187,13 +187,13 @@ class network():
       for j in range(gridY):
         idx = i*gridX+j
         if snakeInstance.grid[i][j] == -1: #empty
-          self.nodes[0][idx].value = 0 #a value of 1 means a positive weight will pull it in this direction
+          self.nodes[0][idx].value = 1 #negative pulls
         elif snakeInstance.grid[i][j] > 0: #snake body
-          self.nodes[0][idx].value = 2 #a value of -1 means a positive weight will push it from this direction
+          self.nodes[0][idx].value = -1 #positive pushes
         elif snakeInstance.grid[i][j] == 0: #head
-          self.nodes[0][idx].value = 1 #1 will allow a head square to have a positive weight that pushes in the desired direction
+          self.nodes[0][idx].value = -2 #positive pushes
         else: #food
-          self.nodes[0][idx].value = -1 #2 pulls towords the food
+          self.nodes[0][idx].value = 2 #push
 
 class genome():
   def __init__(self, gx:int, gy:int):
@@ -379,40 +379,38 @@ class genome():
     #top right bot left
     for x in range(self.gridX):
       for y in range(self.gridY):
-        os = [0,0,0,0]
-        addGene = False
-        if x == 0: #left
-          addGene = True
-          os[3] = -1*(random())-1
-        else:
-          os[3] = random() + 1
-        if x == self.gridX-1: #right
-          addGene = True
-          os[1] = -1*(random())-1
-        else:
-          os[1] = random() + 1
-        if y == 0: #top
-          addGene = True
-          os[0] = -1*(random())-1
-        else:
-          os[0] = random() + 1
-        if y == self.gridY-1: #bot
-          addGene = True
-          os[2] = -1*(random())-1
-        else:
-          os[2] = random() + 1
-        #add genes
-        if addGene:
-          for i in range(4):
-            newLink = gene()
-            newLink.in_Idx = (0,y*gridX+x)
-            newLink.out_Idx = (2,i) #up
-            newLink.addedFrom = "initGenes"
-            innovation += 1
-            newLink.id = innovation
-            newLink.weight = os[i] #force negative
-            self.genes.append(newLink)
-            self.neurons[2][i].inputs.append(len(self.genes)-1)
+        os = [random() for _ in range(4)]
+
+        if x == 0: #left side
+          os[3] = -1*(random())-1 #left negative
+        elif (x == (self.gridX-1)) or (y==0) or (y==(self.gridY-1)): #right bot or top
+          os[3] = random() + 1 #left positive
+
+        if x == (self.gridX-1): #right side
+          os[1] = -1*(random())-1 #right negative
+        elif (x==0) or (y==0) or (y==(self.gridY-1)): #left bot or top
+          os[1] = random() + 1 #right positive
+
+        if y == 0: #top side
+          os[0] = -1*(random())-1 #up negative
+        elif (x == (self.gridX-1)) or (x==0) or (y==(self.gridY-1)): #right left bot
+          os[0] = random() + 1 #up positive
+
+        if y == (self.gridY-1): #bot
+          os[2] = -1*(random())-1 #bot negative
+        elif (x == (self.gridX-1)) or (x==0) or (y==0): #right left top
+          os[2] = random() + 1 #top positive
+
+        for i in range(4):
+          newLink = gene()
+          newLink.in_Idx = (0,y*gridX+x) #input node
+          newLink.out_Idx = (2,i) #output node
+          newLink.addedFrom = "initGenes"
+          innovation += 1
+          newLink.id = innovation
+          newLink.weight = os[i]
+          self.genes.append(newLink)
+          self.neurons[2][i].inputs.append(len(self.genes)-1)
     for i in range(startGenes):
       self.addGeneMutate()
     for i in range(startNeurons):
