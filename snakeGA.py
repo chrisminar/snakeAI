@@ -792,6 +792,7 @@ class pool():
     species_ = self.species[0]
     snakeInstance = snake(False, self.gridX, self.gridY)
     
+    iter = 0
     self.drawNetwork(snakeInstance.gridNum2Color,species_.genomes[0].network) #draw network
     while not snakeInstance.gameover:
       pg.draw.rect(self.DISPLAY, (255,255,255), (800, 0, 800,400)) #reset area
@@ -802,7 +803,9 @@ class pool():
       self.drawNetwork(snakeInstance.gridNum2Color,species_.genomes[0].network) #draw network
       pg.event.pump()
       pg.display.update()
-      pg.time.wait(500)
+      pygame.image.save(self.DISPLAY, "screenshot_{}_{}.jpeg". format(self.generation, iter))
+      iter += 1
+      #pg.time.wait(500)
     self.updateGenerationGUI
 
 
