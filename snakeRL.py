@@ -25,9 +25,36 @@
 #for the first 30 moves the temperature is set to 1, afterwards it is set to 0
 #
 #ARCHITECTURE
+# BLOCK
+# convolution 256 filters, 3x3 patch, stride 1
+# batch norm
+# relu
+# convolution 256 filters, 3x3 patch, stride 1
+# batch norm
+# skip connection that adds block input
+# relu
+# convolution 256 filters, 3x3 patch, stride 1
+# batch norm
+# skip connection that adds block input
+# relu
+#
+# HEAD
 # 
-# 
-# 
+# convolution 1 filter, 1x1 patch, stride 1
+# batch norm
+# relu
+# fully connceced to hidden layer size 256
+# relu
+# fully connected linear layer to scaler
+# tanh outputing a scalar in range -1 1
+#
+#
+#
+#
+#
+#
+#
+#
 # 
 #glossary
 #p: vector of move probabilities

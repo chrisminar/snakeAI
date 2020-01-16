@@ -803,7 +803,7 @@ class pool():
       self.drawNetwork(snakeInstance.gridNum2Color,species_.genomes[0].network) #draw network
       pg.event.pump()
       pg.display.update()
-      pygame.image.save(self.DISPLAY, "screenshot_{}_{}.jpeg". format(self.generation, iter))
+      pg.image.save(self.DISPLAY, "screenshot_{}_{}.jpeg". format(self.generation, iter))
       iter += 1
       #pg.time.wait(500)
     self.updateGenerationGUI
