@@ -1,8 +1,8 @@
 #steps (end of page 5)
 
 #glossary
-#p: vector of move probabilities
-#v: predictied value
+#p: vector of move probabilities (likelyhood of choosing a given move)
+#v: predictied victor of the game
 #s: board state
 #pi: mcts probabilities of playing each move
 #f_theta: neural network
@@ -63,7 +63,27 @@
   # checkpoint every 1000 steps
   # evaluation consists of 400 games
   #if checkpoint_t scores 1.2x> checkpoint_(i_best), it is the new baseline and used to generate data
-
+  #mcts
+    # store:
+      # node
+        # state
+        # Prior probability P (s,a)
+        # vist count N (s,a)
+        # action value Q(s,a)
+        # children
+        # parent
+    # selection -- starts from root and selects children nodes until a leaf is found.
+      #maximise confidence bound to traverse the tree
+      #Q(s,a) + U(s,a)
+      #U(s,a) = P(s,a)/(1+N(s,a))
+    # expansion -- make a new node from leaf using output from neural net f_theta
+    # simulation -- play out a game somehow and determine a winner
+      # P(s'), V(s') = f_theta(s') --- probability and prediction from new state with neural net f_theta
+    # backpropagation -- update the tree using the winner of simulation
+      #each node (s,a) is traversed to update:
+        #N(s,a) += 1
+        #Q(s,a) = 1/N(s,a) Sum_s'|s,a->s' V(s')
+          #s,a->s' indicates a simulation reached s' after taking move a from position s (sum the number of times this node was chosen)
 # self play
   # input to self play
     #best theta
@@ -119,7 +139,13 @@
   # iteration of a_theta_i that made the game
 #self play list
   #list of self play games
-#mcts step
+#mcts
+  # state
+  # Prior probability P (s,a)
+  # vist count N (s,a)
+  # action value Q(s,a)
+  # children
+  # parent
 
 #new move
   #direction enumerator
