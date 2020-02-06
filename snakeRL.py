@@ -105,30 +105,18 @@
 # pause/play 
 # ORDER
 
-
 # domain knowledge -- what should the ai know?
   # mcts should attempt to not go into body or wall
 
 # WORK BLOCKS
 
 # learning
-  # how to pandas
   # how to do automatic unit testing with python/git/VS
   # mcts
 
-# YOU ARE HERE. FIGURE OUT MORE SPECIFIC SIZES FOR MCST
-# FIGURE OUT THE DATA STRUCTS TO HOLD ALL OF THIS INFORMATION
-  # dataframes -- done
-  # working lists/arrays -- todo
-# WHAT IS THE PURPOSE OF 2 HEADS?
-# what is the purpose of having distinct evaluations and self play?
+# YOU ARE HERE.
 # WRITE SUDO CODE
 # WRITE SKELETAL ARCHITECHTURE
-#game state
-  # array gridX x gridY
-    # food 2
-    # empty 1
-    # body -1
 #neural net
   # 2 blocks 64 filters each
   # 1 head policy
@@ -146,41 +134,6 @@
   # action value Q(s,a)
   # children
   # parent
-
-#new move
-  #direction enumerator
-#vector of move probabilities -p
-  # 4 array with probabilities for up,right,down,left
-#vector predicted value -v
-  # 4 array with predicted value for up,right,down,left
-
-# data inputs for each step
-#neural network -- training
-  # last 20000 games of self play
-# neural network -- feedforward
-  # game state
-#mcts evaluator
-  # best neural network
-  # current neural network
-#mcts
-  # game state
-  # neural network
-#self play
-  # best neural network
-
-# data outputs for each step
-#neural network -- training
-  # newest neural network
-# neural network -- feedforward
-  # vector of move probabilities -p
-  # predicted value -v
-# mcts evaluator
-  # 400 game outputs
-  # mean score over 400 games
-# mcts
-  # new move
-# self play
-  # 2000 game outputs
 
 # data tracking -- put this in pandas datastructs
 # generation
@@ -205,6 +158,27 @@
     # 20000 training games
     # total training time
     # mean training time per mini batch
+
+
+
+# data inputs for each step
+#neural network -- training
+  # last 20000 games of self play
+#mcts evaluator
+  # best neural network
+  # current neural network
+#self play
+  # best neural network
+
+# data outputs for each step
+#neural network -- training
+  # newest neural network
+# mcts evaluator
+  # 400 game outputs
+  # mean score over 400 games
+# self play
+  # 2000 game outputs
+
   
   # dataframes:
   # 1 self play detail
@@ -247,3 +221,99 @@
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+import typing
+from typing import List,Tuple
+
+#globals
+GRID_X = 10 #x grid size of snake game
+GRID_Y = 10 #y grid size of snake game
+#number of evaluation games to play
+#number of self play games to play
+#number of self play games to train on
+
+#dataframes
+#mcts evaluator
+#network trainer
+#self play
+
+class mcts:
+  def __init__(self, state:game_state, neural_net:neural_network):
+    self.s = state
+    self.f_theta = neural_net
+    self.root = mcts_node(self.s)
+
+  def evaluate(self):
+    f_theta.evaluate(self.s)
+    return self.f_theta.out.move
+
+class mcts_node:
+  #mcts - node
+  # game state
+  # P (s,a) float[]
+  # vist count N (s,a) int
+  # action value Q(s,a) float
+  # children mctsNode[]
+  # parent mctsNode
+  def __init__(self, state, parent:mcts_node = None):
+    self.parent = parent
+    self.s = state
+    self.P = [0.0]*4
+    self.N = 0
+    self.Q = 0.0
+    self.children = []
+
+class game_state:
+  #game state
+  # array gridx x gridy int[][]
+  # food 2
+  # empty 1
+  # body -1
+  # head -2
+  def __init__(self):
+    global GRID_X
+    global GRID_Y
+    self.x = GRID_X
+    self.y = GRID_Y
+    self.grid = np.zeros((self.x,self.y))
+
+class neural_network:
+  #neural network
+    # tensorflow blocks
+    # BLOCK
+    # convolution 64 filters, 3x3 patch, stride 1
+    # batch norm
+    # relu
+    # convolution 64 filters, 3x3 patch, stride 1
+    # batch norm
+    # skip connection that adds block input
+    # relu
+    # convolution 64 filters, 3x3 patch, stride 1
+    # batch norm
+    # skip connection that adds block input
+    # relu
+    #
+    # HEAD
+    # 
+    # convolution 1 filter, 1x1 patch, stride 1
+    # batch norm
+    # relu
+    # fully connceced to hidden layer size 64
+    # relu
+    # fully connected linear layer to scaler
+    # tanh outputing a scalar in range -1 1
+  def __init__(self):
+    self.out = nn_out()
+
+class nn_out:
+  #new move
+    #direction enumerator
+
+  #vector of move probabilities -p
+    # 4 array with probabilities for up,right,down,left
+
+  #vector predicted value -v
+    # 4 array with predicted score for up,right,down,left
+  def __init__(self):
+    self.move = '' #direction the neural net thinks the snake should move
+    self.P = ['']*4 #move probabilities for each of the 4 directions
+    self.V = 0 #predicted score of the game
