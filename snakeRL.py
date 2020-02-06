@@ -179,44 +179,9 @@
 # self play
   # 2000 game outputs
 
-  
-  # dataframes:
-  # 1 self play detail
-    # columns: time(float),score(int)
-    # index1: generation(list[0-?])
-    # index2: games(list[0-1999])
-  # 2 self play broad
-    # columns: mean score(float), time(float)
-    # index: generation(list[0-?])
-  # 3 evaluator detailed
-    # columns: 
-      # time of game(float)
-      # score of game(int)
-      # #moves(int)
-      # total time for mcts tree generation(float)
-      # total time for ffnn(float)
-      # mean time for mcts tree generation (float)
-      # mean time for ffnn (float)
-    # index:
-      #1: generation(list[0-?])
-      #2: games(list[0-399])
-  # 4 evaluator broad
-    #columns:
-      #mean score(float)
-      #generation time (float)
-    #index generation(list[0-?])
-  #5 training
-    #columns: 
-      # generation time (float)
-      # # minibatches(int)
-      # mean training time per mini batch(float)
-    #index:
-      #generation(list[0-?])
-
-
-
-
-
+#bonus stuff to do
+  #handle the incorrect data type being passed into dataframes
+  #how to manage git from visual studio
 
 import pandas as pd
 import numpy as np
@@ -225,13 +190,45 @@ import typing
 from typing import List,Tuple
 
 #globals
-GRID_X = 10 #x grid size of snake game
-GRID_Y = 10 #y grid size of snake game
-#number of evaluation games to play
-#number of self play games to play
-#number of self play games to train on
+GRID_X = 10                # x grid size of snake game
+GRID_Y = 10                # y grid size of snake game
+NUM_EVALUATION_GAMES = 400 # number of evaluation games to play
+NUM_SELF_PLAY_GAMES = 400  # number of self play games to play
+NUM_TRAINING_GAMES = 20000 # number of self play games to train on
 
-#dataframes
+class dataTrack:
+  def __init__(self):
+    self.self_play_detail_column_names = ['time', 'score',      'generation', 'game_id']
+    self.self_play_broad_column_names  = ['time', 'mean score']
+    self.evaluator_detail_column_names = ['time', 'score',      'generation', 'game_id', 'game_length', 'mcts_tree_total_time', 'mcts_nn_total_time', 'mcts_tree_mean_time', 'mcts_nn_mean_time']
+    self.evaluator_broad_column_names  = ['time', 'mean_score']
+    self.training_column_names         = ['time', 'num_minibatch', 'mean_time_per_minibatch']
+    self.self_play_detail = pd.DataFrame(columns=self.self_play_detail_column_names) #index is #
+    self.self_play_broad  = pd.DataFrame(columns=self.self_play_broad_column_names) #index is generation #
+    self.evaluator_detail = pd.DataFrame(columns=self.evaluator_detail_column_names) #index is #
+    self.evaluator_broad  = pd.DataFrame(columns=self.evaluator_broad_column_names) #index is #
+    self.training         = pd.DataFrame(columns=self.training_column_names) #index is generation #
+
+  def appendSelfPlayDetail(self, time:float, score:int, generation:int, game_id:int):
+    current_index = len(self.self_play_detail.index.values)
+    self.self_play_detail.loc[current_index] = [time, score, generation, game_id]
+
+  def appendSelfPlayBroad(self, time:float, mean_score:int):
+    current_index = len(self.self_play_broad.index.values)
+    self.self_play_broad.loc[current_index] = [time, mean_score]
+
+  def appendEvaluatorDetail(self, time:float, score:int, generation:int, game_id:int, game_length:int, mcts_tree_total_time:float, mcts_nn_total_time:float, mcts_tree_mean_time:float, mcts_nn_mean_time:float):
+    current_index = len(self.evaluator_detail.index.values)
+    self.evaluator_detail.loc[current_index] = [time, score, generation, game_id, game_length, mcts_tree_total_time, mcts_nn_total_time, mcts_tree_mean_time, mcts_nn_mean_time]
+
+  def appendEvaluatorBroad(self, time:float, score:int):
+    current_index = len(self.evaluator_broad.index.values)
+    self.evaluator_broad.loc[current_index] = [time, score]
+
+  def appendTraining(self, time:float, num_minibatch:int, mean_time_per_minibatch:float):
+    current_index = len(self.training.index.values)
+    self.training.loc[current_index] = [time, num_minibatch, mean_time_per_minibatch]
+
 #mcts evaluator
 #network trainer
 #self play
