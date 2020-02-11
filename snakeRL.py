@@ -233,32 +233,6 @@ class dataTrack:
 #network trainer
 #self play
 
-class mcts:
-  def __init__(self, state:game_state, neural_net:neural_network):
-    self.s = state
-    self.f_theta = neural_net
-    self.root = mcts_node(self.s)
-
-  def evaluate(self):
-    f_theta.evaluate(self.s)
-    return self.f_theta.out.move
-
-class mcts_node:
-  #mcts - node
-  # game state
-  # P (s,a) float[]
-  # vist count N (s,a) int
-  # action value Q(s,a) float
-  # children mctsNode[]
-  # parent mctsNode
-  def __init__(self, state, parent:mcts_node = None):
-    self.parent = parent
-    self.s = state
-    self.P = [0.0]*4
-    self.N = 0
-    self.Q = 0.0
-    self.children = []
-
 class game_state:
   #game state
   # array gridx x gridy int[][]
@@ -300,6 +274,32 @@ class neural_network:
     # tanh outputing a scalar in range -1 1
   def __init__(self):
     self.out = nn_out()
+
+class mcts:
+  def __init__(self, state:game_state, neural_net:neural_network):
+    self.s = state
+    self.f_theta = neural_net
+    self.root = mcts_node(self.s)
+
+  def evaluate(self):
+    f_theta.evaluate(self.s)
+    return self.f_theta.out.move
+
+class mcts_node:
+  #mcts - node
+  # game state
+  # P (s,a) float[]
+  # vist count N (s,a) int
+  # action value Q(s,a) float
+  # children mctsNode[]
+  # parent mctsNode
+  def __init__(self, state, parent = None):
+    self.parent = parent
+    self.s = state
+    self.P = [0.0]*4
+    self.N = 0
+    self.Q = 0.0
+    self.children = []
 
 class nn_out:
   #new move
