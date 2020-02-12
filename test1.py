@@ -1,5 +1,8 @@
 import unittest
 import snakeRL
+from mcts import mcts
+from mcts import mcts_node
+from dataTrack import dataTrack
 
 class Test_test1(unittest.TestCase):
   def test_addData_To_Dataframe(self):

@@ -91,13 +91,6 @@
     #25000 games
     #for the first 30 moves the temperature is set to 1, afterwards it is set to 0
 
-# generic architecture
-  # parallelism handeled here
-  # data storage
-    # check point performance
-    # best check point
-    # most recent x games
-
 # do network pruning
 # automated unit testing
 # track/understand what the neural network is doing
@@ -108,15 +101,15 @@
 # domain knowledge -- what should the ai know?
   # mcts should attempt to not go into body or wall
 
-# WORK BLOCKS
+# WORK BLOCKS YOU ARE HERE.
+  #move classes into different files
+# WRITE SUDO CODE for functions
+  #self play
+  #training
+  #evaluator
+#implement neural network in tensorflow
+#figureout how mcts works
 
-# learning
-  # how to do automatic unit testing with python/git/VS
-  # mcts
-
-# YOU ARE HERE.
-# WRITE SUDO CODE
-# WRITE SKELETAL ARCHITECHTURE
 #neural net
   # 2 blocks 64 filters each
   # 1 head policy
@@ -159,26 +152,6 @@
     # total training time
     # mean training time per mini batch
 
-
-
-# data inputs for each step
-#neural network -- training
-  # last 20000 games of self play
-#mcts evaluator
-  # best neural network
-  # current neural network
-#self play
-  # best neural network
-
-# data outputs for each step
-#neural network -- training
-  # newest neural network
-# mcts evaluator
-  # 400 game outputs
-  # mean score over 400 games
-# self play
-  # 2000 game outputs
-
 #bonus stuff to do
   #handle the incorrect data type being passed into dataframes
   #how to manage git from visual studio
@@ -188,6 +161,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 import typing
 from typing import List,Tuple
+from dataTrack import dataTrack
+from mcts import mcts
+from mcts import mcts_node
+from neuralNet import neural_network
+from neuralNet import nn_out
+from game_state import game_state
 
 #globals
 GRID_X = 10                # x grid size of snake game
@@ -196,121 +175,65 @@ NUM_EVALUATION_GAMES = 400 # number of evaluation games to play
 NUM_SELF_PLAY_GAMES = 400  # number of self play games to play
 NUM_TRAINING_GAMES = 20000 # number of self play games to train on
 
-class dataTrack:
+class snakeRL():
   def __init__(self):
-    self.self_play_detail_column_names = ['time', 'score',      'generation', 'game_id']
-    self.self_play_broad_column_names  = ['time', 'mean score']
-    self.evaluator_detail_column_names = ['time', 'score',      'generation', 'game_id', 'game_length', 'mcts_tree_total_time', 'mcts_nn_total_time', 'mcts_tree_mean_time', 'mcts_nn_mean_time']
-    self.evaluator_broad_column_names  = ['time', 'mean_score']
-    self.training_column_names         = ['time', 'num_minibatch', 'mean_time_per_minibatch']
-    self.self_play_detail = pd.DataFrame(columns=self.self_play_detail_column_names) #index is #
-    self.self_play_broad  = pd.DataFrame(columns=self.self_play_broad_column_names) #index is generation #
-    self.evaluator_detail = pd.DataFrame(columns=self.evaluator_detail_column_names) #index is #
-    self.evaluator_broad  = pd.DataFrame(columns=self.evaluator_broad_column_names) #index is #
-    self.training         = pd.DataFrame(columns=self.training_column_names) #index is generation #
+    self.tracker = dataTrack()
+    self.gameList = []
+    self.nnList = []
+    pass
 
-  def appendSelfPlayDetail(self, time:float, score:int, generation:int, game_id:int):
-    current_index = len(self.self_play_detail.index.values)
-    self.self_play_detail.loc[current_index] = [time, score, generation, game_id]
 
-  def appendSelfPlayBroad(self, time:float, mean_score:int):
-    current_index = len(self.self_play_broad.index.values)
-    self.self_play_broad.loc[current_index] = [time, mean_score]
+  def train(self):
+    while 1:
+      self.selfPlay()
+      self.networkTrainer()
+      self.mcts_evaluator()
 
-  def appendEvaluatorDetail(self, time:float, score:int, generation:int, game_id:int, game_length:int, mcts_tree_total_time:float, mcts_nn_total_time:float, mcts_tree_mean_time:float, mcts_nn_mean_time:float):
-    current_index = len(self.evaluator_detail.index.values)
-    self.evaluator_detail.loc[current_index] = [time, score, generation, game_id, game_length, mcts_tree_total_time, mcts_nn_total_time, mcts_tree_mean_time, mcts_nn_mean_time]
+  #operates on:
+    #best neural network
+  #outputs:
+    #2000 game outputs
+  def selfPlay(self):
+    pass
 
-  def appendEvaluatorBroad(self, time:float, score:int):
-    current_index = len(self.evaluator_broad.index.values)
-    self.evaluator_broad.loc[current_index] = [time, score]
+  #operates on:
+    # last 20000 games of self play
+  #outputs:
+    #new neural network
+  def networkTrainer(self):
+    pass
 
-  def appendTraining(self, time:float, num_minibatch:int, mean_time_per_minibatch:float):
-    current_index = len(self.training.index.values)
-    self.training.loc[current_index] = [time, num_minibatch, mean_time_per_minibatch]
+   #operates on: 
+    #best neural network
+    #current neural network
+  #outputs:
+    #400 games (with gamestate)
+    #mean score of 400 games
+  def mcts_evaluator(self):
+    pass
 
-#mcts evaluator
-#network trainer
-#self play
+#########################
+## self play functions ##
+#########################
+#loop 
+  #run game
+  #add game to local list
+#add/kickout games to masterlist
+#reorganize gamestate data into nn format
+  #game_state to array input
+  #output
+#add statistics
 
-class game_state:
-  #game state
-  # array gridx x gridy int[][]
-  # food 2
-  # empty 1
-  # body -1
-  # head -2
-  def __init__(self):
-    global GRID_X
-    global GRID_Y
-    self.x = GRID_X
-    self.y = GRID_Y
-    self.grid = np.zeros((self.x,self.y))
+#######################
+## network functions ##
+#######################
+#load checkpoint
+#train network
+#save checkpoint
+#add nn to nn list
+#add statistics
 
-class neural_network:
-  #neural network
-    # tensorflow blocks
-    # BLOCK
-    # convolution 64 filters, 3x3 patch, stride 1
-    # batch norm
-    # relu
-    # convolution 64 filters, 3x3 patch, stride 1
-    # batch norm
-    # skip connection that adds block input
-    # relu
-    # convolution 64 filters, 3x3 patch, stride 1
-    # batch norm
-    # skip connection that adds block input
-    # relu
-    #
-    # HEAD
-    # 
-    # convolution 1 filter, 1x1 patch, stride 1
-    # batch norm
-    # relu
-    # fully connceced to hidden layer size 64
-    # relu
-    # fully connected linear layer to scaler
-    # tanh outputing a scalar in range -1 1
-  def __init__(self):
-    self.out = nn_out()
-
-class mcts:
-  def __init__(self, state:game_state, neural_net:neural_network):
-    self.s = state
-    self.f_theta = neural_net
-    self.root = mcts_node(self.s)
-
-  def evaluate(self):
-    f_theta.evaluate(self.s)
-    return self.f_theta.out.move
-
-class mcts_node:
-  #mcts - node
-  # game state
-  # P (s,a) float[]
-  # vist count N (s,a) int
-  # action value Q(s,a) float
-  # children mctsNode[]
-  # parent mctsNode
-  def __init__(self, state, parent = None):
-    self.parent = parent
-    self.s = state
-    self.P = [0.0]*4
-    self.N = 0
-    self.Q = 0.0
-    self.children = []
-
-class nn_out:
-  #new move
-    #direction enumerator
-
-  #vector of move probabilities -p
-    # 4 array with probabilities for up,right,down,left
-
-  #vector predicted value -v
-    # 4 array with predicted score for up,right,down,left
-  def __init__(self):
-    self.move = '' #direction the neural net thinks the snake should move
-    self.P = ['']*4 #move probabilities for each of the 4 directions
-    self.V = 0 #predicted score of the game
+####################
+## mcts evaluator ##
+####################
+#add statistics
