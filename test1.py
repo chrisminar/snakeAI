@@ -3,6 +3,8 @@ import snakeRL
 from mcts import mcts
 from mcts import mcts_node
 from dataTrack import dataTrack
+from neuralNet import neural_network
+import pandas as pd
 
 class Test_test1(unittest.TestCase):
   def test_addData_To_Dataframe(self):
@@ -52,6 +54,9 @@ class Test_test1(unittest.TestCase):
     err = dt.training_column_names
     for v, col in zip(val, err):
       self.assertEqual(dt.training.loc[0][col] , v, "failed to set {} for training dataframe".format(col))
+
+  def testNN(self):
+    nn=neural_network()
 
 if __name__ == '__main__':
   unittest.main()
