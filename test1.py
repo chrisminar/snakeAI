@@ -5,6 +5,7 @@ from mcts import mcts_node
 from dataTrack import dataTrack
 from neuralNet import neural_network
 import pandas as pd
+from tensorflow import keras
 
 class Test_test1(unittest.TestCase):
   def test_addData_To_Dataframe(self):
@@ -57,6 +58,7 @@ class Test_test1(unittest.TestCase):
 
   def testNN(self):
     nn=neural_network()
+    print(nn.model.summary())
 
 if __name__ == '__main__':
   unittest.main()
