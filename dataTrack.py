@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class dataTrack:
   def __init__(self):
     self.self_play_detail_column_names = ['time', 'score',      'generation', 'game_id']

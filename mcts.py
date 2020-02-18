@@ -1,6 +1,7 @@
 from neuralNet import neural_network
 from game_state import game_state
 
+
 class mcts:
   def __init__(self, state:game_state, neural_net:neural_network):
     self.s = state

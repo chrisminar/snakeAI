@@ -1,5 +1,6 @@
-
 import numpy as np
+from globalVar import globe
+
 
 class game_state:
   #game state
@@ -9,8 +10,6 @@ class game_state:
   # body -1
   # head -2
   def __init__(self):
-    global GRID_X
-    global GRID_Y
-    self.x = GRID_X
-    self.y = GRID_Y
+    self.x = globe.GRID_X
+    self.y = globe.GRID_Y
     self.grid = np.zeros((self.x,self.y))
