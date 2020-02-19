@@ -67,9 +67,9 @@ class neural_network:
     l1 = layers.Conv2D( 2, 1, padding = 'same', use_bias = False,        name = 'policyhead_conv' )( input )
     l2 = layers.BatchNormalization( axis = 1, momentum = globe.MOMENTUM, name = 'policyhead_batch_norm' )( l1 )
     l3 = layers.Activation( 'relu',                                      name = 'policyhead_activation' )( l2 )
-    l4 = layers.Dense( 4,                                                name = 'policy' )( l3 )
-    #YOU ARE HERE, the dense layer doesn't output the expected size
-    return l4
+    l4 = layers.GlobalAveragePooling2D(                                  name = 'policyhead_pool')(l3)
+    l5 = layers.Dense( 4,  activation = 'relu',                          name = 'policy' )( l4 )
+    return l5
 
   # valueHEAD
   # convolution 2 filter, 1x1 patch, stride 1
@@ -83,12 +83,11 @@ class neural_network:
     l1 = layers.Conv2D( 2, 1, padding = 'same', use_bias = False,        name = 'valuehead_conv' )( input )
     l2 = layers.BatchNormalization( axis = 1, momentum = globe.MOMENTUM, name = 'valuehead_batch_norm' )( l1 )
     l3 = layers.Activation( 'relu',                                      name = 'valuehead_activation' )( l2 )
-    l4 = layers.Dense( 64,                                               name = 'valuehead_dense')( l3 )
-    l5 = layers.Activation( 'relu',                                      name = 'valuehead_activation2' )( l4 )
-    l6 = layers.Dense( 1,                                                name = 'valuehead_dense2' )( l5 )
-    l7 = layers.Activation( 'relu',                                      name = 'value' )( l6 )
+    l4 = layers.GlobalAveragePooling2D(                                  name = 'valuehead_pool')(l3)
+    l5 = layers.Dense( 64, activation = 'relu',                          name = 'valuehead_dense')( l4 )
+    l6 = layers.Dense( 1, activation = 'relu',                           name = 'value' )( l5 )
 
-    return l7
+    return l6
 
   def dispModel(self):
     print( self.model.summary() )
