@@ -1,6 +1,9 @@
+#todo convert gamestates to training
+  #figure out what the training input format needs to be
 import numpy as np
 from globalVar import globe
 import snake
+from neuralNet import neural_network
 
 class game_state:
   #game state
@@ -16,7 +19,7 @@ class game_state:
 
 
 class game:
-  def __init__(self):
+  def __init__(self, nn:neural_network):
     self.snakeInstance = snake.snake(False, globe.GRID_X,globe.GRID_Y)
     pass
 

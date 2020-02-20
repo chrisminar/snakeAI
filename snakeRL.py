@@ -68,10 +68,13 @@
 # domain knowledge -- what should the ai know?
   # mcts should attempt to not go into body or wall
 
-# WORK BLOCKS YOU ARE HERE.
+# WORK BLOCKS
 # WRITE SUDO CODE for functions
-  #self play
-  #training
+  #training #you are here
+    #figure out what you want the output from self play to be, eg it can be nn input, nn output, but then its hard to track game id? #pandas???
+    #write function to kick out old games from the gamelist
+    #write function to convert your gamelist into nn training data
+    #train nn
   #evaluator
 # add data tracking
 #figureout how mcts works
@@ -126,6 +129,7 @@ from neuralNet import neural_network
 from neuralNet import nn_out
 from game_state import game_state
 from globalVar import globe
+from selfPlayClass import selfPlayClass
 
 
 class snakeRL():
@@ -137,20 +141,22 @@ class snakeRL():
 
 
   def train(self):
+    generation = 0
     while 1:
-      self.selfPlay()
+      self.selfPlay(generation)
+      #todo, need a function that kicks out the lowest scored games from the game list
       self.networkTrainer()
       self.mcts_evaluator()
+      generation += 1
 
   #operates on:
     #best neural network
   #outputs:
     #2000 game outputs
-  def selfPlay(self):
-    gamelist = []
-    for i in range(globe.NUM_TRAINING_GAMES):
-      gamelist.append(playgame())
-
+  def selfPlay(self, nn:neural_network, generation:int):
+    spc = selfPlayClass(nn)
+    spc.playGames(generation)
+    self.gameList += spc.gamelist
 
   #operates on:
     # last 20000 games of self play
