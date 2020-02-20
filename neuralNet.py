@@ -93,8 +93,11 @@ class neural_network:
     print( self.model.summary() )
     keras.utils.plot_model( self.model, show_shapes = True )
 
+  def save(self,generation,checkpoint):
+    self.model.save('generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
 
-    
+  def load(self,generation,checkpoint):
+    self.model = keras.models.load_model('generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
 
 
 class nn_out:

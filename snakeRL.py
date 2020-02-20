@@ -1,5 +1,3 @@
-#steps (end of page 5)
-
 #glossary
 #p: vector of move probabilities (likelyhood of choosing a given move)
 #v: predictied victor of the game
@@ -16,30 +14,6 @@
   # do something with computational power vs performance
 
 # neural network trainer -- update neural network parameters theta_i -using recent self play data
-  # neural network
-    # tensorflow blocks
-    # BLOCK
-    # convolution 64 filters, 3x3 patch, stride 1
-    # batch norm
-    # relu
-    # convolution 64 filters, 3x3 patch, stride 1
-    # batch norm
-    # skip connection that adds block input
-    # relu
-    # convolution 64 filters, 3x3 patch, stride 1
-    # batch norm
-    # skip connection that adds block input
-    # relu
-    #
-    # HEAD
-    # 
-    # convolution 1 filter, 1x1 patch, stride 1
-    # batch norm
-    # relu
-    # fully connceced to hidden layer size 64
-    # relu
-    # fully connected linear layer to scaler
-    # tanh outputing a scalar in range -1 1
   # using the last x games, train the network
     #how do positive and negative examples work?
     #outputs of neural network?
@@ -47,8 +21,6 @@
   #neural network (p,v) = f_theta(s) is adjusted to minimse the error between the predicted value v and the self play winner z, and to maximise the similarities between p and pi.
   #loss function l=(z-v)^2-pi^T log(p)+c||theta||^2
   #c = constant = 1e-4
-  #stocastic gradient descent with momentum and learning rate annealing
-  #momentum = 0.9
 
 # mcts evaluator -- alpha go players a_theta_i are evaluated and best performing generates new self play data
   # game terminates when staleness threshold is passed, or when score exceeds a certain length
@@ -85,10 +57,6 @@
         #Q(s,a) = 1/N(s,a) Sum_s'|s,a->s' V(s')
           #s,a->s' indicates a simulation reached s' after taking move a from position s (sum the number of times this node was chosen)
 # self play
-  # input to self play
-    #best theta
-  # output of self play
-    #25000 games
     #for the first 30 moves the temperature is set to 1, afterwards it is set to 0
 
 # do network pruning
@@ -96,24 +64,18 @@
 # track/understand what the neural network is doing
 # gui
 # pause/play 
-# ORDER
 
 # domain knowledge -- what should the ai know?
   # mcts should attempt to not go into body or wall
 
 # WORK BLOCKS YOU ARE HERE.
-  #move classes into different files
 # WRITE SUDO CODE for functions
   #self play
   #training
   #evaluator
-#implement neural network in tensorflow
+# add data tracking
 #figureout how mcts works
 
-#neural net
-  # 2 blocks 64 filters each
-  # 1 head policy
-  # 1 head value
 #self play game
   # game state for each turn
   # end score
@@ -152,10 +114,6 @@
     # total training time
     # mean training time per mini batch
 
-#bonus stuff to do
-  #handle the incorrect data type being passed into dataframes
-  #how to manage git from visual studio
-
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -167,6 +125,7 @@ from mcts import mcts_node
 from neuralNet import neural_network
 from neuralNet import nn_out
 from game_state import game_state
+from globalVar import globe
 
 
 class snakeRL():
@@ -188,7 +147,10 @@ class snakeRL():
   #outputs:
     #2000 game outputs
   def selfPlay(self):
-    pass
+    gamelist = []
+    for i in range(globe.NUM_TRAINING_GAMES):
+      gamelist.append(playgame())
+
 
   #operates on:
     # last 20000 games of self play
@@ -205,18 +167,6 @@ class snakeRL():
     #mean score of 400 games
   def mcts_evaluator(self):
     pass
-
-#########################
-## self play functions ##
-#########################
-#loop 
-  #run game
-  #add game to local list
-#add/kickout games to masterlist
-#reorganize gamestate data into nn format
-  #game_state to array input
-  #output
-#add statistics
 
 #######################
 ## network functions ##

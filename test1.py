@@ -6,7 +6,8 @@ from dataTrack import dataTrack
 from neuralNet import neural_network
 import pandas as pd
 from tensorflow import keras
-
+import timer
+import time
 
 class Test_test1(unittest.TestCase):
   def test_addData_To_Dataframe(self):
@@ -14,8 +15,8 @@ class Test_test1(unittest.TestCase):
 
     #test self play detail
     l1 = len(dt.self_play_detail.index.values)
-    val = [0.0, 1, 2, 3]
-    dt.appendSelfPlayDetail(val[0], val[1], val[2], val[3])
+    val = [0.0, 1, 2]
+    dt.appendSelfPlayDetail(val[0], val[1], 0, val[2])
     self.assertGreater(len(dt.self_play_detail.index.values) , l1, "failed to add new row to self play detail dataframe")
     err = dt.self_play_detail_column_names
     for v, col in zip(val, err):
@@ -23,7 +24,7 @@ class Test_test1(unittest.TestCase):
 
     #test self play broad
     l1 = len(dt.self_play_broad.index.values)
-    val = [0.0, 1]
+    val = [0.0, 1.0]
     dt.appendSelfPlayBroad(val[0], val[1])
     self.assertGreater(len(dt.self_play_broad.index.values) , l1, "failed to add new row to self play broad dataframe")
     err = dt.self_play_broad_column_names
@@ -32,8 +33,8 @@ class Test_test1(unittest.TestCase):
 
     #test evaluator detail
     l1 = len(dt.evaluator_detail.index.values)
-    val = [0.0, 1, 2, 3, 4, 5.0, 6.0, 7.0, 8.0]
-    dt.appendEvaluatorDetail(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8])
+    val = [0.0, 1, 3, 4, 5.0, 6.0, 7.0, 8.0]
+    dt.appendEvaluatorDetail(val[0], val[1], 0, val[2], val[3], val[4], val[5], val[6], val[7])
     self.assertGreater(len(dt.evaluator_detail.index.values) , l1, "failed to add new row to evaluator detail dataframe")
     err = dt.evaluator_detail_column_names
     for v, col in zip(val, err):
@@ -41,7 +42,7 @@ class Test_test1(unittest.TestCase):
 
     # test evaluator broad
     l1 = len(dt.evaluator_broad.index.values)
-    val = [0.0, 1]
+    val = [0.0, 1.0]
     dt.appendEvaluatorBroad(val[0], val[1])
     self.assertGreater(len(dt.evaluator_broad.index.values) , l1, "failed to add new row to evaluator broad dataframe")
     err = dt.evaluator_broad_column_names
@@ -60,6 +61,11 @@ class Test_test1(unittest.TestCase):
   def testNN(self):
     nn=neural_network()
     print(nn.model.summary())
+
+  def testTimer(self):
+    with timer.Timer() as t:
+      time.sleep(2)
+    print(t.secs)
 
 if __name__ == '__main__':
   unittest.main()
