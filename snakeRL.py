@@ -69,23 +69,34 @@
   # mcts should attempt to not go into body or wall
 
 # WORK BLOCKS
-# WRITE SUDO CODE for functions
-  #training #you are here
-    #figure out what you want the output from self play to be, eg it can be nn input, nn output, but then its hard to track game id? #pandas???
-    #write function to kick out old games from the gamelist
-    #write function to convert your gamelist into nn training data
-    #train nn
+# WRITE CODE
+  # training #YOU ARE HERE
+    # upgrade snake
+      #base class
+        #human game class
+        #ga class
+        #RL class
+          #make rl class save all gamestates
+    # write function to concatenate output from all games
+    # write function to kick out old games from the gamelist
+      #something like:
+        #last = gameid.max()
+        #idx = np.argwhere(gameid>(last-20000))
+        #scores = scores(idx)
+        #states = states(idx)
+    #STOP, TEST THESE FUNCTIONS
+    # train nn
   #evaluator
 # add data tracking
-#figureout how mcts works
+# figureout how mcts works
 
-#self play game
+# self play game
   # game state for each turn
   # end score
   # iteration of a_theta_i that made the game
-#self play list
-  #list of self play games
-#mcts
+# self play list
+  # list of self play games
+# mcts
   # state
   # Prior probability P (s,a)
   # vist count N (s,a)

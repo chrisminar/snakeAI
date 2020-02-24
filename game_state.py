@@ -21,10 +21,24 @@ class game_state:
 class game:
   def __init__(self, nn:neural_network):
     self.snakeInstance = snake.snake(False, globe.GRID_X,globe.GRID_Y)
-    pass
+    self.gamestate_to_nn = np.vectorize(game.grid_val_to_nn)
+    return
 
-  def gamestate_to_nn(game_state:game_state):
-    pass
+  def grid_val_to_nn(input):
+    if input == -1:
+      out = 1
+    elif input >0:
+      out = -1
+    elif input == 0:
+      out = -2
+    else:
+      out = 2
+
+  def concatenate_game_output(self, snakeInstance:snake):
+    game_states = np.stack( snakeInstance.states ) #todo need to have a list of game states
+    scores = np.full( ( game_states.shape[0], ), snakeInstance.score )
+    return [self.gamestate_to_nn(game_states), scores]
 
   def playgame(self):
-    pass
+    self.snakeInstance.play()
+    return concatenate_game_output(self.snakeInstance)
