@@ -6,7 +6,8 @@ import pygame as pg
 class snakeRL(snake):
   def __init__(self, *args, **kwargs):
     super(snakeRL, self).__init__(*args, **kwargs)
-    self.foodX,self.foodY = self.spawn_food()
+    self.nn = kwargs['nn']
+    self.foodX, self.foodY = self.spawn_food()
     self.grid[self.foodX][self.foodY] = -2   #set food on grid
     self.stateList = []
 

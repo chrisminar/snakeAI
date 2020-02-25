@@ -70,19 +70,13 @@
 
 # WORK BLOCKS
 # WRITE CODE
-  # training #YOU ARE HERE
-    # write function to concatenate output from all games
-    # write function to kick out old games from the gamelist
-      #something like:
-        #last = gameid.max()
-        #idx = np.argwhere(gameid>(last-20000))
-        #scores = scores(idx)
-        #states = states(idx)
-    #STOP, TEST THESE FUNCTIONS
-    # train nn
+  # you are behind on unit tests, tool
+  # training 
+    # train nn #YOU ARE HERE
   #evaluator
 # add data tracking
 # figureout how mcts works
+  #implement mcts
 
 # self play game
   # game state for each turn
@@ -136,12 +130,14 @@ from game_state import game_state
 from globalVar import globe
 from selfPlayClass import selfPlayClass
 
-
 class snakeRL():
   def __init__(self):
     self.tracker = dataTrack()
-    self.gameList = []
+    self.gameStates = np.zeros((0,globe.GRID_X,globe.GRID_Y))
+    self.gameScores = np.zeros((0,1))
+    self.gameIDs = np.zeros((0,1))
     self.nnList = []
+    self.gameID = 0
     pass
 
 
@@ -149,7 +145,7 @@ class snakeRL():
     generation = 0
     while 1:
       self.selfPlay(generation)
-      #todo, need a function that kicks out the lowest scored games from the game list
+      self.trimGameList()
       self.networkTrainer()
       self.mcts_evaluator()
       generation += 1
@@ -160,8 +156,10 @@ class snakeRL():
     #2000 game outputs
   def selfPlay(self, nn:neural_network, generation:int):
     spc = selfPlayClass(nn)
-    spc.playGames(generation)
-    self.gameList += spc.gamelist
+    states, scores, ids = spc.playGames(generation, self.gameID)
+    self.gameStates = np.concatenate(self.gameStates,states)
+    self.gameScores = np.concatenate(self.gameScores,scores)
+    self.gameIDs = np.concatenate(self.gameIDs,ids)
 
   #operates on:
     # last 20000 games of self play
@@ -178,6 +176,16 @@ class snakeRL():
     #mean score of 400 games
   def mcts_evaluator(self):
     pass
+
+  def trimGameList(self):
+    minId = np.min(self.gameIDs)
+    maxID = np.max(self.gameIDs)
+    if maxID - minId > globe.NUM_TRAINING_GAMES:
+      validIdx = np.argwhere(self.gameIDs > maxID - globe.NUM_TRAINING_GAMES)
+      self.gameIDs = self.gameIDs[validIdx]
+      self.gameScores = self.gameScores[validIdx]
+      self.gameStates = self.gameStates[validIdx,:,:]
+    return
 
 #######################
 ## network functions ##
