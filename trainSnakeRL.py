@@ -60,7 +60,6 @@
     #for the first 30 moves the temperature is set to 1, afterwards it is set to 0
 
 # do network pruning
-# automated unit testing
 # track/understand what the neural network is doing
 # gui
 # pause/play 
@@ -69,14 +68,12 @@
   # mcts should attempt to not go into body or wall
 
 # WORK BLOCKS
-# WRITE CODE
-  # you are behind on unit tests, tool
-  # training 
-    # train nn #YOU ARE HERE
-  #evaluator
-# add data tracking
-# figureout how mcts works
-  #implement mcts
+# ON DECK
+  # UNIT TEST
+  # add predictions to tracked data fron snakeRL
+  # MCTS
+    # make autoplay loop in snakerl
+  # EVALUATOR
 
 # self play game
   # game state for each turn
@@ -128,7 +125,9 @@ from neuralNet import neural_network
 from neuralNet import nn_out
 from game_state import game_state
 from globalVar import globe
+
 from selfPlayClass import selfPlayClass
+from trainer import trainerClass
 
 class snakeRL():
   def __init__(self):
@@ -145,8 +144,7 @@ class snakeRL():
     generation = 0
     while 1:
       self.selfPlay(generation)
-      self.trimGameList()
-      self.networkTrainer()
+      self.networkTrainer(generation)
       self.mcts_evaluator()
       generation += 1
 
@@ -155,17 +153,18 @@ class snakeRL():
   #outputs:
     #2000 game outputs
   def selfPlay(self, nn:neural_network, generation:int):
-    spc = selfPlayClass(nn)
+    spc = selfPlayClass(self.tracker, nn)
     states, scores, ids = spc.playGames(generation, self.gameID)
-    self.gameStates = np.concatenate(self.gameStates,states)
-    self.gameScores = np.concatenate(self.gameScores,scores)
-    self.gameIDs = np.concatenate(self.gameIDs,ids)
+    self.addGamesToList(states, scores, ids)
+    self.trimGameList()
 
   #operates on:
     # last 20000 games of self play
   #outputs:
     #new neural network
-  def networkTrainer(self):
+  def networkTrainer(self, generation:int):
+    trn = trainerClass(self.tracker)
+    trn.train(generation, self.nnList[-1], self.gameStates, self.gameScores)
     pass
 
    #operates on: 
@@ -176,6 +175,11 @@ class snakeRL():
     #mean score of 400 games
   def mcts_evaluator(self):
     pass
+
+  def addGamesToList(self, states, scores, ids):
+    self.gameStates = np.concatenate(self.gameStates, states)
+    self.gameScores = np.concatenate(self.gameScores, scores)
+    self.gameIDs = np.concatenate(self.gameIDs, ids)
 
   def trimGameList(self):
     minId = np.min(self.gameIDs)

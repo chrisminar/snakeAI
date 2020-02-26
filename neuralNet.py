@@ -3,7 +3,6 @@ from tensorflow import keras
 from tensorflow.python.keras import layers
 from globalVar import globe
 
-
 class neural_network:
   def __init__(self):
     self.checkPointID = 0
@@ -23,6 +22,31 @@ class neural_network:
     vblock = self.valueHead(block2)
 
     self.model = block_model = keras.Model(inputs=block_input, outputs=[pblock,vblock])
+    self.compile()
+
+  def step_decay_schedule(initial_lr=1e-3, decay_factor=0.75, step_size=10):
+    '''
+    Wrapper function to create a LearningRateScheduler with step decay schedule.
+    '''
+    def schedule(epoch):
+        return initial_lr * (decay_factor ** np.floor(epoch/step_size))
+    
+    return keras.callbacks.LearningRateScheduler(schedule)
+
+  def compile(self):
+    lr_sched = neural_network.step_decay_schedule(initial_lr=1e-4, decay_factor=0.75, step_size=2)
+    model.compile(loss={'policy':keras.losses.CategoricalCrossEntropy(from_logits=True), 
+                        'value':keras.losses.MSE},
+                  optimizer=keras.optimizers.SGD(momentum=globe.MOMENTUM), 
+                  callbacks=[lr_sched],
+                  loss_weights=[1,0.1])
+
+  def train(self, inputs, scores, predictions, generation):
+    history = model.fit({'input_game_state':inputs, 'policy':predictions, 'value':scores},
+                        batch_size=globe.BATCH_SIZE,
+                        epochs=globe.EPOCHS,
+                        validation_split=0.15)
+    self.save(generation,0)
 
   # conv BLOCK
   # convolution 64 filters, 3x3 patch, stride 1
@@ -85,7 +109,7 @@ class neural_network:
     l3 = layers.Activation( 'relu',                                      name = 'valuehead_activation' )( l2 )
     l4 = layers.GlobalAveragePooling2D(                                  name = 'valuehead_pool')(l3)
     l5 = layers.Dense( 64, activation = 'relu',                          name = 'valuehead_dense')( l4 )
-    l6 = layers.Dense( 1, activation = 'relu',                           name = 'value' )( l5 )
+    l6 = layers.Dense( 1, activation = 'relu', kernel_regularizer=regularizers.l2(0.0001), name = 'value' )( l5 )
 
     return l6
 
@@ -94,10 +118,10 @@ class neural_network:
     keras.utils.plot_model( self.model, show_shapes = True )
 
   def save(self,generation,checkpoint):
-    self.model.save('generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
+    self.model.save('saves/generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
 
   def load(self,generation,checkpoint):
-    self.model = keras.models.load_model('generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
+    self.model = keras.models.load_model('saves/generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
 
 
 class nn_out:

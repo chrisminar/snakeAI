@@ -11,16 +11,14 @@ from neuralNet import neural_network
 ###################
 class trainerClass():
   """description of class"""
-  def __init__( self, dfTrack:dataTrack, nn:neural_network, trainingData ):
+  def __init__( self, dfTrack:dataTrack, nn:neural_network):
     self.td = trainingData
-    self.dfDetail = dfDetail
+    self.dfTrack = dfTrack
     self.nn = nn
 
-
-  def train( self, generation ):
+  def train( self, generation, inputs, scores, move_predictions):
     with Timer as t():
-      #todo you are here, calc num minibatches, call training
-      num_minibatch = 0
-      #train
+      self.nn.train( inputs, scores, move_predictions, generation)
+      num_minibatch = move_predictions.shape[0]
     self.dfTrack.appendTraining(t.secs, num_minibatch, td.secs/num_minibatch)
 

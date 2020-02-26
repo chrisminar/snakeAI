@@ -7,3 +7,5 @@ class globe():
   NUM_SELF_PLAY_GAMES = 2000 # number of self play games to play
   NUM_TRAINING_GAMES = 20000 # number of self play games to train on
   MOMENTUM = 0.9
+  BATCH_SIZE = 64
+  EPOCHS=5
