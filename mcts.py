@@ -1,9 +1,9 @@
-from neuralNet import neural_network
-from game_state import game_state
+from neuralNet import NeuralNetwork
+from gameState import GameState
 
 
-class mcts:
-  def __init__(self, state:game_state, neural_net:neural_network):
+class Mcts:
+  def __init__(self, state:GameState, neural_net:NeuralNetwork):
     self.s = state
     self.f_theta = neural_net
     self.root = mcts_node(self.s)
@@ -12,7 +12,7 @@ class mcts:
     f_theta.evaluate(self.s)
     return self.f_theta.out.move
 
-class mcts_node:
+class Mcts_node:
   #mcts - node
   # game state
   # P (s,a) float[]

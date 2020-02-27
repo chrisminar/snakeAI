@@ -1,28 +1,28 @@
 #todo, convert and store gamelist as nn state
-from globalVar import globe
-from game_state import game_state
-from game_state import game
+from globalVar import Globe as globe
+from gameState import GameState
+from gameState import Game
 from timer import Timer
-from dataTrack import dataTrack
-from neuralNet import neural_network
+from dataTrack import DataTrack
+from neuralNet import NeuralNetwork
 import numpy as np
 
 #####################
 ## self play class ##
 #####################
-class selfPlayClass():
+class SelfPlay():
   """description of class"""
-  def __init__( self, dfTrack:dataTrack, nn:neural_network ):
+  def __init__( self, dfTrack:DataTrack, nn:NeuralNetwork ):
     self.gamestates = []
     self.gameScore = []
     self.gameID = []
     self.dfDetail = dfDetail
     self.nn = nn
 
-  def playGames( self, generation, startID ):
+  def playGames( self, generation:int, startID:int ):
     for i in range(globe.NUM_TRAINING_GAMES):
-      with Timer as t():
-        g = game(nn=self.nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
+      with Timer() as t:
+        g = Game(nn=self.nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
         g.play()
         gamestates.append(np.stack(g.stateList))
         gameScore.append( np.full( (len(g.stateList), ), g.score ) )

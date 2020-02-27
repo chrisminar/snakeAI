@@ -1,6 +1,6 @@
 
 
-class globe():
+class Globe():
   GRID_X = 10                # x grid size of snake game
   GRID_Y = 10                # y grid size of snake game
   NUM_EVALUATION_GAMES = 400 # number of evaluation games to play

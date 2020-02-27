@@ -118,20 +118,20 @@ import numpy as np
 from matplotlib import pyplot as plt
 import typing
 from typing import List,Tuple
-from dataTrack import dataTrack
-from mcts import mcts
-from mcts import mcts_node
-from neuralNet import neural_network
+from dataTrack import DataTrack
+from mcts import Mcts
+from mcts import Mcts_node
+from neuralNet import NeuralNetwork
 from neuralNet import nn_out
-from game_state import game_state
-from globalVar import globe
+from gameState import GameState
+from globalVar import Globe as globe
 
-from selfPlayClass import selfPlayClass
-from trainer import trainerClass
+from selfPlay import SelfPlay
+from trainer import Trainer
 
-class snakeRL():
+class TrainRL():
   def __init__(self):
-    self.tracker = dataTrack()
+    self.tracker = DataTrack()
     self.gameStates = np.zeros((0,globe.GRID_X,globe.GRID_Y))
     self.gameScores = np.zeros((0,1))
     self.gameIDs = np.zeros((0,1))
@@ -152,8 +152,8 @@ class snakeRL():
     #best neural network
   #outputs:
     #2000 game outputs
-  def selfPlay(self, nn:neural_network, generation:int):
-    spc = selfPlayClass(self.tracker, nn)
+  def selfPlay(self, nn:NeuralNetwork, generation:int):
+    spc = SelfPlay(self.tracker, nn)
     states, scores, ids = spc.playGames(generation, self.gameID)
     self.addGamesToList(states, scores, ids)
     self.trimGameList()
@@ -163,7 +163,7 @@ class snakeRL():
   #outputs:
     #new neural network
   def networkTrainer(self, generation:int):
-    trn = trainerClass(self.tracker)
+    trn = Trainer(self.tracker)
     trn.train(generation, self.nnList[-1], self.gameStates, self.gameScores)
     pass
 

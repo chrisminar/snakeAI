@@ -15,7 +15,7 @@
 
 from typing import List,Tuple
 import typing
-from snake import snake
+from snake import Snake
 from copy import deepcopy
 import pickle
 import operator

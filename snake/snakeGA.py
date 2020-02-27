@@ -1,16 +1,16 @@
-###snake
-
-from snake import snake
+from snake import Snake
 import random
 import numpy as np
 import pygame as pg
+
+
 buttons = {0: "up",
            1: "right",
            2: "down",
            3: "left",
            4: "none"}
 
-class snakeGA(snake):
+class SnakeGA(Snake):
   def __init__(self, *args, **kwargs):
     super(snakeGA, self).__init__(*args, **kwargs)
 

@@ -4,7 +4,7 @@
 import pandas as pd
 
 
-class dataTrack:
+class DataTrack:
   def __init__(self):
     self.self_play_detail_column_names = ['time', 'score', 'game_id']
     self.self_play_broad_column_names  = ['time', 'mean score']

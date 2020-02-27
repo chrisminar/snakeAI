@@ -1,9 +1,9 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.python.keras import layers
-from globalVar import globe
+from globalVar import Globe as globe
 
-class neural_network:
+class NeuralNetwork:
   def __init__(self):
     self.checkPointID = 0
     self.generationID = 0

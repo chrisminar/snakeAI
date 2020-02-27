@@ -1,11 +1,12 @@
 #todo convert gamestates to training
   #figure out what the training input format needs to be
 import numpy as np
-from globalVar import globe
-import snake
-from neuralNet import neural_network
+from globalVar import Globe as globe
+from snakeRL import SnakeRL as snake
+from neuralNet import NeuralNetwork
 
-class game_state:
+
+class GameState:
   #game state
   # array gridx x gridy int[][]
   # food 2
@@ -18,9 +19,9 @@ class game_state:
     self.grid = np.zeros((self.x,self.y))
 
 
-class game:
-  def __init__(self, nn:neural_network):
-    self.snakeInstance = snake.snake(False, globe.GRID_X,globe.GRID_Y)
+class Game:
+  def __init__(self, nn:NeuralNetwork):
+    self.snakeInstance = snake(False, globe.GRID_X,globe.GRID_Y)
     self.gamestate_to_nn = np.vectorize(game.grid_val_to_nn)
     return
 

@@ -9,7 +9,7 @@ buttons = {0: "up",
            3: "left",
            4: "none"}
 
-class snake():
+class Snake():
   def __init__(self, sizeX=20, sizeY=20):
     #grid
     self.sizeX = sizeX                       #width of grid

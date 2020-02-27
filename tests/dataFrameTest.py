@@ -1,19 +1,11 @@
 import unittest
-import snakeRL
-from mcts import mcts
-from mcts import mcts_node
-from dataTrack import dataTrack
-from neuralNet import neural_network
-import pandas as pd
-from tensorflow import keras
-import timer
-import time
+from dataTrack import DataTrack
 
-class Test_test1(unittest.TestCase):
-  def test_addData_To_Dataframe(self):
-    dt = snakeRL.dataTrack()
+class DataTrack_test(unittest.TestCase):
 
-    #test self play detail
+  #test self play detail
+  def test_add_to_self_play_detail(self):
+    dt = DataTrack()
     l1 = len(dt.self_play_detail.index.values)
     val = [0.0, 1, 2]
     dt.appendSelfPlayDetail(val[0], val[1], 0, val[2])
@@ -22,7 +14,9 @@ class Test_test1(unittest.TestCase):
     for v, col in zip(val, err):
       self.assertEqual(dt.self_play_detail.loc[0][col] , v, "failed to set {} for self play detail dataframe".format(col))
 
-    #test self play broad
+  #test self play broad
+  def test_add_to_self_play_broad(self):
+    dt = DataTrack()
     l1 = len(dt.self_play_broad.index.values)
     val = [0.0, 1.0]
     dt.appendSelfPlayBroad(val[0], val[1])
@@ -31,7 +25,9 @@ class Test_test1(unittest.TestCase):
     for v, col in zip(val, err):
       self.assertEqual(dt.self_play_broad.loc[0][col] , v, "failed to set {} for self play broad dataframe".format(col))
 
-    #test evaluator detail
+  #test evaluator detail
+  def test_add_to_evaluator_detail(self):
+    dt = DataTrack()
     l1 = len(dt.evaluator_detail.index.values)
     val = [0.0, 1, 3, 4, 5.0, 6.0, 7.0, 8.0]
     dt.appendEvaluatorDetail(val[0], val[1], 0, val[2], val[3], val[4], val[5], val[6], val[7])
@@ -40,7 +36,9 @@ class Test_test1(unittest.TestCase):
     for v, col in zip(val, err):
       self.assertEqual(dt.evaluator_detail.loc[0][col] , v, "failed to set {} for evaluator detail dataframe".format(col))
 
-    # test evaluator broad
+  # test evaluator broad
+  def test_add_to_evaluator_broad(self):
+    dt = DataTrack()
     l1 = len(dt.evaluator_broad.index.values)
     val = [0.0, 1.0]
     dt.appendEvaluatorBroad(val[0], val[1])
@@ -49,7 +47,9 @@ class Test_test1(unittest.TestCase):
     for v, col in zip(val, err):
       self.assertEqual(dt.evaluator_broad.loc[0][col] , v, "failed to set {} for evaluator detail dataframe".format(col))
 
-    #test training
+  #test training
+  def test_add_to_trainer(self):
+    dt = DataTrack()
     l1 = len(dt.training.index.values)
     val = [0.0, 1, 2.0]
     dt.appendTraining(val[0], val[1], val[2])
@@ -57,15 +57,6 @@ class Test_test1(unittest.TestCase):
     err = dt.training_column_names
     for v, col in zip(val, err):
       self.assertEqual(dt.training.loc[0][col] , v, "failed to set {} for training dataframe".format(col))
-
-  def testNN(self):
-    nn=neural_network()
-    print(nn.model.summary())
-
-  def testTimer(self):
-    with timer.Timer() as t:
-      time.sleep(2)
-    print(t.secs)
 
 if __name__ == '__main__':
   unittest.main()

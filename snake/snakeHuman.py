@@ -1,10 +1,10 @@
-
-from snake import snake
+from snake import Snake
 import random
 import numpy as np
 import pygame as pg
 
-class snakeHuman(snake):
+
+class SnakeHuman(Snake):
   def __init__(self, *args, **kwargs):
     super(snakeHuman, self).__init__(*args, **kwargs)
     #init pygame
