@@ -69,10 +69,12 @@
 
 # WORK BLOCKS
 # ON DECK
-  # UNIT TEST
   # add predictions to tracked data fron snakeRL
   # MCTS
-    # make autoplay loop in snakerl
+  # UNIT TEST
+    #add test function for each function
+
+  # make autoplay loop in snakeRL
   # EVALUATOR
 
 # self play game

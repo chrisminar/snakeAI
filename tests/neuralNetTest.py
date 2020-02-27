@@ -4,8 +4,9 @@ import unittest
 
 
 class NeuralNet_test(unittest.TestCase):
-  def test1(self):
-    pass
+  def test_init(self):
+    self.assertEqual(0,1)
+  #YOU ARE HERE
 
 if __name__ == '__main__':
   unittest.main()
