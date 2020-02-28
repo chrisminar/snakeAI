@@ -10,34 +10,32 @@ class SnakeRL(Snake):
     self.foodX, self.foodY = self.spawn_food()
     self.grid[self.foodX][self.foodY] = -2   #set food on grid
     self.stateList = []
+    self.moveList = []
 
   def runStep(self, dir: str): 
     if not self.gameover:
       self.moves+=1
-      if dir == buttons[3]: #left
+      if dir[3]: #left
         self.runSingle(-1, 0)
-      elif dir == buttons[1]: #right
-        self.runSingle(1,0)
-      elif dir == buttons[2]: #down
-        self.runSingle(0,1)
-      elif dir == buttons[0]: #up
-        self.runSingle(0,-1)
-      elif dir == buttons[4]: #no input
-        self.runSingle(self.Xdir,self.Ydir)
+      elif dir[1]: #right
+        self.runSingle(1, 0)
+      elif dir[2]: #down
+        self.runSingle(0, 1)
+      elif dir[0]: #up
+        self.runSingle(0, -1)
       else: #invalid direction = no input
-        self.runSingle(self.Xdir,self.Ydir)
+        self.runSingle(self.Xdir, self.Ydir)
       self.stateList.append(self.grid)
-      return
-    else: #game is over
-      return
+    return
 
   def play(self):
     while (self.gameover == False):
       newDir = self.evaluateNextStep()
+      self.moveList.append(newDir)
       self.runStep(newDir)
     return self.score
 
   def evaluateNextStep(self):
     #do some stuff
-    direction = (0,0)
+    direction = [0,0,0,1]
     return direction

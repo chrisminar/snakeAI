@@ -69,12 +69,10 @@
 
 # WORK BLOCKS
 # ON DECK
-  # add predictions to tracked data fron snakeRL
   # MCTS
+    # make autoplay loop in snakeRL
   # UNIT TEST
-    #add test function for each function
-
-  # make autoplay loop in snakeRL
+    #do the actual work
   # EVALUATOR
 
 # self play game
@@ -137,6 +135,7 @@ class TrainRL():
     self.gameStates = np.zeros((0,globe.GRID_X,globe.GRID_Y))
     self.gameScores = np.zeros((0,1))
     self.gameIDs = np.zeros((0,1))
+    self.moves = np.zeros(0,4)
     self.nnList = []
     self.gameID = 0
     pass
@@ -156,8 +155,8 @@ class TrainRL():
     #2000 game outputs
   def selfPlay(self, nn:NeuralNetwork, generation:int):
     spc = SelfPlay(self.tracker, nn)
-    states, scores, ids = spc.playGames(generation, self.gameID)
-    self.addGamesToList(states, scores, ids)
+    states, scores, ids, moves = spc.playGames(generation, self.gameID)
+    self.addGamesToList(states, scores, ids, moves)
     self.trimGameList()
 
   #operates on:
@@ -166,7 +165,7 @@ class TrainRL():
     #new neural network
   def networkTrainer(self, generation:int):
     trn = Trainer(self.tracker)
-    trn.train(generation, self.nnList[-1], self.gameStates, self.gameScores)
+    trn.train(generation, self.nnList[-1], self.gameStates, self.gameScores, self.moves)
     pass
 
    #operates on: 
@@ -178,10 +177,11 @@ class TrainRL():
   def mcts_evaluator(self):
     pass
 
-  def addGamesToList(self, states, scores, ids):
+  def addGamesToList(self, states, scores, ids, moves):
     self.gameStates = np.concatenate(self.gameStates, states)
     self.gameScores = np.concatenate(self.gameScores, scores)
     self.gameIDs = np.concatenate(self.gameIDs, ids)
+    self.moves = np.concatenate(self.moves, moves)
 
   def trimGameList(self):
     minId = np.min(self.gameIDs)
