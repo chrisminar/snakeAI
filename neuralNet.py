@@ -9,9 +9,6 @@ class NeuralNetwork:
     self.generationID = 0
     self.out = nn_out()
 
-    #inputs_  = keras.Input(shape=(gridX,gridY))
-    #outputs_ = self.HeadBlock()
-    #self.model    = keras.Model(inputs=inputs_, outputs=outputs)
     gridX = 8
     gridY = 8
     block_input = keras.Input( shape = ( globe.GRID_X, globe.GRID_Y, 1 ), name = 'input_game_state')
@@ -46,7 +43,7 @@ class NeuralNetwork:
                         batch_size=globe.BATCH_SIZE,
                         epochs=globe.EPOCHS,
                         validation_split=0.15)
-    self.save(generation,0)
+    self.save(generation)
 
   # conv BLOCK
   # convolution 64 filters, 3x3 patch, stride 1
@@ -117,11 +114,11 @@ class NeuralNetwork:
     print( self.model.summary() )
     keras.utils.plot_model( self.model, show_shapes = True )
 
-  def save(self,generation,checkpoint):
-    self.model.save('saves/generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
+  def save(self,generation):
+    self.model.save('saves/generation_{}.ckpt'.format(generation))
 
-  def load(self,generation,checkpoint):
-    self.model = keras.models.load_model('saves/generation_{}_checkpoint_{}.ckpt'.format(generation,checkpoint))
+  def load(self,generation):
+    self.model = keras.models.load_model('saves/generation_{}.ckpt'.format(generation))
 
 
 class nn_out:

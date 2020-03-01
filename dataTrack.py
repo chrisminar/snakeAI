@@ -24,9 +24,11 @@ class DataTrack:
     current_index = len(self.self_play_broad.index.values)
     self.self_play_broad.loc[current_index] = [time, mean_score]
 
+  #todo make generation the first variable
   def appendEvaluatorDetail(self, time:float, score:int, generation:int, game_id:int, game_length:int, mcts_tree_total_time:float, mcts_nn_total_time:float, mcts_tree_mean_time:float, mcts_nn_mean_time:float):
     self.evaluator_detail.loc[generation] = [time, score, game_id, game_length, mcts_tree_total_time, mcts_nn_total_time, mcts_tree_mean_time, mcts_nn_mean_time]
 
+  #todo change this to explicity use the generation as an index
   def appendEvaluatorBroad(self, time:float, score:float):
     current_index = len(self.evaluator_broad.index.values)
     self.evaluator_broad.loc[current_index] = [time, score]
