@@ -21,13 +21,13 @@ class PlayGames():
     return np.vectorize(functionIn)
 
   def grid_val_to_nn(input):
-    if input == -1:
+    if input == -1: #empty
       out = 1
-    elif input >0:
+    elif input >0: #body
       out = -1
-    elif input == 0:
+    elif input == 0: #head
       out = -2
-    else:
+    else: #food
       out = 2
     return out
 

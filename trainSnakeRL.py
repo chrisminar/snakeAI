@@ -74,6 +74,13 @@
 #change evaluator broad to explicity use the generation as the index
 #change unit tests to reflect the class inheritance of selfplay/plagames/evaluator
 #unit tests for evaluator
+#add feedforward part to neural net class
+#figure out noise in mcts
+#store move direction in mcts node
+#figure out the b thing in mcts
+#figure out how to keep the tree from mcts
+#prune mcts tree when done
+#figure out how to count number of moves when tree is preserved from the prior run
 
 #stuff to do someday
   # do network pruning
