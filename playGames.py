@@ -21,14 +21,11 @@ class PlayGames():
     return np.vectorize(functionIn)
 
   def grid_val_to_nn(input):
-    if input == -1: #empty
-      out = 1
-    elif input >0: #body
-      out = -1
-    elif input == 0: #head
-      out = -2
-    else: #food
-      out = 2
-    return out
+    """Convert input snake grid value to nn value"""
+    # empty -> 1
+    # head -> 0
+    # body = negative
+    #food = 2
+    return -input
 
 

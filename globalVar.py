@@ -13,3 +13,5 @@ class Globe():
 
   MCTS_EPSILON = 0.25
   MCTS_DIR = 0.03
+
+  SCORE_PER_FOOD = 100

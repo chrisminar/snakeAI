@@ -75,18 +75,25 @@
 #change unit tests to reflect the class inheritance of selfplay/plagames/evaluator
 #unit tests for evaluator
 #add feedforward part to neural net class
+
+#MCTS
 #figure out noise in mcts
-#store move direction in mcts node
 #figure out the b thing in mcts
-#figure out how to keep the tree from mcts
-#prune mcts tree when done
+#figure out how to keep the tree from previous mcts
+  #pruning implemented, need to implement inheritance
 #figure out how to count number of moves when tree is preserved from the prior run
+  #have to count the number of nodes in tree after pruning is done, calculate in pruning?
+#add random seeding and spawn food to gameState
+  #I think I can just copy the random seed before calling random, then reset the random seed after using it
+
+
 
 #stuff to do someday
   # do network pruning
   # track/understand what the neural network is doing
   # gui
   # pause/play 
+  #visualization of mcts
 
 # mcts
   # state

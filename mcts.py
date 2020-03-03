@@ -31,6 +31,7 @@ class Mcts:
     return True
 
   def select(self, root:Mcts_node): #PAGE 26
+    """Select a leaf with the highest action value"""
     maxedVal = 0
     index = 0
     if len(root.children) > 0:
@@ -45,23 +46,33 @@ class Mcts:
     else:
       return root
 
-  def expand(self, root:Mcts_node):
-    # run neural network
-    policy, value = self.f_theta.evaluate(root.s)
+  def expand(self, leaf:Mcts_node):
+    """Add a new leaf to the tree given a leaf"""
     # make move
-    newState = root.makeMove(policy)
+    grid, score, direction, gameover = GameState.move(leaf.s, leaf.P, leaf.score)
+    # run neural network
+    policy, value = self.f_theta.evaluate(grid)
     # add move
-    root.children.append(Mcts_node(newState, policy, parent=root))
-    return root.children[-1]
+    leaf.children.append(Mcts_node(grid, policy, parent=leaf, direction=direction, score=score, isDead=gameover))
+    return leaf.children[-1]
 
-  def backup(self, root:Mcts_node, v):
-    root.N += 1
-    root.W = v
-    root.Q = root.W/root.N
-    if root.parent == None:
+  def backup(self, leaf:Mcts_node, v):
+    """Work up the tree from a given and update values"""
+    leaf.N += 1
+    leaf.W = v
+    leaf.Q = leaf.W/leaf.N
+    if leaf.parent == None: #no parent, root reached
       return
     else:
-      self.backup(root.parent)
+      self.backup(leaf.parent)
+
+  def prune(self, root:Mcts_node, move:int):
+    for child in reversed(root.children):
+      if (child.direction == move):
+        pass
+      else:
+        del root.children[i]
+    return
 
   def selectFinal(self):
     max = 0
@@ -102,14 +113,17 @@ class Mcts_node:
   # action value Q(s,a) float
   # children mctsNode[]
   # parent mctsNode
-  def __init__(self, state, probability = np.zeros((4,)), parent = None):
-    self.parent = parent
-    self.s = state
-    self.P = probability #prior probability
+  def __init__(self, state, probability = np.zeros((4,)), direction = dicrection, parent = None, score = 0, isDead=False):
+    self.parent = parent # parent mcts node
+    self.s = state # snake game state
+    self.score = score # snake score
+    self.direction = direction # direction moved to get to this state
+    self.isDead = isDead # has the game ended at this state?
+    self.P = probability # move probabilities at this state
     self.N = 0 #visit count
     self.W = 0 #total action value
     self.Q = 0.0 #mean action value
-    self.children = []
+    self.children = [] #children mcts nodes
     
 
 
