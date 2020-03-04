@@ -2,7 +2,7 @@
   #figure out what the training input format needs to be
 import numpy as np
 from globalVar import Globe as globe
-
+from copy import deepcopy
 
 class GameState:
   #game state
@@ -16,9 +16,11 @@ class GameState:
     self.y = globe.GRID_Y
     self.grid = grid
 
-  def move(grid, policy, score:int):
+  def move(grid, direction, score:int):
     """Move the snake in a given direction"""
-    direction = np.argmax(policy)
+
+    grid = deepcopy(grid)
+
     if direction == 0: # 0,1,2,3 = up,right,down,left
       xd = 0
       yd = -1
@@ -74,7 +76,7 @@ class GameState:
     if not go:
       grid[x][y] = 0
 
-    return grid, score, direction, go
+    return grid, score, go
 
   def check_game_over(x,y,grid):
     #check if we ran into a wall
@@ -89,4 +91,5 @@ class GameState:
 
     return False
 
-  def spawn_food()
+  def spawn_food():
+    pass
