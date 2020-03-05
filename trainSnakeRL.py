@@ -15,10 +15,15 @@
 #unit tests for evaluator
 #add feedforward part to neural net class
 
+#add rotation and mirror of game state for training
+#need alternative to mcts
+
 #MCTS
 #figure out noise in mcts
 #implement 'itsdead' in mcts search. include domain knowledge so you never consider gameovers
 #implement the 'newmove' in mcts
+#change mtcs implementation to not have 'empty' leaves
+#this doesn't make sense for non-combatant games
 
 #figure out how to keep the tree from previous mcts
   #pruning implemented, need to implement inheritance

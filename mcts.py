@@ -12,6 +12,7 @@ class Mcts:
 
   def mcts_search(self):
     policy = self.f_theta.evaluate(self.s)
+    P = (1-globe.MCTS_EPSILON)*root.P + globe.MCTS_EPSILON * np.random.dirichlet(np.zeros((4,)) + globe.MCTS_DIR) #Noise
     self.root = Mcts_node(self.s, policy)
     Mcts.addMoveSpace(self.root.s, self.root)
 
@@ -32,12 +33,10 @@ class Mcts:
     if not root.isLeaf:
       sumVisitCount = np.sqrt(sum(i.N for i in root.children))
       for i, child in enumerate(root.children):
-        P = (1-globe.MCTS_EPSILON)*pca + globe.MCTS_EPSILON*globe.MCTS_DIR #HERE
-        U = c_puct * root.P[i] * sumVisitCount / (1+child.N)
-        
+        U = globe.CPUCT * root.P[i] * sumVisitCount / (1+child.N)
         a_t = U + child.Q
-        if upperConfidenceBound > maxedVal:
-          maxedVal = upperConfidenceBound
+        if a_t > maxedVal:
+          maxedVal = a_t
           index = i
       self.select(root.children(index))
     else:

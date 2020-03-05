@@ -12,6 +12,8 @@ class Globe():
   EPOCHS=5
 
   MCTS_EPSILON = 0.25
-  MCTS_DIR = 0.03
+  MCTS_DIR = 1.0 #0.03 #1 makes the disribution more uniform whereas 0.03 will only look at ~1 move
 
   SCORE_PER_FOOD = 100
+
+  CPUCT = 1.0
