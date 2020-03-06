@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.python.keras import layers
 from globalVar import Globe as globe
+from gameState import GameState
 
 class NeuralNetwork:
   def __init__(self):
@@ -20,6 +21,9 @@ class NeuralNetwork:
 
     self.model = block_model = keras.Model(inputs=block_input, outputs=[pblock,vblock])
     self.compile()
+
+  def evaluate(self, state):
+    return self.model.predict(state)
 
   def step_decay_schedule(initial_lr=1e-3, decay_factor=0.75, step_size=10):
     '''

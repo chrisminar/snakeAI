@@ -27,5 +27,3 @@ class PlayGames():
     # body = negative
     #food = 2
     return -input
-
-

@@ -3,33 +3,15 @@
 
 # WORK BLOCKS
 # ON DECK
-  # MCTS
-    # make autoplay loop in snakeRL
   # UNIT TEST
     #do the actual work
 
 #todo list
+#the neural net being used isn't handled correctly in trainsnakerl
 #make generation the first input to all datatrack functions
 #change evaluator broad to explicity use the generation as the index
 #change unit tests to reflect the class inheritance of selfplay/plagames/evaluator
 #unit tests for evaluator
-#add feedforward part to neural net class
-
-#add rotation and mirror of game state for training
-#need alternative to mcts
-
-#MCTS
-#figure out noise in mcts
-#implement 'itsdead' in mcts search. include domain knowledge so you never consider gameovers
-#implement the 'newmove' in mcts
-#change mtcs implementation to not have 'empty' leaves
-#this doesn't make sense for non-combatant games
-
-#figure out how to keep the tree from previous mcts
-  #pruning implemented, need to implement inheritance
-#add random seeding and spawn food to gameState
-  #I think I can just copy the random seed before calling random, then reset the random seed after using it
-
 
 #stuff to do someday
   # do network pruning
@@ -44,8 +26,6 @@ from matplotlib import pyplot as plt
 import typing
 from typing import List,Tuple
 from dataTrack import DataTrack
-from mcts import Mcts
-from mcts import Mcts_node
 from neuralNet import NeuralNetwork
 from neuralNet import nn_out
 from gameState import GameState
@@ -73,7 +53,12 @@ class TrainRL():
     while 1:
       self.selfPlay(generation)
       self.networkTrainer(generation)
-      self.mcts_evaluator(generation)
+      self.evaluator(generation)
+      print('Mean score of {:0.1f} in generation {}. Selfplay, training, evaluation in {}s, {}s, {}s'.format(self.tracker.evaluator_broad.loc[gneration, 'mean_score'],
+                                                                                                             generation, 
+                                                                                                             self.tracker.self_play_broad.loc[generation, 'time'],
+                                                                                                             self.tracker.training.loc[generation, 'time'],
+                                                                                                             self.tracker.evaluator_broad.loc[generation, 'time']))
       generation += 1
     return
 
@@ -104,7 +89,7 @@ class TrainRL():
   #outputs:
     #400 games (with gamestate)
     #mean score of 400 games
-  def mcts_evaluator(self, generation:int):
+  def evaluator(self, generation:int):
     eval = Evaluator(self.tracker, self.currentNN)
     states, scores, ids, moves = eval.evaluate(generation, self.gameID)
     if self.tracker.evaluator_broad.loc[generation, 'score'] == self.tracker.evaluator_broad['score'].max():

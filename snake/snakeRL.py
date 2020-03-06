@@ -36,6 +36,5 @@ class SnakeRL(Snake):
     return self.score
 
   def evaluateNextStep(self):
-    #do some stuff
-    direction = [0,0,0,1]
-    return direction
+    policy, value = nn.evaluate(self.grid)
+    return np.argmax(policy)
