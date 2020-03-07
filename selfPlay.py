@@ -12,6 +12,13 @@ import numpy as np
 #####################
 class SelfPlay(PlayGames):
   """Generate self play games"""
+  def __init__(self, tracker:DataTrack, bestNN:NeuralNetwork):
+    self.nn = bestNN
+    self.dfTrack = tracker
+    self.gamestates = []
+    self.gameScore = []
+    self.gameId = []
+    self.prediction = []
 
   def playGames( self, generation:int, startID:int ):
     for i in range(globe.NUM_SELF_PLAY_GAMES):

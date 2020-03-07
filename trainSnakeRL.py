@@ -12,6 +12,8 @@
 #change evaluator broad to explicity use the generation as the index
 #change unit tests to reflect the class inheritance of selfplay/plagames/evaluator
 #unit tests for evaluator
+#change the training weights, drastically reduce the value of the 'value head' This doesn't really even need to be here because we are not using mcts
+#move prediction vstack is wrong in trainer because I've flipped the grid
 
 #stuff to do someday
   # do network pruning
@@ -115,8 +117,3 @@ class TrainRL():
       self.gameScores = self.gameScores[validIdx]
       self.gameStates = self.gameStates[validIdx,:,:]
     return
-
-####################
-## mcts evaluator ##
-####################
-#add statistics

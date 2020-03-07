@@ -7,6 +7,9 @@ class NeuralNet_test(unittest.TestCase):
   def test_init(self):
     self.assertEqual(0,1)
 
+  def test_evaluate(self):
+    self.assertEqual(0,1)
+
   def test_step_decay_schedule(self):
     self.assertEqual(0,1)
 
