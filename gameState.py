@@ -11,7 +11,7 @@ class GameState:
   # empty 1
   # body -1
   # head -2
-  def __init__(self, grid=np.zeros(globe.GRID_X,globe.GRID_Y)):
+  def __init__(self, grid=np.zeros((globe.GRID_X,globe.GRID_Y))):
     self.x = globe.GRID_X
     self.y = globe.GRID_Y
     self.grid = grid
