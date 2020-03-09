@@ -8,10 +8,7 @@ class NeuralNetwork:
   def __init__(self):
     self.checkPointID = 0
     self.generationID = 0
-    self.out = nn_out()
 
-    gridX = 8
-    gridY = 8
     block_input = keras.Input( shape = ( globe.GRID_X, globe.GRID_Y, 1 ), name = 'input_game_state')
     block0 = self.convBlock(0, block_input)
     block1 = self.residualBlock(1, block0)
@@ -19,7 +16,7 @@ class NeuralNetwork:
     pblock = self.policyHead(block2)
     vblock = self.valueHead(block2)
 
-    self.model = block_model = keras.Model(inputs=block_input, outputs=[pblock,vblock])
+    self.model = keras.Model(inputs=block_input, outputs=[pblock,vblock])
     self.compile()
 
   def evaluate(self, state):
@@ -35,12 +32,12 @@ class NeuralNetwork:
     return keras.callbacks.LearningRateScheduler(schedule)
 
   def compile(self):
-    lr_sched = neural_network.step_decay_schedule(initial_lr=1e-4, decay_factor=0.75, step_size=2)
-    model.compile(loss={'policy':keras.losses.CategoricalCrossEntropy(from_logits=True), 
-                        'value':keras.losses.MSE},
+    lr_sched = NeuralNetwork.step_decay_schedule(initial_lr=1e-4, decay_factor=0.75, step_size=2)
+    self.model.compile(loss={'policy':keras.losses.CategoricalCrossentropy(from_logits=True), 
+                             'value':keras.losses.MSE},
                   optimizer=keras.optimizers.SGD(momentum=globe.MOMENTUM), 
                   callbacks=[lr_sched],
-                  loss_weights=[1,0.1])
+                  loss_weights=[1,0.001])
 
   def train(self, inputs, scores, predictions, generation):
     history = model.fit({'input_game_state':inputs, 'policy':predictions, 'value':scores},
@@ -110,31 +107,18 @@ class NeuralNetwork:
     l3 = layers.Activation( 'relu',                                      name = 'valuehead_activation' )( l2 )
     l4 = layers.GlobalAveragePooling2D(                                  name = 'valuehead_pool')(l3)
     l5 = layers.Dense( 64, activation = 'relu',                          name = 'valuehead_dense')( l4 )
-    l6 = layers.Dense( 1, activation = 'relu', kernel_regularizer=regularizers.l2(0.0001), name = 'value' )( l5 )
+    l6 = layers.Dense( 1, activation = 'relu', kernel_regularizer=keras.regularizers.l2(0.0001), name = 'value' )( l5 )
 
     return l6
 
   def dispModel(self):
     print( self.model.summary() )
-    keras.utils.plot_model( self.model, show_shapes = True )
+    print( self.model.layers)
+    print(self.model.metrics_names)
+    #keras.utils.plot_model( self.model, show_shapes = True )
 
   def save(self,generation):
     self.model.save('saves/generation_{}.ckpt'.format(generation))
 
   def load(self,generation):
     self.model = keras.models.load_model('saves/generation_{}.ckpt'.format(generation))
-
-
-class nn_out:
-  #new move
-    #direction enumerator
-
-  #vector of move probabilities -p
-    # 4 array with probabilities for up,right,down,left
-
-  #vector predicted value -v
-    # 4 array with predicted score for up,right,down,left
-  def __init__(self):
-    self.move = '' #direction the neural net thinks the snake should move
-    self.P = ['']*4 #move probabilities for each of the 4 directions
-    self.V = 0 #predicted score of the game
