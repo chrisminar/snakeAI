@@ -28,7 +28,6 @@ class NeuralNetwork:
     '''
     def schedule(epoch):
         return initial_lr * (decay_factor ** np.floor(epoch/step_size))
-    
     return keras.callbacks.LearningRateScheduler(schedule)
 
   def compile(self):
