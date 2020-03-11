@@ -21,7 +21,7 @@ class Trainer():
     with Timer() as t:
       inState = Trainer.randomizeMe(inputs)
       sc = np.vstack(scores,scores,scores,scores,scores,scores,scores)
-      mp = np.vstack(move_predictions,move_predictions,move_predictions,move_predictions,move_predictions,move_predictions)
+      mp = np.vstack(move_predictions,move_predictions,move_predictions,move_predictions,move_predictions,move_predictions) #this is wrong
       self.nn.train( inState, sc, mp, generation )
       num_minibatch = mp.shape[0]
     self.dfTrack.appendTraining( t.secs, num_minibatch, t.secs/num_minibatch )

@@ -14,6 +14,7 @@
 #unit tests for evaluator
 #change the training weights, drastically reduce the value of the 'value head' This doesn't really even need to be here because we are not using mcts
 #move prediction vstack is wrong in trainer because I've flipped the grid
+#change the 'evaluate nn' function to take (10,10) instead of (1,10,10,1)
 
 #stuff to do someday
   # do network pruning

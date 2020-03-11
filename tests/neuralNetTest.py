@@ -3,31 +3,29 @@ import unittest
 import numpy as np
 from tensorflow import keras
 from globalVar import Globe as globe
-
+from tensorflow.python.keras import layers
+import tensorflow as tf
 
 class NeuralNet_test(unittest.TestCase):
   def test_init(self):
     nn = NeuralNetwork()
     self.assertEqual(nn.model.get_layer('value').output_shape, (None, 1) )
     self.assertEqual(nn.model.get_layer('policy').output_shape, (None, 4) )
-    self.assertEqual(0,1)
-    #check weights
 
-  def test_evaluate(self):
-    self.assertEqual(0,1)
+  def test_compile_fit_evaluate_step_decay_schedule(self):
+    n= 100
+    trainSet = np.random.randint(3, size=(n,10,10,1))
+    policy = np.random.randint(1, size=(n,4))
+    value = np.random.randint(500, size=(n,1))
 
-  def test_step_decay_schedule(self):
-    f = NeuralNetwork.step_decay_schedule(initial_lr=1e-4, decay_factor=0.75, step_size=2)
-    #u r here
-    self.assertEqual(0,1)
-
-  def test_train(self):
-    self.assertEqual(0,1)
+    nn=NeuralNetwork()
+    nn.train(trainSet, value, policy, 0)
+    nn.evaluate(np.zeros((1,10,10,1)))
+    #should put some asserts here
 
   def test_conv(self):
-    nn = NeuralNetwork()
     input = keras.Input( shape = ( globe.GRID_X, globe.GRID_Y, 1 ), name = 'input_game_state')
-    out = nn.convBlock(0, input)
+    out = NeuralNetwork.convBlock(0, input)
     model = keras.Model(inputs=input, outputs=out)
     print(model.layers[0].input_shape)
     print(model.layers[-1].output_shape)
@@ -35,9 +33,8 @@ class NeuralNet_test(unittest.TestCase):
     self.assertEqual(model.layers[-1].output_shape, (None, globe.GRID_X, globe.GRID_Y, 64))
 
   def test_residual(self):
-    nn = NeuralNetwork()
     input = keras.Input( shape = ( globe.GRID_X, globe.GRID_Y, 64 ), name = 'input_residual')
-    out = nn.residualBlock(0, input)
+    out = NeuralNetwork.residualBlock(0, input)
     model = keras.Model(inputs=input, outputs=out)
     print(model.layers[0].input_shape)
     print(model.layers[-1].output_shape)
@@ -45,9 +42,8 @@ class NeuralNet_test(unittest.TestCase):
     self.assertEqual(model.layers[-1].output_shape, (None, globe.GRID_X, globe.GRID_Y, 64))
 
   def test_PolicyHead(self):
-    nn = NeuralNetwork()
     input = keras.Input( shape = ( globe.GRID_X, globe.GRID_Y, 64 ), name = 'input_policyhead')
-    out = nn.policyHead(input)
+    out = NeuralNetwork.policyHead(input)
     model = keras.Model(inputs=input, outputs=out)
     print(model.layers[0].input_shape)
     print(model.layers[-1].output_shape)
@@ -55,9 +51,8 @@ class NeuralNet_test(unittest.TestCase):
     self.assertEqual(model.layers[-1].output_shape, (None, 4))
 
   def test_ValueHead(self):
-    nn = NeuralNetwork()
     input = keras.Input( shape = ( globe.GRID_X, globe.GRID_Y, 64 ), name = 'input_valuehead')
-    out = nn.valueHead(input)
+    out = NeuralNetwork.valueHead(input)
     model = keras.Model(inputs=input, outputs=out)
     print(model.layers[0].input_shape)
     print(model.layers[-1].output_shape)
@@ -67,7 +62,7 @@ class NeuralNet_test(unittest.TestCase):
   def test_displayModel(self):
     self.assertEqual(0,1)
 
-  def test_saveload(self):
+  def test_load(self):
     self.assertEqual(0,1)
 
 if __name__ == '__main__':
