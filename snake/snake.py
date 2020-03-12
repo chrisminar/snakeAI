@@ -48,6 +48,8 @@ class Snake():
     #gamestate
     self.gameover = False
 
+    self.foodX,self.foodY = self.spawn_food()
+
   def runSingle(self, xdir, ydir):
     self.Xdir = xdir
     self.Ydir = ydir
@@ -120,15 +122,11 @@ class Snake():
           count += 1
 
     #generate a random number from 0-count
-    currentState = random.getstate() #save random state
-    random.setstate(self.randomState) #go to semi-random state
     if count > 1:
       spot = random.randint(1,count-1)
     else:
       print('no more valid spots')
       return(i,j)
-    self.randomState = random.getstate() #save semi random-state
-    random.setstate(currentState)#go back to random state
 
     #print(mask)
     #print(spot, count)
