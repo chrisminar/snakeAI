@@ -42,7 +42,18 @@ class Snake_test(unittest.TestCase):
     self.assertEqual(s.length, l)
 
   def test_RunSingle_with_food(self):
-    self.assertEqual(0,1)
+    s = Snake( globe.GRID_X, globe.GRID_Y )
+    x = s.X
+    y = s.Y
+    l = s.length
+    score = s.score
+    s.foodX = x+1
+    s.foodY = y;
+    s.grid[s.foodX][s.foodY] = -2
+    s.runSingle(1,0) #move right
+    self.assertEqual(s.grid[x][y], l+1)
+    self.assertGreater(s.score, score)
+    self.assertEqual(s.length, l+1)
 
   def test_spawnFood(self):
     s = Snake( globe.GRID_X, globe.GRID_Y )

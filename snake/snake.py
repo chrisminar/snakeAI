@@ -19,7 +19,7 @@ class Snake():
     #snake
     self.X = int(self.sizeX/2)               #snake head position x
     self.Y = int(self.sizeY/2)               #snake head position y
-    self.length = 2                          #current length of snake
+    self.length = 0                          #current length of snake
     self.grid[self.X][self.Y] = 0            #set snake head on the grid
 
     #scoring
@@ -101,7 +101,7 @@ class Snake():
       for j in range(self.sizeY):
         if self.grid[i][j] >= 0:
           self.grid[i][j] += 1
-          if (self.grid[i][j] == self.length-1) and (not ateThisTurn): # if the gird length is longer than the actual length, delete the tail
+          if (self.grid[i][j] > self.length) and (not ateThisTurn): # if the gird length is longer than the actual length, delete the tail
             self.grid[i][j] = -1
 
     #check if dead
