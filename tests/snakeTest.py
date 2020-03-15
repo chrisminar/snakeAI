@@ -66,6 +66,10 @@ class Snake_test(unittest.TestCase):
     self.assertGreater(np.std(j), 0)
 
   def test_checkGameOver(self):
+    #create snake
+    #force snake into various game over situations
+    #hit all 4 walls
+    #run into tail
     self.assertEqual(0,1)
 
 class SnakeRL_test(unittest.TestCase):
