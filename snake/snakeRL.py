@@ -36,5 +36,5 @@ class SnakeRL(Snake):
     return self.score
 
   def evaluateNextStep(self):
-    policy, value = nn.evaluate(self.grid)
+    policy, value = self.nn.evaluate(self.grid)
     return np.argmax(policy)

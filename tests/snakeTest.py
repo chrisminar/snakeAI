@@ -141,6 +141,10 @@ class SnakeRL_test(unittest.TestCase):
     self.assertEqual(0,1)
 
   def test_evaluateNext(self):
+    nn = NeuralNetwork()
+    s = SnakeRL(nn=nn, sizeX = 8, sizeY = 8)
+    direction = s.evaluateNextStep()
+    print(direction)
     self.assertEqual(0,1)
 
   def test_play(self):
