@@ -2,6 +2,7 @@ import unittest
 from snake import Snake
 from snakeRL import SnakeRL
 from globalVar import Globe as globe
+from neuralNet import NeuralNetwork
 import numpy as np
 
 class Snake_test(unittest.TestCase):
@@ -65,16 +66,76 @@ class Snake_test(unittest.TestCase):
     self.assertGreater(np.std(i), 0)
     self.assertGreater(np.std(j), 0)
 
-  def test_checkGameOver(self):
-    #create snake
-    #force snake into various game over situations
-    #hit all 4 walls
-    #run into tail
-    self.assertEqual(0,1)
+  def test_checkGameOver_sides(self):
+    #die right
+    s = Snake ( 8, 8 )
+    s.runSingle(1,0)#head at 5,4
+    self.assertFalse(s.gameover)
+    s.runSingle(1,0)#head at 6,4
+    self.assertFalse(s.gameover)
+    s.runSingle(1,0)#head at 7,4
+    self.assertFalse(s.gameover)
+    s.runSingle(1,0)#head at 8,5 (dead)
+    self.assertTrue(s.gameover)
+
+    #die left
+    s = Snake ( 8, 8 )
+    s.runSingle(-1,0)#head at 3,4
+    self.assertFalse(s.gameover)
+    s.runSingle(-1,0)#head at 2,4
+    self.assertFalse(s.gameover)
+    s.runSingle(-1,0)#head at 1,4
+    self.assertFalse(s.gameover)
+    s.runSingle(-1,0)#head at 0,4
+    self.assertFalse(s.gameover)
+    s.runSingle(-1,0)#head at -1,5 (dead)
+    self.assertTrue(s.gameover)
+
+    #die up
+    s = Snake ( 8, 8 )
+    s.runSingle(0,1)#head at 4,5
+    self.assertFalse(s.gameover)
+    s.runSingle(0,1)#head at 4,6
+    self.assertFalse(s.gameover)
+    s.runSingle(0,1)#head at 4,7
+    self.assertFalse(s.gameover)
+    s.runSingle(0,1)#head at 4,8 (dead)
+    self.assertTrue(s.gameover)
+
+    #die down
+    s = Snake ( 8, 8 )
+    s.runSingle(0,-1)#head at 4,3
+    self.assertFalse(s.gameover)
+    s.runSingle(0,-1)#head at 4,2
+    self.assertFalse(s.gameover)
+    s.runSingle(0,-1)#head at 4,1
+    self.assertFalse(s.gameover)
+    s.runSingle(0,-1)#head at 4,0
+    self.assertFalse(s.gameover)
+    s.runSingle(0,-1)#head at 4,-1 (dead)
+    self.assertTrue(s.gameover)
+
+  def test_checkGameOver_tail(self):
+    s = Snake ( 8, 8 )
+    s.grid[3][4] = -2 #place food at (3,4)
+    s.foodX,s.foodY = 3,4
+    s.runSingle(-1,0) #move left and eat
+    s.grid[3][3] = -2 #place food at (3,3)
+    s.foodX,s.foodY = 3,3
+    s.runSingle(0,-1) #move down and eat
+    s.grid[4][3] = -2 #place food at (4,3)
+    s.foodX,s.foodY = 4,3
+    s.runSingle(1,0) #move right and eat
+    s.runSingle(0,1) #move up into old tail spot
+    self.assertFalse(s.gameover)
+    s.runSingle(0,-1)#move down into tail
+    self.assertTrue(s.gameover)
 
 class SnakeRL_test(unittest.TestCase):
   def test_init(self):
-    self.assertEqual(0,1)
+    nn = NeuralNetwork()
+    s = SnakeRL(nn=nn, sizeX = 8, sizeY = 8)
+    self.assertTrue(hasattr(s,'nn'))
 
   def test_runStep(self):
     self.assertEqual(0,1)
