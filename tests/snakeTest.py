@@ -137,8 +137,52 @@ class SnakeRL_test(unittest.TestCase):
     s = SnakeRL(nn=nn, sizeX = 8, sizeY = 8)
     self.assertTrue(hasattr(s,'nn'))
 
-  def test_runStep(self):
-    self.assertEqual(0,1)
+  def test_Runstep_no_food(self):
+    nn = NeuralNetwork()
+    s = SnakeRL( nn=nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y )
+    x = s.X
+    y = s.Y
+    l = s.length
+    s.runStep(1) #move right
+    self.assertEqual(s.X, x+1)
+    self.assertEqual(s.Y, y)
+    self.assertEqual(s.length, l)
+    x = s.X
+    y = s.Y
+    l = s.length
+    s.runStep(3) #move left
+    self.assertEqual(s.X, x-1)
+    self.assertEqual(s.Y, y)
+    self.assertEqual(s.length, l)
+    x = s.X
+    y = s.Y
+    l = s.length
+    s.runStep(2) #move up (up on grid, down if looking at it)
+    self.assertEqual(s.X, x)
+    self.assertEqual(s.Y, y+1)
+    self.assertEqual(s.length, l)
+    x = s.X
+    y = s.Y
+    l = s.length
+    s.runStep(0) #move down (down on grid, up i flooking at it)
+    self.assertEqual(s.X, x)
+    self.assertEqual(s.Y, y-1)
+    self.assertEqual(s.length, l)
+
+  def test_Runstep_with_food(self):
+    nn = NeuralNetwork()
+    s = SnakeRL( nn=nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y )
+    x = s.X
+    y = s.Y
+    l = s.length
+    score = s.score
+    s.foodX = x+1
+    s.foodY = y;
+    s.grid[s.foodX][s.foodY] = -2
+    s.runStep(1) #move right
+    self.assertEqual(s.grid[x][y], l+1)
+    self.assertGreater(s.score, score)
+    self.assertEqual(s.length, l+1)
 
   def test_evaluateNext(self):
     nn = NeuralNetwork()
