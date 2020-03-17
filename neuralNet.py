@@ -20,7 +20,7 @@ class NeuralNetwork:
     self.compile()
 
   def evaluate(self, state):
-    return self.model.predict(state)
+    return self.model.predict(state.reshape(1,state.shape[0],state.shape[1],1))
 
   def step_decay_schedule(initial_lr=1e-3, decay_factor=0.75, step_size=10, verbose= 0):
     '''

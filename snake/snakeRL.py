@@ -15,13 +15,13 @@ class SnakeRL(Snake):
   def runStep(self, dir: str): 
     if not self.gameover:
       self.moves+=1
-      if dir[3]: #left
+      if dir==3: #left
         self.runSingle(-1, 0)
-      elif dir[1]: #right
+      elif dir==1: #right
         self.runSingle(1, 0)
-      elif dir[2]: #down
+      elif dir==2: #down
         self.runSingle(0, 1)
-      elif dir[0]: #up
+      elif dir==0: #up
         self.runSingle(0, -1)
       else: #invalid direction = no input
         self.runSingle(self.Xdir, self.Ydir)

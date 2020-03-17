@@ -142,13 +142,20 @@ class SnakeRL_test(unittest.TestCase):
 
   def test_evaluateNext(self):
     nn = NeuralNetwork()
-    s = SnakeRL(nn=nn, sizeX = 8, sizeY = 8)
+    s = SnakeRL(nn=nn, sizeX = 10, sizeY = 10)
     direction = s.evaluateNextStep()
     print(direction)
-    self.assertEqual(0,1)
+    self.assertGreaterEqual(direction,0)
+    self.assertLessEqual(direction,3)
 
   def test_play(self):
-    self.assertEqual(0,1)
+    nn = NeuralNetwork()
+    s = SnakeRL(nn=nn, sizeX = 10, sizeY = 10)
+    s.play()
+    self.assertTrue(s.gameover,False)
+    self.assertGreater(len(setUp.moveList),0)
+    print(s.moveList)
+    print(s.grid)
 
 if __name__ == '__main__':
   unittest.main()
