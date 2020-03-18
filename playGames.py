@@ -12,10 +12,10 @@ class PlayGames():
     self.gamestates = []
     self.gameScore = []
     self.prediction = []
-    self.gameID = []
-    self.dfDetail = dfDetail
+    self.gameId = []
+    self.dfTrack = dfTrack
     self.nn = nn
-    self.gamestate_to_nn = SelfPlay.vectorizeFunction(SelfPlay.grid_val_to_nn)
+    self.gamestate_to_nn = PlayGames.vectorizeFunction(PlayGames.grid_val_to_nn)
 
   def vectorizeFunction(functionIn):
     return np.vectorize(functionIn)

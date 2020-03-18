@@ -197,7 +197,7 @@ class SnakeRL_test(unittest.TestCase):
     s = SnakeRL(nn=nn, sizeX = 10, sizeY = 10)
     s.play()
     self.assertTrue(s.gameover,False)
-    self.assertGreater(len(setUp.moveList),0)
+    self.assertGreater(len(s.moveList),0)
     print(s.moveList)
     print(s.grid)
 

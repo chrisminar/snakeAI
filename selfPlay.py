@@ -12,24 +12,17 @@ import numpy as np
 #####################
 class SelfPlay(PlayGames):
   """Generate self play games"""
-  def __init__(self, tracker:DataTrack, bestNN:NeuralNetwork):
-    self.nn = bestNN
-    self.dfTrack = tracker
-    self.gamestates = []
-    self.gameScore = []
-    self.gameId = []
-    self.prediction = []
 
-  def playGames( self, generation:int, startID:int ):
-    for i in range(globe.NUM_SELF_PLAY_GAMES):
+  def playGames( self, generation:int, startID:int, num_games:int=globe.NUM_SELF_PLAY_GAMES ):
+    for i in range(num_games):
       with Timer() as t:
         g = snake(nn=self.nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
         g.play()
         self.gamestates.append( np.stack(g.stateList))
         self.gameScore.append(  np.full( (len(g.stateList), ), g.score ) )
-        self.gameID.append(     np.full( (len(g.stateList), ), startID+i ) )
+        self.gameId.append(     np.full( (len(g.stateList), ), startID+i ) )
         self.prediction.append( np.array(g.moveList))
-      self.dfTrack.appendSelfPlayDetail(t.secs, g.score, generation, i)
+      self.dfTrack.appendSelfPlayDetail(t.secs, g.score, generation, startID+i, i)
     self.dfTrack.appendSelfPlayBroad(self.dfTrack.self_play_detail.loc[generation,'time'].sum(), self.dfTrack.self_play_detail.loc[generation,'score'].mean())
 
-    return self.gamestate_to_nn(np.concatenate(self.gamestates)), np.concatenate(self.gameScore), np.concatenate(self.gameID), np.concatenate(self.prediction)
+    return self.gamestate_to_nn(np.concatenate(self.gamestates)), np.concatenate(self.gameScore), np.concatenate(self.gameId), np.concatenate(self.prediction)
