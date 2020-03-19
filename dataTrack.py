@@ -39,8 +39,16 @@ class DataTrack:
     current_index = len(self.training.index.values)
     self.training.loc[current_index] = [time, num_minibatch, mean_time_per_minibatch]
 
-  def loadAllDataFrames(self):
-    pass
+  def loadAllDataFrames(self, generation):
+    self.self_play_detail = pd.read_pickle(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\sp_detail_gen{}.pkl'.format(generation))
+    self.self_play_broad  = pd.read_pickle(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\sp_broad_gen{}.pkl'.format(generation))
+    self.evaluator_detail = pd.read_pickle(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\eval_detail_gen{}.pkl'.format(generation))
+    self.evaluator_broad  = pd.read_pickle(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\eval_broad_gen{}.pkl'.format(generation))
+    self.training         = pd.read_pickle(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\train_gen{}.pkl'.format(generation))
 
-  def saveAllDataFrames(self):
-    pass
+  def saveAllDataFrames(self, generation):
+    self.self_play_detail.to_pickle(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\sp_detail_gen{}.pkl'.format(generation))
+    self.self_play_broad.to_pickle( r'C:\Users\Chris Minar\Documents\Python\Snake\saves\sp_broad_gen{}.pkl'.format(generation))
+    self.evaluator_detail.to_pickle(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\eval_detail_gen{}.pkl'.format(generation))
+    self.evaluator_broad.to_pickle( r'C:\Users\Chris Minar\Documents\Python\Snake\saves\eval_broad_gen{}.pkl'.format(generation))
+    self.training.to_pickle(        r'C:\Users\Chris Minar\Documents\Python\Snake\saves\train_gen{}.pkl'.format(generation))

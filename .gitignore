@@ -6,5 +6,6 @@ __pycache__/
 *.png
 *.jpeg
 *.user
+*.pkl
 
 saves/

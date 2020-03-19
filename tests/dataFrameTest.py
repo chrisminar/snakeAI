@@ -58,11 +58,22 @@ class DataTrack_test(unittest.TestCase):
     for v, col in zip(val, err):
       self.assertEqual(dt.training.loc[0][col] , v, "failed to set {} for training dataframe".format(col))
 
-  def test_load_df(self):
-    self.assertEqual(0,1)
+  def test_save_load_df(self):
+    dt = DataTrack()
+    dt.appendSelfPlayDetail(0.0, 1, 0, 2, 0)
+    dt.appendSelfPlayBroad(0.0, 1.0)
+    dt.appendEvaluatorDetail(0.0, 1, 0, 3, 4, 5.0, 6.0, 7.0, 8.0, 0)
+    dt.appendTraining(0.0, 1, 2.0)
+    dt.appendEvaluatorBroad(0.0, 1.0)
+    dt.saveAllDataFrames(0)
+    dt2 = DataTrack()
+    dt2.loadAllDataFrames(0)
+    self.assertTrue(dt.self_play_detail.equals(dt2.self_play_detail))
+    self.assertTrue(dt.self_play_broad.equals(dt2.self_play_broad))
+    self.assertTrue(dt.evaluator_detail.equals(dt2.evaluator_detail))
+    self.assertTrue(dt.evaluator_broad.equals(dt2.evaluator_broad))
+    self.assertTrue(dt.training.equals(dt2.training))
 
-  def test_save_df(self):
-    self.assertEqual(0,1)
 
 if __name__ == '__main__':
   unittest.main()

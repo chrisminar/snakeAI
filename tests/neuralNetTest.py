@@ -20,7 +20,7 @@ class NeuralNet_test(unittest.TestCase):
 
     nn=NeuralNetwork()
     nn.train(trainSet, value, policy, 0)
-    nn.evaluate(np.zeros((1,10,10,1)))
+    nn.evaluate(np.zeros((10,10)))
     #should put some asserts here
 
   def test_conv(self):
@@ -60,7 +60,8 @@ class NeuralNet_test(unittest.TestCase):
     self.assertEqual(model.layers[-1].output_shape, (None, 1))
 
   def test_displayModel(self):
-    self.assertEqual(0,1)
+    nn=NeuralNetwork()
+    nn.dispModel()
 
   def test_load(self):
     self.assertEqual(0,1)

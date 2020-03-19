@@ -106,15 +106,15 @@ class TrainRL():
   def addGamesToList(self, states, scores, ids, moves):
     self.gameStates = np.concatenate(self.gameStates, states)
     self.gameScores = np.concatenate(self.gameScores, scores)
-    self.gameIDs = np.concatenate(self.gameIDs, ids)
-    self.moves = np.concatenate(self.moves, moves)
+    self.gameIDs    = np.concatenate(self.gameIDs, ids)
+    self.moves      = np.concatenate(self.moves, moves)
 
   def trimGameList(self):
     minId = np.min(self.gameIDs)
     maxID = np.max(self.gameIDs)
-    if maxID - minId > globe.NUM_TRAINING_GAMES:
-      validIdx = np.argwhere(self.gameIDs > maxID - globe.NUM_TRAINING_GAMES)
-      self.gameIDs = self.gameIDs[validIdx]
+    if (maxID - minId) > globe.NUM_TRAINING_GAMES:
+      validIdx        = np.argwhere(self.gameIDs > maxID - globe.NUM_TRAINING_GAMES)
+      self.gameIDs    = self.gameIDs[validIdx]
       self.gameScores = self.gameScores[validIdx]
       self.gameStates = self.gameStates[validIdx,:,:]
     return
