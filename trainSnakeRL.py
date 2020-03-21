@@ -83,7 +83,7 @@ class TrainRL():
     #new neural network
   def networkTrainer(self, generation:int):
     trn = Trainer(self.tracker)
-    trn.train(generation, self.currentNN, self.gameStates, self.gameScores, self.moves)
+    trn.train(generation, self.currentNN, self.gameStates, self.gameScores, self.moves, self.meanScore)
     return
 
    #operates on: 
@@ -112,9 +112,12 @@ class TrainRL():
   def trimGameList(self):
     minId = np.min(self.gameIDs)
     maxID = np.max(self.gameIDs)
+    tempIdx           = np.argwhere(self.gameIDs > ( maxID - (globe.NUM_TRAINING_GAMES*2) ) )
+    self.meanScore    = np.mean(self.gameScores)
     if (maxID - minId) > globe.NUM_TRAINING_GAMES:
-      validIdx        = np.argwhere(self.gameIDs > maxID - globe.NUM_TRAINING_GAMES)
+      validIdx        = np.argwhere(self.gameIDs > (maxID - globe.NUM_TRAINING_GAMES) )
       self.gameIDs    = self.gameIDs[validIdx]
       self.gameScores = self.gameScores[validIdx]
       self.gameStates = self.gameStates[validIdx,:,:]
+      self.moves      = self.moves[validIdx,:]
     return
