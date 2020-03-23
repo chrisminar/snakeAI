@@ -4,8 +4,6 @@ import numpy as np
 
 
 class Trainer_test(unittest.TestCase):
-  def test_(self):
-    self.assertEqual(0,1)
 
   def test_train(self):
     self.assertEqual(0,1)
