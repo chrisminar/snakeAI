@@ -189,8 +189,8 @@ class SnakeRL_test(unittest.TestCase):
     s = SnakeRL(nn=nn, sizeX = 10, sizeY = 10)
     direction = s.evaluateNextStep()
     print(direction)
-    self.assertGreaterEqual(direction,0)
-    self.assertLessEqual(direction,3)
+    self.assertGreaterEqual(np.argmax(direction),0)
+    self.assertLessEqual(np.argmax(direction),3)
 
   def test_play(self):
     nn = NeuralNetwork()

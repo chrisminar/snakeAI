@@ -22,7 +22,7 @@ class Evaluator(PlayGames):
           self.gamestates.append( np.stack(g.stateList))
           self.gameScore.append(  np.full( (len(g.stateList), ), g.score ) )
           self.gameID.append(     np.full( (len(g.stateList), ), startID+i ) )
-          self.prediction.append( np.array(g.moveList))
+          self.prediction.append( np.stack(g.moveList))
         self.dfTrack.appendEvaluatorDetail( t.secs, g.score, generation, startID+i, len(g.stateList), 0.0, 0.0, 0.0, 0.0) #todo, get the mcts times tracked
     self.dfTrack.appendEvaluatorBroad(overallTime.secs, self.dfTrack.evaluator_detail.loc[generation,'score'].mean())
 

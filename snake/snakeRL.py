@@ -37,4 +37,6 @@ class SnakeRL(Snake):
 
   def evaluateNextStep(self):
     policy, value = self.nn.evaluate(self.grid)
+    out = [0,0,0,0]
+    out[int(np.argmax(policy))] = 1
     return np.argmax(policy)
