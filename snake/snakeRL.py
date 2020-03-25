@@ -11,6 +11,7 @@ class SnakeRL(Snake):
     self.grid[self.foodX][self.foodY] = -2   #set food on grid
     self.stateList = []
     self.moveList = []
+    self.stateList.append(self.grid)
 
   def runStep(self, dir: str): 
     if not self.gameover:
@@ -30,8 +31,8 @@ class SnakeRL(Snake):
 
   def play(self):
     while (self.gameover == False):
-      newDir = self.evaluateNextStep()
-      self.moveList.append(newDir)
+      newDir, move = self.evaluateNextStep()
+      self.moveList.append(move)
       self.runStep(newDir)
     return self.score
 
@@ -39,4 +40,4 @@ class SnakeRL(Snake):
     policy, value = self.nn.evaluate(self.grid)
     out = [0,0,0,0]
     out[int(np.argmax(policy))] = 1
-    return np.argmax(policy)
+    return np.argmax(policy), out

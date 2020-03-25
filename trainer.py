@@ -31,12 +31,12 @@ class Trainer():
 
   def permute_inputs(states, scores, moves):
     #flip left - right
-    stateLR = np.flip(states,1)
+    stateLR = np.flip(states)
     movesLR = Trainer.flipMoveLR(moves)
     scoreLR = np.copy(scores)
 
     #flip ud
-    stateUD = np.flipud(states,2)
+    stateUD = np.flipud(states)
     movesUD = Trainer.flipMoveUD(moves)
     scoreUD = np.copy(scores)
 
@@ -53,9 +53,9 @@ class Trainer():
     scoreR270 = np.copy(scores)
     movesR270 = Trainer.rotateMoves(moves, 3)
 
-    stateOut = np.vstack(states, stateLR, stateUD, stateR90, stateR180, stateR270)
-    movesOut = np.vstack(moves, movesLR, movesUD, movesR90, movesR180, movesR270)
-    scoreOut = np.vstack(scores, scoreLR, scoreUD, scoreR90, scoreR180, scoreR270)
+    stateOut = np.vstack([states, stateLR, stateUD, stateR90, stateR180, stateR270])
+    movesOut = np.vstack([moves, movesLR, movesUD, movesR90, movesR180, movesR270])
+    scoreOut = np.concatenate([scores, scoreLR, scoreUD, scoreR90, scoreR180, scoreR270])
 
     return stateOut, movesOut, scoreOut
 
