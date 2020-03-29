@@ -11,7 +11,7 @@ class SnakeRL(Snake):
     self.grid[self.foodX][self.foodY] = -2   #set food on grid
     self.stateList = []
     self.moveList = []
-    self.stateList.append(self.grid)
+    self.stateList.append(np.copy(self.grid))
 
   def runStep(self, dir: str): 
     if not self.gameover:
@@ -26,7 +26,7 @@ class SnakeRL(Snake):
         self.runSingle(0, -1)
       else: #invalid direction = no input
         self.runSingle(self.Xdir, self.Ydir)
-      self.stateList.append(self.grid)
+      self.stateList.append(np.copy(self.grid))
     return
 
   def play(self):

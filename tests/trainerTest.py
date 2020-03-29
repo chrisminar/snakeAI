@@ -36,11 +36,11 @@ class Trainer_test(unittest.TestCase):
     gxStart = int(globe.GRID_X/2)
     gyStart = int(globe.GRID_Y/2)
     stateslr = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
-    stateslr[0,gxStart+0,gyStart] = 0
-    stateslr[1,gxStart-1,gyStart] = 0
-    stateslr[2,gxStart-2,gyStart] = 0
-    stateslr[3,gxStart-2,gyStart] = 1
-    stateslr[3,gxStart-3,gyStart] = 0
+    stateslr[0,gxStart-1,gyStart] = 0
+    stateslr[1,gxStart-2,gyStart] = 0
+    stateslr[2,gxStart-3,gyStart] = 0
+    stateslr[3,gxStart-3,gyStart] = 1
+    stateslr[3,gxStart-4,gyStart] = 0
 
     moveslr = np.zeros( (4,4) )
     moveslr[0,3] = 1
@@ -50,11 +50,11 @@ class Trainer_test(unittest.TestCase):
 
     #ud
     statesud = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
-    statesud[0,gxStart+0,gyStart] = 0
-    statesud[1,gxStart+1,gyStart] = 0
-    statesud[2,gxStart+2,gyStart] = 0
-    statesud[3,gxStart+2,gyStart] = 1
-    statesud[3,gxStart+3,gyStart] = 0
+    statesud[0,gxStart+0,gyStart-1] = 0
+    statesud[1,gxStart+1,gyStart-1] = 0
+    statesud[2,gxStart+2,gyStart-1] = 0
+    statesud[3,gxStart+2,gyStart-1] = 1
+    statesud[3,gxStart+3,gyStart-1] = 0
 
     movesud = np.zeros( (4,4) )
     movesud[0,1] = 1
@@ -64,11 +64,11 @@ class Trainer_test(unittest.TestCase):
 
     #90
     states90 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
-    states90[0,gxStart,gyStart+0] = 0
-    states90[1,gxStart,gyStart+1] = 0
-    states90[2,gxStart,gyStart+2] = 0
-    states90[3,gxStart,gyStart+3] = 1
-    states90[3,gxStart,gyStart+3] = 0
+    states90[0,gxStart-1,gyStart+0] = 0
+    states90[1,gxStart-1,gyStart+1] = 0
+    states90[2,gxStart-1,gyStart+2] = 0
+    states90[3,gxStart-1,gyStart+2] = 1
+    states90[3,gxStart-1,gyStart+3] = 0
 
     moves90 = np.zeros( (4,4) )
     moves90[0,0] = 1
@@ -78,11 +78,11 @@ class Trainer_test(unittest.TestCase):
 
     #180
     states180 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
-    states180[0,gxStart-0, gyStart] = 0
-    states180[1,gxStart-1, gyStart] = 0
-    states180[2,gxStart-2, gyStart] = 0
-    states180[3,gxStart-2, gyStart] = 1
-    states180[3,gxStart-3, gyStart] = 0
+    states180[0,gxStart-1, gyStart-1] = 0
+    states180[1,gxStart-2, gyStart-1] = 0
+    states180[2,gxStart-3, gyStart-1] = 0
+    states180[3,gxStart-3, gyStart-1] = 1
+    states180[3,gxStart-4, gyStart-1] = 0
 
     moves180 = np.zeros( (4,4) )
     moves180[0,3] = 1
@@ -92,11 +92,11 @@ class Trainer_test(unittest.TestCase):
 
     #270
     states270 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
-    states270[0,gxStart, gyStart -0] = 0
-    states270[1,gxStart, gyStart -1] = 0
-    states270[2,gxStart, gyStart -2] = 0
+    states270[0,gxStart, gyStart -1] = 0
+    states270[1,gxStart, gyStart -2] = 0
+    states270[2,gxStart, gyStart -3] = 0
     states270[3,gxStart, gyStart -3] = 1
-    states270[3,gxStart, gyStart -3] = 0
+    states270[3,gxStart, gyStart -4] = 0
 
     moves270 = np.zeros( (4,4) )
     moves270[0,2] = 1
@@ -105,7 +105,14 @@ class Trainer_test(unittest.TestCase):
     moves270[3,2] = 1
 
     #accumulate
+    states = np.where(states==-2, -1, states) #set -2s to -1s
     st,mv,sc = Trainer.permute_inputs(states,scores,moves)
+    self.assertTrue(np.array_equal(st[:4,:,:],    states), 'states')
+    self.assertTrue(np.array_equal(st[4:8,:,:],   stateslr), 'fliplr')
+    self.assertTrue(np.array_equal(st[8:12,:,:],  statesud), 'flipud')
+    self.assertTrue(np.array_equal(st[12:16,:,:], states90), 'rotate90')
+    self.assertTrue(np.array_equal(st[16:20,:,:], states180), 'rotate180')
+    self.assertTrue(np.array_equal(st[20:,:,:],   states270), 'rotate270')
     stateAll = np.concatenate([states, stateslr, statesud, states90, states180, states270])
     movesAll = np.concatenate([moves, moveslr, movesud, moves90, moves180, moves270])
     scoresAll = np.concatenate([scores, scores, scores, scores, scores, scores])

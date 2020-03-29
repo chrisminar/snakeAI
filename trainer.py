@@ -30,13 +30,14 @@ class Trainer():
     self.dfTrack.appendTraining( t.secs, num_minibatch, t.secs/num_minibatch )
 
   def permute_inputs(states, scores, moves):
+    flipAxis = len(states.shape)-1
     #flip left - right
-    stateLR = np.flip(states)
+    stateLR = np.flip(states, axis=flipAxis-1)
     movesLR = Trainer.flipMoveLR(moves)
     scoreLR = np.copy(scores)
 
     #flip ud
-    stateUD = np.flipud(states)
+    stateUD = np.flip(states, axis=flipAxis)
     movesUD = Trainer.flipMoveUD(moves)
     scoreUD = np.copy(scores)
 
