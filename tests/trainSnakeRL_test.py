@@ -4,16 +4,7 @@ from trainSnakeRL import TrainRL
 
 class trainSnake_test(unittest.TestCase):
   def test_init(self):
-    self.assertEqual(0,1)
-
-  def test_train(self):
-    self.assertEqual(0,1)
-
-  def test_selfPlay(self):
-    self.assertEqual(0,1)
-
-  def test_evaluator(self):
-    self.assertEqual(0,1)
+    t = TrainRL()
 
   def test_addGamesToList(self):
     self.assertEqual(0,1)

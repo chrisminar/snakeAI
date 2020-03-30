@@ -187,10 +187,11 @@ class SnakeRL_test(unittest.TestCase):
   def test_evaluateNext(self):
     nn = NeuralNetwork()
     s = SnakeRL(nn=nn, sizeX = 10, sizeY = 10)
-    direction = s.evaluateNextStep()
+    direction, move_array = s.evaluateNextStep()
     print(direction)
-    self.assertGreaterEqual(np.argmax(direction),0)
-    self.assertLessEqual(np.argmax(direction),3)
+    self.assertGreaterEqual(np.argmax(direction),0,'invalid direction output')
+    self.assertLessEqual(np.argmax(move_array),3, 'invalid direction output')
+    self.assertEqual(np.argmax(move_array),direction, 'direction doesn\'t match move array')
 
   def test_play(self):
     nn = NeuralNetwork()

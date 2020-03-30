@@ -30,13 +30,11 @@ import typing
 from typing import List,Tuple
 from dataTrack import DataTrack
 from neuralNet import NeuralNetwork
-from neuralNet import nn_out
 from gameState import GameState
 from globalVar import Globe as globe
 
 from selfPlay import SelfPlay
 from trainer import Trainer
-from evaluator import Evaluator
 
 class TrainRL():
   def __init__(self):
@@ -44,10 +42,8 @@ class TrainRL():
     self.gameStates = np.zeros((0,globe.GRID_X,globe.GRID_Y))
     self.gameScores = np.zeros((0,1))
     self.gameIDs = np.zeros((0,1))
-    self.moves = np.zeros(0,4)
-    self.currentNN = NeuralNetwork()
-    self.bestNN = NeuralNetwork()
-    self.bestNN_genID = 0
+    self.moves = np.zeros((0,4))
+    self.nn = NeuralNetwork()
     self.gameID = 0
     return
 
@@ -56,17 +52,15 @@ class TrainRL():
     while 1:
       self.selfPlay(generation)
       self.networkTrainer(generation)
-      self.evaluator(generation)
-      print('Mean score of {:0.1f} in generation {}. Selfplay, training, evaluation in {}s, {}s, {}s'.format(self.tracker.evaluator_broad.loc[gneration, 'mean_score'],
-                                                                                                             generation, 
-                                                                                                             self.tracker.self_play_broad.loc[generation, 'time'],
-                                                                                                             self.tracker.training.loc[generation, 'time'],
-                                                                                                             self.tracker.evaluator_broad.loc[generation, 'time']))
+      print('Mean score of {:0.1f} in generation {}. Selfplay, training in {}s, {}s'.format(self.tracker.evaluator_broad.loc[gneration, 'mean_score'],
+                                                                                            generation, 
+                                                                                            self.tracker.self_play_broad.loc[generation, 'time'],
+                                                                                            self.tracker.training.loc[generation, 'time']))
       generation += 1
     return
 
   #operates on:
-    #best neural network
+    #neural network
   #outputs:
     #2000 game outputs
   def selfPlay(self, nn:NeuralNetwork, generation:int):
@@ -86,23 +80,6 @@ class TrainRL():
     trn.train(generation, self.currentNN, self.gameStates, self.gameScores, self.moves, self.meanScore)
     return
 
-   #operates on: 
-    #best neural network
-    #current neural network
-  #outputs:
-    #400 games (with gamestate)
-    #mean score of 400 games
-  def evaluator(self, generation:int):
-    eval = Evaluator(self.tracker, self.currentNN)
-    states, scores, ids, moves = eval.evaluate(generation, self.gameID)
-    if self.tracker.evaluator_broad.loc[generation, 'score'] == self.tracker.evaluator_broad['score'].max():
-      self.bestNN_genID = generation
-      self.bestNN.load(bestNN_genID)
-      self.gameID += globe.NUM_EVALUATION_GAMES
-      self.addGamesToList(states, scores, ids, moves)
-      self.trimGameList()
-    return
-
   def addGamesToList(self, states, scores, ids, moves):
     self.gameStates = np.concatenate(self.gameStates, states)
     self.gameScores = np.concatenate(self.gameScores, scores)
@@ -112,7 +89,6 @@ class TrainRL():
   def trimGameList(self):
     minId = np.min(self.gameIDs)
     maxID = np.max(self.gameIDs)
-    tempIdx           = np.argwhere(self.gameIDs > ( maxID - (globe.NUM_TRAINING_GAMES*2) ) )
     self.meanScore    = np.mean(self.gameScores)
     if (maxID - minId) > globe.NUM_TRAINING_GAMES:
       validIdx        = np.argwhere(self.gameIDs > (maxID - globe.NUM_TRAINING_GAMES) )
