@@ -7,14 +7,9 @@
     #do the actual work
 
 #todo list
-#the neural net being used isn't handled correctly in trainsnakerl
 #make generation the first input to all datatrack functions
-#change evaluator broad to explicity use the generation as the index
-#change unit tests to reflect the class inheritance of selfplay/plagames/evaluator
-#unit tests for evaluator
+#change unit tests to reflect the class inheritance of selfplay/plagames
 #change the training weights, drastically reduce the value of the 'value head' This doesn't really even need to be here because we are not using mcts
-#move prediction vstack is wrong in trainer because I've flipped the grid
-#change the 'evaluate nn' function to take (10,10) instead of (1,10,10,1)
 
 #stuff to do someday
   # do network pruning
@@ -40,8 +35,8 @@ class TrainRL():
   def __init__(self):
     self.tracker = DataTrack()
     self.gameStates = np.zeros((0,globe.GRID_X,globe.GRID_Y))
-    self.gameScores = np.zeros((0,1))
-    self.gameIDs = np.zeros((0,1))
+    self.gameScores = np.zeros((0,))
+    self.gameIDs = np.zeros((0,))
     self.moves = np.zeros((0,4))
     self.nn = NeuralNetwork()
     self.gameID = 0
@@ -50,7 +45,7 @@ class TrainRL():
   def train(self):
     generation = 0
     while 1:
-      self.selfPlay(generation)
+      self.selfPlay(self.nn, generation)
       self.networkTrainer(generation)
       print('Mean score of {:0.1f} in generation {}. Selfplay, training in {}s, {}s'.format(self.tracker.evaluator_broad.loc[gneration, 'mean_score'],
                                                                                             generation, 
@@ -64,7 +59,7 @@ class TrainRL():
   #outputs:
     #2000 game outputs
   def selfPlay(self, nn:NeuralNetwork, generation:int):
-    spc = SelfPlay(self.tracker, self.bestNN)
+    spc = SelfPlay(self.tracker, nn)
     states, scores, ids, moves = spc.playGames(generation, self.gameID)
     self.gameID += globe.NUM_SELF_PLAY_GAMES
     self.addGamesToList(states, scores, ids, moves)
@@ -81,10 +76,10 @@ class TrainRL():
     return
 
   def addGamesToList(self, states, scores, ids, moves):
-    self.gameStates = np.concatenate(self.gameStates, states)
-    self.gameScores = np.concatenate(self.gameScores, scores)
-    self.gameIDs    = np.concatenate(self.gameIDs, ids)
-    self.moves      = np.concatenate(self.moves, moves)
+    self.gameStates = np.concatenate((self.gameStates, states))
+    self.gameScores = np.concatenate((self.gameScores, scores))
+    self.gameIDs    = np.concatenate((self.gameIDs, ids))
+    self.moves      = np.concatenate((self.moves, moves))
 
   def trimGameList(self):
     minId = np.min(self.gameIDs)
