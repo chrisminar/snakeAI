@@ -71,8 +71,8 @@ class TrainRL():
   #outputs:
     #new neural network
   def networkTrainer(self, generation:int):
-    trn = Trainer(self.tracker)
-    trn.train(generation, self.currentNN, self.gameStates, self.gameScores, self.moves, self.meanScore)
+    trn = Trainer(self.tracker, self.nn)
+    trn.train(generation, self.gameStates, self.gameScores, self.moves, self.meanScore)
     return
 
   def addGamesToList(self, states, scores, ids, moves):

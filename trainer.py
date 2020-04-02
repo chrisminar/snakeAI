@@ -12,7 +12,6 @@ import numpy as np
 class Trainer():
   """description of class"""
   def __init__( self, dfTrack:DataTrack, nn:NeuralNetwork ):
-    self.td = trainingData
     self.dfTrack = dfTrack
     self.nn = nn
 
@@ -22,7 +21,7 @@ class Trainer():
       idx = np.argwhere(scores>meanScore)
 
       #get all permutations
-      statesP, movesP, scoresP = Trainer.permute_inputs(inputs[idx][:][:], scores[idx], move_predictions[idx][:])
+      statesP, movesP, scoresP = Trainer.permute_inputs(inputs[idx][:][:], scores[idx], move_predictions[idx][:]) #calling idx here changes shape from x,4 to x,1,4... then it breaks
       
       #train on them
       self.nn.train( statesP, scoresP, movesP, generation )
