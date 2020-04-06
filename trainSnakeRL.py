@@ -1,15 +1,10 @@
-# self play
-    #for the first 30 moves the temperature is set to 1, afterwards it is set to 0
-
-# WORK BLOCKS
-# ON DECK
-  # UNIT TEST
-    #do the actual work
-
 #todo list
+#make a timeout for snake
+# need to add the last two 'permutes' that were missing. flip around y=x, and flip around y=-x
 #make generation the first input to all datatrack functions
 #change unit tests to reflect the class inheritance of selfplay/plagames
 #change the training weights, drastically reduce the value of the 'value head' This doesn't really even need to be here because we are not using mcts
+#snake grid update can be done more efficiently
 
 #stuff to do someday
   # do network pruning
@@ -47,7 +42,7 @@ class TrainRL():
     while 1:
       self.selfPlay(self.nn, generation)
       self.networkTrainer(generation)
-      print('Mean score of {:0.1f} in generation {}. Selfplay, training in {}s, {}s'.format(self.tracker.evaluator_broad.loc[gneration, 'mean_score'],
+      print('Mean score of {:0.1f} in generation {}. Selfplay, training in {}s, {}s'.format(self.tracker.self_play_broad.loc[generation,'mean_score'],
                                                                                             generation, 
                                                                                             self.tracker.self_play_broad.loc[generation, 'time'],
                                                                                             self.tracker.training.loc[generation, 'time']))

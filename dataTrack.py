@@ -9,7 +9,7 @@ class DataTrack:
     index = ['generation','id']
     midx = pd.MultiIndex(levels = [[],[]], labels = [[],[]], names = index)
     self.self_play_detail_column_names = ['time', 'score', 'game_id']
-    self.self_play_broad_column_names  = ['time', 'mean score']
+    self.self_play_broad_column_names  = ['time', 'mean_score']
     self.training_column_names         = ['time', 'num_minibatch', 'mean_time_per_minibatch']
     self.self_play_detail = pd.DataFrame(columns=self.self_play_detail_column_names, index = midx) #index is gen #
     self.self_play_broad  = pd.DataFrame(columns=self.self_play_broad_column_names) #index is generation #
