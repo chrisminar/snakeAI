@@ -26,14 +26,19 @@ class Trainer_test(unittest.TestCase):
         s.grid[s.foodX][s.foodY] = -2
       m = [0,1,0,0]
       s.moveList.append(m)
+      s.stateList.append(np.copy(s.grid))
       s.runStep(1) #move right
 
-    m = [0,1,0,0]
     s.moveList.append(m)
+    s.stateList.append(np.copy(s.grid))
+    m = [0,1,0,0]
 
     states = np.stack(s.stateList)
     moves  = np.stack(s.moveList)
     scores = np.full( (len(s.stateList), ), s.score )
+
+    gxStart = int(globe.GRID_X/2)
+    gyStart = int(globe.GRID_Y/2)
 
     #90
     states90 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
@@ -78,8 +83,6 @@ class Trainer_test(unittest.TestCase):
     moves270[3,2] = 1
 
     #lr
-    gxStart = int(globe.GRID_X/2)
-    gyStart = int(globe.GRID_Y/2)
     stateslr = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
     stateslr[0,gxStart-1,gyStart] = 0
     stateslr[1,gxStart-2,gyStart] = 0
@@ -95,13 +98,13 @@ class Trainer_test(unittest.TestCase):
 
     #lr 90
     stateslr90 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
-    stateslr90[0,gxStart+0,gyStart+0] = 0
-    stateslr90[1,gxStart+0,gyStart+1] = 0
-    stateslr90[2,gxStart+0,gyStart+2] = 0
-    stateslr90[3,gxStart+0,gyStart+2] = 0
-    stateslr90[3,gxStart+0,gyStart+3] = 0
+    stateslr90[0,gxStart-1,gyStart-1] = 0
+    stateslr90[1,gxStart-1,gyStart-2] = 0
+    stateslr90[2,gxStart-1,gyStart-3] = 0
+    stateslr90[3,gxStart-1,gyStart-3] = 1
+    stateslr90[3,gxStart-1,gyStart-4] = 0
 
-    moveslr = np.zeros( (4,4) )
+    moveslr90 = np.zeros( (4,4) )
     moveslr90[0,2] = 1
     moveslr90[1,2] = 1
     moveslr90[2,2] = 1
@@ -123,11 +126,11 @@ class Trainer_test(unittest.TestCase):
 
     #lr 270
     stateslr270 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
-    stateslr270[0,gxStart-1,gyStart+1] = 0
-    stateslr270[1,gxStart-1,gyStart+2] = 0
-    stateslr270[2,gxStart-1,gyStart+3] = 0
-    stateslr270[3,gxStart-1,gyStart+3] = 1
-    stateslr270[3,gxStart-1,gyStart+4] = 0
+    stateslr270[0,gxStart,gyStart+0] = 0
+    stateslr270[1,gxStart,gyStart+1] = 0
+    stateslr270[2,gxStart,gyStart+2] = 0
+    stateslr270[3,gxStart,gyStart+2] = 1
+    stateslr270[3,gxStart,gyStart+3] = 0
 
     moveslr270 = np.zeros( (4,4) )
     moveslr270[0,0] = 1
@@ -146,7 +149,7 @@ class Trainer_test(unittest.TestCase):
     self.assertTrue(np.array_equal(st[20:24,:,:], stateslr90),  'rotatelr90')
     self.assertTrue(np.array_equal(st[24:28,:,:], stateslr180), 'rotatelr180')
     self.assertTrue(np.array_equal(st[28:,:,:],   stateslr270), 'rotatelr270')
-    stateAll = np.concatenate([states, states90, states180, states27, stateslr, stateslr90, stateslr180, stateslr270])
+    stateAll = np.concatenate([states, states90, states180, states270, stateslr, stateslr90, stateslr180, stateslr270])
     movesAll = np.concatenate([moves, moves90, moves180, moves270, moveslr, moveslr90, moveslr180, moveslr270])
     scoresAll = np.concatenate([scores, scores, scores, scores, scores, scores, scores, scores])
     #test
