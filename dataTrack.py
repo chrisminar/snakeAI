@@ -7,7 +7,7 @@ import pandas as pd
 class DataTrack:
   def __init__(self):
     index = ['generation','id']
-    midx = pd.MultiIndex(levels = [[],[]], labels = [[],[]], names = index)
+    midx = pd.MultiIndex(levels = [[],[]], codes = [[],[]], names = index)
     self.self_play_detail_column_names = ['time', 'score', 'game_id']
     self.self_play_broad_column_names  = ['time', 'mean_score']
     self.training_column_names         = ['time', 'num_minibatch', 'mean_time_per_minibatch']
