@@ -35,7 +35,6 @@ class Trainer_test(unittest.TestCase):
 
     states = np.stack(s.stateList)
     moves  = np.stack(s.moveList)
-    scores = np.full( (len(s.stateList), ), s.score )
 
     gxStart = int(globe.GRID_X/2)
     gyStart = int(globe.GRID_Y/2)
@@ -140,7 +139,7 @@ class Trainer_test(unittest.TestCase):
 
     #accumulate
     states = np.where(states==-2, -1, states) #set -2s to -1s
-    st,mv,sc = Trainer.permute_inputs(states,scores,moves)
+    st,mv = Trainer.permute_inputs(states, moves)
     self.assertTrue(np.array_equal(st[:4,:,:],    states),      'states')
     self.assertTrue(np.array_equal(st[4:8,:,:],   states90),    'rotate90')
     self.assertTrue(np.array_equal(st[8:12,:,:],  states180),   'rotate180')
@@ -151,9 +150,6 @@ class Trainer_test(unittest.TestCase):
     self.assertTrue(np.array_equal(st[28:,:,:],   stateslr270), 'rotatelr270')
     stateAll = np.concatenate([states, states90, states180, states270, stateslr, stateslr90, stateslr180, stateslr270])
     movesAll = np.concatenate([moves, moves90, moves180, moves270, moveslr, moveslr90, moveslr180, moveslr270])
-    scoresAll = np.concatenate([scores, scores, scores, scores, scores, scores, scores, scores])
-    #test
-    self.assertTrue(np.array_equal(sc, scoresAll))
     self.assertTrue(np.array_equal(mv, movesAll))
     self.assertTrue(np.array_equal(st, stateAll))
 

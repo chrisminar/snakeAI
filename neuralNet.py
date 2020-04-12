@@ -14,9 +14,8 @@ class NeuralNetwork:
     block1 = NeuralNetwork.residualBlock(1, block0)
     block2 = NeuralNetwork.residualBlock(2, block1)
     pblock = NeuralNetwork.policyHead(block2)
-    vblock = NeuralNetwork.valueHead(block2)
 
-    self.model = keras.Model(inputs=block_input, outputs=[pblock,vblock])
+    self.model = keras.Model(inputs=block_input, outputs=pblock)
     self.compile()
 
   def evaluate(self, state):
@@ -32,17 +31,16 @@ class NeuralNetwork:
 
   def compile(self):
     lr_sched = NeuralNetwork.step_decay_schedule(initial_lr=1e-4, decay_factor=0.75, step_size=2)
-    self.model.compile(loss={'policy':keras.losses.CategoricalCrossentropy(from_logits=True), 
-                             'value':keras.losses.MSE},
+    self.model.compile(loss={'policy':keras.losses.CategoricalCrossentropy(from_logits=True)},
                   optimizer=keras.optimizers.SGD(momentum=globe.MOMENTUM), 
-                  callbacks=[lr_sched],
-                  loss_weights=[1,0.001])
+                  callbacks=[lr_sched])
 
-  def train(self, inputs, scores, predictions, generation):
-    history = self.model.fit({'input_game_state':inputs}, {'policy':predictions, 'value':scores},
+  def train(self, inputs, predictions, generation):
+    history = self.model.fit({'input_game_state':inputs}, {'policy':predictions},
                                batch_size=globe.BATCH_SIZE,
                                epochs=globe.EPOCHS,
-                               validation_split=0.15)
+                               validation_split=0.15,
+                               verbose=2)
     self.save(generation)
 
   # conv BLOCK
@@ -91,24 +89,6 @@ class NeuralNetwork:
     l4 = layers.GlobalAveragePooling2D(                                  name = 'policyhead_pool')(l3)
     l5 = layers.Dense( 4,  activation = 'relu',                          name = 'policy' )( l4 )
     return l5
-
-  # valueHEAD
-  # convolution 2 filter, 1x1 patch, stride 1
-  # batch norm
-  # relu
-  # fully connected to hidden layer size 64
-  # relu
-  # fully connect to size 1
-  # tanh activation
-  def valueHead(input):
-    l1 = layers.Conv2D( 2, 1, padding = 'same', use_bias = False,        name = 'valuehead_conv' )( input )
-    l2 = layers.BatchNormalization( axis = -1, momentum = globe.MOMENTUM, name = 'valuehead_batch_norm' )( l1 )
-    l3 = layers.Activation( 'relu',                                      name = 'valuehead_activation' )( l2 )
-    l4 = layers.GlobalAveragePooling2D(                                  name = 'valuehead_pool')(l3)
-    l5 = layers.Dense( 64, activation = 'relu',                          name = 'valuehead_dense')( l4 )
-    l6 = layers.Dense( 1, activation = 'relu', kernel_regularizer=keras.regularizers.l2(0.0001), name = 'value' )( l5 )
-
-    return l6
 
   def dispModel(self):
     print( self.model.summary() )

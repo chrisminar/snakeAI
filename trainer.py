@@ -21,58 +21,49 @@ class Trainer():
       idx = np.nonzero(scores>meanScore)
 
       #get all permutations
-      statesP, movesP, scoresP = Trainer.permute_inputs(inputs[idx], scores[idx], move_predictions[idx])
+      statesP, movesP = Trainer.permute_inputs(inputs[idx], move_predictions[idx])
       
       #train on them
-      self.nn.train( np.reshape(statesP,(statesP.shape[0], statesP.shape[1], statesP.shape[1], 1)), scoresP, movesP, generation )
+      self.nn.train( np.reshape(statesP,(statesP.shape[0], statesP.shape[1], statesP.shape[1], 1)), movesP, generation )
       num_minibatch = statesP.shape[0]/globe.BATCH_SIZE
     self.dfTrack.appendTraining( t.secs, num_minibatch, t.secs/num_minibatch )
 
-  def permute_inputs(states, scores, moves):
+  def permute_inputs(states, moves):
     flipAxis = len(states.shape)-1
-
 
     #rotate 90
     stateR90 = np.rot90(states,1,(1,2))
-    scoreR90 = np.copy(scores)
     movesR90 = Trainer.rotateMoves(moves, 1)
 
     #rotate 180
     stateR180 = np.rot90(states,2,(1,2))
-    scoreR180 = np.copy(scores)
     movesR180 = Trainer.rotateMoves(moves, 2)
 
     #rotate 270
     stateR270 = np.rot90(states,3,(1,2))
-    scoreR270 = np.copy(scores)
     movesR270 = Trainer.rotateMoves(moves, 3)
 
     #flip left - right
     stateLR = np.flip(states, axis=flipAxis-1)
     movesLR = Trainer.flipMoveLR(moves)
-    scoreLR = np.copy(scores)
 
     #rotate lr 90
     stateLRR90 = np.rot90(stateLR,1,(1,2))
-    scoreLRR90 = np.copy(scores)
     movesLRR90 = Trainer.rotateMoves(movesLR, 1)
 
     #rotate lr 180
     stateLRR180 = np.rot90(stateLR,2,(1,2))
-    scoreLRR180 = np.copy(scores)
     movesLRR180 = Trainer.rotateMoves(movesLR, 2)
 
     #rotate lr 270
     stateLRR270 = np.rot90(stateLR,3,(1,2))
-    scoreLRR270 = np.copy(scores)
     movesLRR270 = Trainer.rotateMoves(movesLR, 3)
 
 
     stateOut = np.vstack([states, stateR90, stateR180, stateR270, stateLR, stateLRR90, stateLRR180, stateLRR270])
     movesOut = np.vstack([moves, movesR90, movesR180, movesR270, movesLR, movesLRR90, movesLRR180, movesLRR270])
-    scoreOut = np.concatenate([scores, scoreR90, scoreR180, scoreR270, scoreLR, scoreLRR90, scoreLRR180, scoreLRR270])
 
-    return stateOut, movesOut, scoreOut
+    return stateOut, movesOut
 
   def flipMoveLR(moves):
     movesLR = np.copy(moves)

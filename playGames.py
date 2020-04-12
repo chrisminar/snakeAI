@@ -10,9 +10,9 @@ class PlayGames():
   """description of class"""
   def __init__( self, dfTrack:DataTrack, nn:NeuralNetwork ):
     self.gamestates = []
-    self.gameScore = []
     self.prediction = []
     self.gameId = []
+    self.scores = []
     self.dfTrack = dfTrack
     self.nn = nn
     self.gamestate_to_nn = PlayGames.vectorizeFunction(PlayGames.grid_val_to_nn)

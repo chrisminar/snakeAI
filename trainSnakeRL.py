@@ -1,6 +1,5 @@
 #todo list
-#make a timeout for snake
-#change the training weights, drastically reduce the value of the 'value head' This doesn't really even need to be here because we are not using mcts
+#change score tracking to be based on dataframe
 #make generation the first input to all datatrack functions
 #snake grid update can be done more efficiently
 

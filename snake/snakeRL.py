@@ -2,6 +2,7 @@ from snake import Snake
 import random
 import numpy as np
 import pygame as pg
+from globalVar import Globe as globe
 
 class SnakeRL(Snake):
   def __init__(self, *args, **kwargs):
@@ -14,7 +15,8 @@ class SnakeRL(Snake):
 
   def runStep(self, dir: str): 
     if not self.gameover:
-      self.moves+=1
+      self.moves += 1
+      self.movesSinceFood +=1
       if dir==3: #left
         self.runSingle(-1, 0)
       elif dir==1: #right
@@ -37,7 +39,7 @@ class SnakeRL(Snake):
     return self.score
 
   def evaluateNextStep(self):
-    policy, value = self.nn.evaluate(self.grid)
+    policy = self.nn.evaluate(self.grid)
     out = [0,0,0,0]
     out[int(np.argmax(policy))] = 1
     return np.argmax(policy), out

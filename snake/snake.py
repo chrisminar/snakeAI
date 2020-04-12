@@ -3,6 +3,8 @@
 import random
 import numpy as np
 import pygame as pg
+from globalVar import Globe as globe
+
 buttons = {0: "up",
            1: "right",
            2: "down",
@@ -29,6 +31,8 @@ class Snake():
     self.gameoverThreshold = -self.sizeX*self.sizeY*2
     self.moveThreshold = self.sizeX*self.sizeY*2
     self.moves = 0
+
+    self.movesSinceFood = 0
 
     #input
     dir = random.randint(0,3)
@@ -145,6 +149,9 @@ class Snake():
       return True
     elif (self.Y < 0) or (self.Y >= self.sizeY):
       return True
+    elif self.movesSinceFood > globe.TIMEOUT:
+      return True
+
 
     #check if we ran into the body
     if (self.grid[self.X][self.Y] >= 0):
