@@ -3,6 +3,7 @@ import random
 import numpy as np
 import pygame as pg
 from globalVar import Globe as globe
+from timer import Timer
 
 class SnakeRL(Snake):
   def __init__(self, *args, **kwargs):

@@ -1,10 +1,17 @@
 #todo list
+#investigate move differences... eg is it always going right
+  #yes, it always picks the same direction -- how to fix??
+    #investigate different architecture --- next
+#fix memory issues
+#change evaluate to happen on batch
+  #why does playing still take 200s????
+  #snake grid update can be done more efficiently
+#investigate using different values for snake grid
 #change score tracking to be based on dataframe
 #make generation the first input to all datatrack functions
-#snake grid update can be done more efficiently
 
-#goal -- snake runtime from 450s to 50s
-#goal -- upgrade tensorflow to use gpu
+
+#goal -- snake runtime from 450s to 50s (current 200)
 
 #stuff to do someday
   # do network pruning
@@ -22,6 +29,7 @@ from dataTrack import DataTrack
 from neuralNet import NeuralNetwork
 from gameState import GameState
 from globalVar import Globe as globe
+from timer import Timer
 
 from selfPlay import SelfPlay
 from trainer import Trainer
@@ -57,15 +65,17 @@ class TrainRL():
     spc = SelfPlay(self.tracker, nn)
     states, scores, ids, moves = spc.playGames(generation, self.gameID)
     self.gameID += globe.NUM_SELF_PLAY_GAMES
+    print(np.sum(moves,0))
     self.addGamesToList(states, scores, ids, moves)
     self.trimGameList()
     return
 
   #operates on:
-    # last 20000 games of self play
+    # last 10000 games of self play
   #outputs:
     #new neural network
   def networkTrainer(self, generation:int):
+    self.nn = NeuralNetwork()
     trn = Trainer(self.tracker, self.nn)
     trn.train(generation, self.gameStates, self.gameScores, self.moves, self.meanScore)
     return
@@ -81,9 +91,10 @@ class TrainRL():
     maxID = np.max(self.gameIDs)
     self.meanScore    = np.mean(self.gameScores)
     if (maxID - minId) > globe.NUM_TRAINING_GAMES:
-      validIdx        = np.argwhere(self.gameIDs > (maxID - globe.NUM_TRAINING_GAMES) )
+      #validIdx        = np.nonzero(self.gameIDs > (maxID - globe.NUM_TRAINING_GAMES) )
+      validIdx        = np.nonzero(self.gameScores > self.meanScore)
       self.gameIDs    = self.gameIDs[validIdx]
       self.gameScores = self.gameScores[validIdx]
-      self.gameStates = self.gameStates[validIdx,:,:]
-      self.moves      = self.moves[validIdx,:]
+      self.gameStates = self.gameStates[validIdx]
+      self.moves      = self.moves[validIdx]
     return
