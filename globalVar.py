@@ -1,6 +1,6 @@
 class Globe():
-  GRID_X = 10                # x grid size of snake game
-  GRID_Y = 10                # y grid size of snake game
+  GRID_X = 5                # x grid size of snake game
+  GRID_Y = 5                # y grid size of snake game
   NUM_SELF_PLAY_GAMES = 500 # number of self play games to play
   NUM_TRAINING_GAMES = 2000 # number of self play games to train on
   MOMENTUM = 0.9

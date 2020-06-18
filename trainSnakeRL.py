@@ -1,8 +1,10 @@
 #todo list
 #investigate move differences... eg is it always going right
   #yes, it always picks the same direction -- how to fix??
-    #investigate different architecture --- next
-#fix memory issues
+    #investigate different architecture
+      #changed to be smaller and sigmoid -- still having the same issue
+      #try changing the grid inputs -- next
+#fix memory issues -- next
 #change evaluate to happen on batch
   #why does playing still take 200s????
   #snake grid update can be done more efficiently

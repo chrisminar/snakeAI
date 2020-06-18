@@ -186,7 +186,7 @@ class SnakeRL_test(unittest.TestCase):
 
   def test_evaluateNext(self):
     nn = NeuralNetwork()
-    s = SnakeRL(nn=nn, sizeX = 10, sizeY = 10)
+    s = SnakeRL(nn=nn, sizeX = globe.GRID_X, sizeY = globe.GRID_Y)
     direction, move_array = s.evaluateNextStep()
     print(direction)
     self.assertGreaterEqual(np.argmax(direction),0,'invalid direction output')
@@ -195,7 +195,7 @@ class SnakeRL_test(unittest.TestCase):
 
   def test_play(self):
     nn = NeuralNetwork()
-    s = SnakeRL(nn=nn, sizeX = 10, sizeY = 10)
+    s = SnakeRL(nn=nn, sizeX = globe.GRID_X, sizeY = globe.GRID_Y)
     s.play()
     self.assertTrue(s.gameover,False)
     self.assertGreater(len(s.moveList),0)

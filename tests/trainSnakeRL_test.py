@@ -27,7 +27,7 @@ class trainSnake_test(unittest.TestCase):
     moves_per_game = 3
     n=num_games*moves_per_game
     moves = np.zeros((n, 4))
-    states = np.zeros((n,10,10))
+    states = np.zeros((n,globe.GRID_X,globe.GRID_Y))
     scores = np.zeros((n,))
     gameIDs = np.zeros((moves_per_game,))
     for i in range(1,num_games):

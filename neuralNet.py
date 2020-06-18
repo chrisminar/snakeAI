@@ -48,9 +48,9 @@ class NeuralNetwork:
   # batch norm
   # relu
   def convBlock(blockid, block_input):
-    l1 = layers.Conv2D( 64, 3, padding = 'same', use_bias = False,        name = 'l1_block_{}'.format( blockid ) )( block_input ) #filters, patch
+    l1 = layers.Conv2D( 16, 3, padding = 'same', use_bias = False,        name = 'l1_block_{}'.format( blockid ) )( block_input ) #filters, patch
     l2 = layers.BatchNormalization( axis = -1, momentum = globe.MOMENTUM,  name = 'l2_block_{}'.format( blockid ) )( l1 )
-    l3 = layers.Activation( 'relu',                                       name = 'l3_block_{}'.format( blockid ) )( l2 )
+    l3 = layers.Activation( 'sigmoid',                                       name = 'l3_block_{}'.format( blockid ) )( l2 )
     
     return l3
 
@@ -65,14 +65,14 @@ class NeuralNetwork:
   # skip connection that adds block input
   # relu
   def residualBlock(blockid, input):
-    l1 = layers.Conv2D( 64, 3, padding = 'same', use_bias = False,       name = 'l4_block_{}'.format( blockid ) )( input ) #filters, patch, stride
+    l1 = layers.Conv2D( 16, 3, padding = 'same', use_bias = False,       name = 'l4_block_{}'.format( blockid ) )( input ) #filters, patch, stride
     l2 = layers.BatchNormalization( axis = -1, momentum = globe.MOMENTUM, name = 'l5_block_{}'.format( blockid ) )( l1 )
-    l3 = layers.Activation( 'relu',                                      name='l7_block_{}'.format( blockid ) )( l2 )
+    l3 = layers.Activation( 'sigmoid',                                      name='l7_block_{}'.format( blockid ) )( l2 )
 
-    l4 = layers.Conv2D( 64, 3, padding = 'same', use_bias = False,       name = 'l8_block_{}'.format( blockid ) )( l3 ) #filters, patch, stride
+    l4 = layers.Conv2D( 16, 3, padding = 'same', use_bias = False,       name = 'l8_block_{}'.format( blockid ) )( l3 ) #filters, patch, stride
     l5 = layers.BatchNormalization( axis = -1, momentum = globe.MOMENTUM, name = 'l9_block_{}'.format( blockid ) )( l4 )
     l6 = layers.add( [ l5, input ],                                      name = 'l10_block_{}'.format( blockid ))
-    l7 = layers.Activation( 'relu',                                      name = 'l11_block_{}'.format( blockid ) )( l6 )
+    l7 = layers.Activation( 'sigmoid',                                      name = 'l11_block_{}'.format( blockid ) )( l6 )
     
     return l7
 
@@ -85,9 +85,9 @@ class NeuralNetwork:
   def policyHead(input):
     l1 = layers.Conv2D( 2, 1, padding = 'same', use_bias = False,        name = 'policyhead_conv' )( input )
     l2 = layers.BatchNormalization( axis = -1, momentum = globe.MOMENTUM, name = 'policyhead_batch_norm' )( l1 )
-    l3 = layers.Activation( 'relu',                                      name = 'policyhead_activation' )( l2 )
+    l3 = layers.Activation( 'sigmoid',                                      name = 'policyhead_activation' )( l2 )
     l4 = layers.GlobalAveragePooling2D(                                  name = 'policyhead_pool')(l3)
-    l5 = layers.Dense( 4,  activation = 'relu',                          name = 'policy' )( l4 )
+    l5 = layers.Dense( 4,  activation = 'sigmoid',                          name = 'policy' )( l4 )
     return l5
 
   def dispModel(self):

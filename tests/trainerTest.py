@@ -14,8 +14,10 @@ class Trainer_test(unittest.TestCase):
     t = Trainer(df, nn)
 
   def test_permute(self):
+    gx = 10 #the test was designed for a gridx and gridy of 10
+    gy = 10
     nn = NeuralNetwork()
-    s = SnakeRL( nn=nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y )
+    s = SnakeRL( nn=nn, sizeX=gx, sizeY=gy )
     s.grid[s.foodX][s.foodY] = -1
     s.foodX = globe.GRID_X + 1
     s.foodY = globe.GRID_Y + 1
@@ -36,11 +38,11 @@ class Trainer_test(unittest.TestCase):
     states = np.stack(s.stateList)
     moves  = np.stack(s.moveList)
 
-    gxStart = int(globe.GRID_X/2)
-    gyStart = int(globe.GRID_Y/2)
+    gxStart = int(gx/2)
+    gyStart = int(gy/2)
 
     #90
-    states90 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
+    states90 = np.zeros( (4,gx,gy) ) - 1
     states90[0,gxStart-1,gyStart+0] = 0
     states90[1,gxStart-1,gyStart+1] = 0
     states90[2,gxStart-1,gyStart+2] = 0
@@ -54,7 +56,7 @@ class Trainer_test(unittest.TestCase):
     moves90[3,0] = 1
 
     #180
-    states180 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
+    states180 = np.zeros( (4,gx,gy) ) - 1
     states180[0,gxStart-1, gyStart-1] = 0
     states180[1,gxStart-2, gyStart-1] = 0
     states180[2,gxStart-3, gyStart-1] = 0
@@ -68,7 +70,7 @@ class Trainer_test(unittest.TestCase):
     moves180[3,3] = 1
 
     #270
-    states270 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
+    states270 = np.zeros( (4,gx,gy) ) - 1
     states270[0,gxStart, gyStart -1] = 0
     states270[1,gxStart, gyStart -2] = 0
     states270[2,gxStart, gyStart -3] = 0
@@ -82,7 +84,7 @@ class Trainer_test(unittest.TestCase):
     moves270[3,2] = 1
 
     #lr
-    stateslr = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
+    stateslr = np.zeros( (4,gx,gy) ) - 1
     stateslr[0,gxStart-1,gyStart] = 0
     stateslr[1,gxStart-2,gyStart] = 0
     stateslr[2,gxStart-3,gyStart] = 0
@@ -96,7 +98,7 @@ class Trainer_test(unittest.TestCase):
     moveslr[3,3] = 1
 
     #lr 90
-    stateslr90 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
+    stateslr90 = np.zeros( (4,gx,gy) ) - 1
     stateslr90[0,gxStart-1,gyStart-1] = 0
     stateslr90[1,gxStart-1,gyStart-2] = 0
     stateslr90[2,gxStart-1,gyStart-3] = 0
@@ -110,7 +112,7 @@ class Trainer_test(unittest.TestCase):
     moveslr90[3,2] = 1
 
     #lr 180
-    stateslr180 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
+    stateslr180 = np.zeros( (4,gx,gy) ) - 1
     stateslr180[0,gxStart+0,gyStart-1] = 0
     stateslr180[1,gxStart+1,gyStart-1] = 0
     stateslr180[2,gxStart+2,gyStart-1] = 0
@@ -124,7 +126,7 @@ class Trainer_test(unittest.TestCase):
     moveslr180[3,1] = 1
 
     #lr 270
-    stateslr270 = np.zeros( (4,globe.GRID_X,globe.GRID_Y) ) - 1
+    stateslr270 = np.zeros( (4,gx,gy) ) - 1
     stateslr270[0,gxStart,gyStart+0] = 0
     stateslr270[1,gxStart,gyStart+1] = 0
     stateslr270[2,gxStart,gyStart+2] = 0
