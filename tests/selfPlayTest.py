@@ -12,7 +12,7 @@ class SelfPlay_test(unittest.TestCase):
     nn = NeuralNetwork()
     spc = SelfPlay(dt, nn)#make self play class
     #call play games
-    state,score,id,prediction = spc.playGames(0, 0, num_games=2)
+    state,head,score,id,prediction = spc.playGames(0, 0, num_games=2)
 
     print(dt.self_play_broad.head())
     print(dt.self_play_detail.head())

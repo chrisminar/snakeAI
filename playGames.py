@@ -13,6 +13,7 @@ class PlayGames():
     self.prediction = []
     self.gameId = []
     self.scores = []
+    self.heads = []
     self.dfTrack = dfTrack
     self.nn = nn
     self.gamestate_to_nn = PlayGames.vectorizeFunction(PlayGames.grid_val_to_nn)
@@ -22,8 +23,9 @@ class PlayGames():
 
   def grid_val_to_nn(input):
     """Convert input snake grid value to nn value"""
-    # empty -> 1
-    # head -> 0
-    # body = negative
-    #food = 2
-    return -input
+    if input == -1: # empty -1 -> 0
+      return 0
+    elif input == -2: #food -2 -> -1
+      return -1
+    else: # head 0 -> 1, body positive -> 1
+      return 1

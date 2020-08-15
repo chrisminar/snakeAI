@@ -19,15 +19,16 @@ class Snake():
     self.grid = np.zeros((self.sizeX,self.sizeY))-1 #grid                  -2 = food, -1 = empty, any number <= 0 is the position of the snakes body. eg if the snake has length 10 then 0 is the head and 9 is the tail
 
     #snake
-    self.X = int(self.sizeX/2)               #snake head position x
-    self.Y = int(self.sizeY/2)               #snake head position y
+    self.X = int(0)               #snake head position x
+    self.Y = int(0)               #snake head position y
     self.length = 0                          #current length of snake
     self.grid[self.X][self.Y] = 0            #set snake head on the grid
 
     #scoring
     self.score = 0                           #current score
     self.score_per_food = 100                #point modification for eating food
-    self.score_per_move = 0                 #point modificaiton for moving
+    self.score_per_move = 0                  #point modificaiton for moving
+    self.score_penalty_for_failure = -50     #point modification for dying
     self.gameoverThreshold = -self.sizeX*self.sizeY*2
     self.moveThreshold = self.sizeX*self.sizeY*2
     self.moves = 0
@@ -93,10 +94,10 @@ class Snake():
       self.length += 1
       self.foodX,self.foodY = self.spawn_food()
       self.grid[self.foodX][self.foodY] = -2
-      self.score += (self.score_per_food*self.length)
+      self.score += (self.score_per_food)
       ateThisTurn = True
       self.moves = 0
-      if self.length > 398: #if snake is max length, the game has been won
+      if self.length > 15: #if snake is max length, the game has been won
         self.score+= 10000
         self.gameover = True
 
@@ -110,6 +111,8 @@ class Snake():
 
     #check if dead
     self.gameover = self.check_game_over()
+    if self.gameover:
+      self.score += self.score_penalty_for_failure
 
     if (self.gameover == False):
       #set head on grid

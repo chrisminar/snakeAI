@@ -4,6 +4,8 @@ from snakeRL import SnakeRL
 from globalVar import Globe as globe
 from neuralNet import NeuralNetwork
 import numpy as np
+from playGames import PlayGames
+from dataTrack import DataTrack
 
 class Snake_test(unittest.TestCase):
   def test_init(self):
@@ -19,28 +21,28 @@ class Snake_test(unittest.TestCase):
     s.runSingle(1,0) #move right
     self.assertEqual(s.X, x+1)
     self.assertEqual(s.Y, y)
-    self.assertEqual(s.length, l)
+    self.assertEqual(s.length, 0)
     x = s.X
     y = s.Y
     l = s.length
     s.runSingle(-1,0) #move left
     self.assertEqual(s.X, x-1)
     self.assertEqual(s.Y, y)
-    self.assertEqual(s.length, l)
+    self.assertEqual(s.length, 0)
     x = s.X
     y = s.Y
     l = s.length
     s.runSingle(0,1) #move up
     self.assertEqual(s.X, x)
     self.assertEqual(s.Y, y+1)
-    self.assertEqual(s.length, l)
+    self.assertEqual(s.length, 0)
     x = s.X
     y = s.Y
     l = s.length
     s.runSingle(0,-1) #move down
     self.assertEqual(s.X, x)
     self.assertEqual(s.Y, y-1)
-    self.assertEqual(s.length, l)
+    self.assertEqual(s.length, 0)
 
   def test_RunSingle_with_food(self):
     s = Snake( globe.GRID_X, globe.GRID_Y )
@@ -66,57 +68,45 @@ class Snake_test(unittest.TestCase):
     self.assertGreater(np.std(i), 0)
     self.assertGreater(np.std(j), 0)
 
-  def test_checkGameOver_sides(self):
-    #die right
-    s = Snake ( 8, 8 )
-    s.runSingle(1,0)#head at 5,4
+  def test_checkGameOver_right(self):
+    s = Snake ( globe.GRID_X, globe.GRID_Y )
+    #head at 0,0
+    s.runSingle(1,0)#head at 1,0
     self.assertFalse(s.gameover)
-    s.runSingle(1,0)#head at 6,4
+    s.runSingle(1,0)#head at 2,0
     self.assertFalse(s.gameover)
-    s.runSingle(1,0)#head at 7,4
+    s.runSingle(1,0)#head at 3,0
     self.assertFalse(s.gameover)
-    s.runSingle(1,0)#head at 8,5 (dead)
+    s.runSingle(1,0)#head at 4,0 (dead)
     self.assertTrue(s.gameover)
 
-    #die left
-    s = Snake ( 8, 8 )
-    s.runSingle(-1,0)#head at 3,4
-    self.assertFalse(s.gameover)
-    s.runSingle(-1,0)#head at 2,4
-    self.assertFalse(s.gameover)
-    s.runSingle(-1,0)#head at 1,4
-    self.assertFalse(s.gameover)
-    s.runSingle(-1,0)#head at 0,4
-    self.assertFalse(s.gameover)
-    s.runSingle(-1,0)#head at -1,5 (dead)
+  def test_checkGameOver_left(self):
+    s = Snake ( globe.GRID_X, globe.GRID_Y )
+    # head at 0,0
+    s.runSingle(-1,0) #head at -1,0
     self.assertTrue(s.gameover)
 
-    #die up
-    s = Snake ( 8, 8 )
-    s.runSingle(0,1)#head at 4,5
+  def test_checkGameOver_up(self):
+    s = Snake ( globe.GRID_X, globe.GRID_Y )
+    #head at 0,0
+    s.runSingle(0,1)#head at 0,1
     self.assertFalse(s.gameover)
-    s.runSingle(0,1)#head at 4,6
+    s.runSingle(0,1)#head at 0,2
     self.assertFalse(s.gameover)
-    s.runSingle(0,1)#head at 4,7
+    s.runSingle(0,1)#head at 0,3
     self.assertFalse(s.gameover)
-    s.runSingle(0,1)#head at 4,8 (dead)
+    s.runSingle(0,1)#head at 0,4 (dead)
     self.assertTrue(s.gameover)
 
-    #die down
-    s = Snake ( 8, 8 )
-    s.runSingle(0,-1)#head at 4,3
+  def test_checkGameOver_down(self):
+    s = Snake ( globe.GRID_X, globe.GRID_Y )
+    #head at 0,0
     self.assertFalse(s.gameover)
-    s.runSingle(0,-1)#head at 4,2
-    self.assertFalse(s.gameover)
-    s.runSingle(0,-1)#head at 4,1
-    self.assertFalse(s.gameover)
-    s.runSingle(0,-1)#head at 4,0
-    self.assertFalse(s.gameover)
-    s.runSingle(0,-1)#head at 4,-1 (dead)
+    s.runSingle(0,-1)#head at 0,-1
     self.assertTrue(s.gameover)
 
   def test_checkGameOver_tail(self):
-    s = Snake ( 8, 8 )
+    s = Snake ( globe.GRID_X, globe.GRID_Y )
     s.grid[3][4] = -2 #place food at (3,4)
     s.foodX,s.foodY = 3,4
     s.runSingle(-1,0) #move left and eat
@@ -186,17 +176,25 @@ class SnakeRL_test(unittest.TestCase):
 
   def test_evaluateNext(self):
     nn = NeuralNetwork()
+    tr = DataTrack()
     s = SnakeRL(nn=nn, sizeX = globe.GRID_X, sizeY = globe.GRID_Y)
-    direction, move_array = s.evaluateNextStep()
+    g = PlayGames(tr,nn)
+    direction, move_array, head = s.evaluateNextStep(g.gamestate_to_nn)
     print(direction)
     self.assertGreaterEqual(np.argmax(direction),0,'invalid direction output')
     self.assertLessEqual(np.argmax(move_array),3, 'invalid direction output')
     self.assertEqual(np.argmax(move_array),direction, 'direction doesn\'t match move array')
+    self.assertEqual(head[0], 1, 'up is free')
+    self.assertEqual(head[1], 1, 'right is free')
+    self.assertEqual(head[2], 0, 'down is free')
+    self.assertEqual(head[3], 0, 'left is free')
 
   def test_play(self):
     nn = NeuralNetwork()
+    tr = DataTrack()
     s = SnakeRL(nn=nn, sizeX = globe.GRID_X, sizeY = globe.GRID_Y)
-    s.play()
+    g = PlayGames(tr, nn)
+    s.play(g.gamestate_to_nn)
     self.assertTrue(s.gameover,False)
     self.assertGreater(len(s.moveList),0)
     print(s.moveList)
