@@ -3,7 +3,6 @@ import numpy as np
 from tensorflow import keras
 from tensorflow.python.keras import layers
 from globalVar import Globe as globe
-from gameState import GameState
 
 class NeuralNetwork:
   def __init__(self):

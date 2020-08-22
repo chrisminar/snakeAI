@@ -1,5 +1,4 @@
 from snakeRL import SnakeRL as snake
-from dataTrack import DataTrack
 from neuralNet import NeuralNetwork
 import numpy as np
 
@@ -8,13 +7,12 @@ import numpy as np
 #####################
 class PlayGames():
   """description of class"""
-  def __init__( self, dfTrack:DataTrack, nn:NeuralNetwork ):
+  def __init__( self, nn:NeuralNetwork ):
     self.gamestates = []
     self.prediction = []
     self.gameId = []
     self.scores = []
     self.heads = []
-    self.dfTrack = dfTrack
     self.nn = nn
     self.gamestate_to_nn = PlayGames.vectorizeFunction(PlayGames.grid_val_to_nn)
 

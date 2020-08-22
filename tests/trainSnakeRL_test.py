@@ -2,7 +2,6 @@ import unittest
 from trainSnakeRL import TrainRL
 from neuralNet import NeuralNetwork
 from selfPlay import SelfPlay
-from dataTrack import DataTrack
 import numpy as np
 from globalVar import Globe as globe
 
@@ -12,9 +11,8 @@ class trainSnake_test(unittest.TestCase):
 
   def test_addGamesToList(self):
     t=TrainRL()
-    tr = DataTrack()
     nn=NeuralNetwork()
-    spc = SelfPlay(tr, nn)
+    spc = SelfPlay(nn)
     states, heads, scores, ids, moves = spc.playGames(0, 0, 5)
     t.addGamesToList(states, heads, scores, ids, moves)
     self.assertTrue(np.max(t.gameIDs), 4)
@@ -41,7 +39,7 @@ class trainSnake_test(unittest.TestCase):
     for i in range(1,num_games):
       gameIDs = np.concatenate([gameIDs, np.zeros(moves_per_game,) + i + offset])
     t.addGamesToList(states, heads, scores+100, gameIDs, moves)
-    t.trimGameList()
+    t.trimGameList('test0')
     self.assertEqual(t.gameStates.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Gamestates trim unsuccessful')
     self.assertEqual(t.moves.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Moves trim unsuccessful')
     self.assertEqual(t.gameScores.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Scores trim unsuccessful')

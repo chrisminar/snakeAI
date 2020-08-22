@@ -3,7 +3,6 @@ import unittest
 import numpy as np
 from tensorflow import keras
 from globalVar import Globe as globe
-from tensorflow.python.keras import layers
 import tensorflow as tf
 
 class NeuralNet_test(unittest.TestCase):

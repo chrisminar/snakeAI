@@ -5,7 +5,6 @@ from globalVar import Globe as globe
 from neuralNet import NeuralNetwork
 import numpy as np
 from playGames import PlayGames
-from dataTrack import DataTrack
 
 class Snake_test(unittest.TestCase):
   def test_init(self):
@@ -107,18 +106,18 @@ class Snake_test(unittest.TestCase):
 
   def test_checkGameOver_tail(self):
     s = Snake ( globe.GRID_X, globe.GRID_Y )
-    s.grid[3][4] = -2 #place food at (3,4)
-    s.foodX,s.foodY = 3,4
-    s.runSingle(-1,0) #move left and eat
-    s.grid[3][3] = -2 #place food at (3,3)
-    s.foodX,s.foodY = 3,3
-    s.runSingle(0,-1) #move down and eat
-    s.grid[4][3] = -2 #place food at (4,3)
-    s.foodX,s.foodY = 4,3
+    s.grid[0][1] = -2 #place food at (0,1)
+    s.foodX,s.foodY = 0,1
+    s.runSingle(0,1) #move up and eat
+    s.grid[1][1] = -2 #place food at (1,1)
+    s.foodX,s.foodY = 1,1
     s.runSingle(1,0) #move right and eat
-    s.runSingle(0,1) #move up into old tail spot
+    s.grid[1][0] = -2 #place food at (1,0)
+    s.foodX,s.foodY = 1,0
+    s.runSingle(0,-1) #move down and eat
+    s.runSingle(-1,0) #move left into old tail spot
     self.assertFalse(s.gameover)
-    s.runSingle(0,-1)#move down into tail
+    s.runSingle(1,0) #move right into tail
     self.assertTrue(s.gameover)
 
 class SnakeRL_test(unittest.TestCase):
@@ -176,9 +175,8 @@ class SnakeRL_test(unittest.TestCase):
 
   def test_evaluateNext(self):
     nn = NeuralNetwork()
-    tr = DataTrack()
     s = SnakeRL(nn=nn, sizeX = globe.GRID_X, sizeY = globe.GRID_Y)
-    g = PlayGames(tr,nn)
+    g = PlayGames(nn)
     direction, move_array, head = s.evaluateNextStep(g.gamestate_to_nn)
     print(direction)
     self.assertGreaterEqual(np.argmax(direction),0,'invalid direction output')
@@ -191,14 +189,62 @@ class SnakeRL_test(unittest.TestCase):
 
   def test_play(self):
     nn = NeuralNetwork()
-    tr = DataTrack()
     s = SnakeRL(nn=nn, sizeX = globe.GRID_X, sizeY = globe.GRID_Y)
-    g = PlayGames(tr, nn)
+    g = PlayGames(nn)
     s.play(g.gamestate_to_nn)
     self.assertTrue(s.gameover,False)
     self.assertGreater(len(s.moveList),0)
     print(s.moveList)
     print(s.grid)
+
+  # test converthead at starting position
+  def test_convertHead_start(self):
+    #no food
+    grid = np.zeros((4,4))-1 #empty
+    grid[0,0] = 0 #head
+    isFree = SnakeRL.convertHead( 0, 0, 4, 4, grid)
+    truth = [1,1,0,0] #up and right are free
+    for i,j in zip(isFree, truth):
+      self.assertEqual(i, j) 
+    
+    # with food
+    grid[0,1] = -2 #food
+    isFree = SnakeRL.convertHead( 0, 0, 4, 4, grid)
+    for i,j in zip(isFree, truth):
+      self.assertEqual(i, j) 
+
+  # test converthead while along top wall
+  def test_convertHead_top(self):
+    #no food
+    grid = np.zeros((4,4))-1 #empty
+    grid[1,3] = 0 #head
+    isFree = SnakeRL.convertHead( 1, 3, 4, 4, grid)
+    truth = [0,1,1,1] #up not free
+    for i,j in zip(isFree, truth):
+      self.assertEqual(i, j) 
+    
+    # with food
+    grid[1,2] = -2 #food
+    isFree = SnakeRL.convertHead( 1, 3, 4, 4, grid)
+    for i,j in zip(isFree, truth):
+      self.assertEqual(i, j) 
+
+  # test converthead while along right wall
+  def test_convertHead_right(self):
+    #no food
+    grid = np.zeros((4,4))-1 #empty
+    grid[3,1] = 0 #head
+    isFree = SnakeRL.convertHead( 3, 1, 4, 4, grid)
+    truth = [1,0,1,1] #up not free
+    for i,j in zip(isFree, truth):
+      self.assertEqual(i, j) 
+    
+    # with food
+    grid[2,1] = -2 #food
+    isFree = SnakeRL.convertHead( 3, 1, 4, 4, grid)
+    for i,j in zip(isFree, truth):
+      self.assertEqual(i, j) 
+
 
 if __name__ == '__main__':
   unittest.main()

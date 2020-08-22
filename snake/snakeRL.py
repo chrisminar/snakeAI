@@ -24,9 +24,9 @@ class SnakeRL(Snake):
       elif dir==1: #right
         self.runSingle(1, 0)
       elif dir==2: #down
-        self.runSingle(0, 1)
-      elif dir==0: #up
         self.runSingle(0, -1)
+      elif dir==0: #up
+        self.runSingle(0, 1)
       else: #invalid direction = no input
         self.runSingle(self.Xdir, self.Ydir)
     return
@@ -44,9 +44,22 @@ class SnakeRL(Snake):
     pre_processed_grid = grid_fn(self.grid) # preprocess grid
     headView = SnakeRL.convertHead(self.X, self.Y, self.sizeX, self.sizeY, self.grid)
     policy = self.nn.evaluate(pre_processed_grid, headView)
-    out = [0,0,0,0]
-    out[int(np.argmax(policy))] = 1
-    return np.argmax(policy), out, headView
+    
+    out = [0, 0, 0, 0]
+    newDir = np.argmax(policy).astype(int)
+
+    # check if nn direction is dead
+    if headView[newDir] == 0: #current trajotory is death
+      if np.sum(headView) > 0: #at least one direction is free
+        newDir = np.argmax(headView)
+      else:
+        pass#no directions are free, death is immenent
+    else:
+      pass#current trajectory is ok
+
+    out[newDir] = 1
+
+    return newDir, out, headView
 
   # look at head, return a boolean array [up, right, down, left] 0 means not ok to move, and 1 means ok to move
   def convertHead(x: int, y: int, sizeX: int, sizeY: int, grid: np.ndarray) -> np.ndarray:
