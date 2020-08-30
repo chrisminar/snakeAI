@@ -6,9 +6,6 @@ from globalVar import Globe as globe
 
 class NeuralNetwork:
   def __init__(self):
-    self.checkPointID = 0
-    self.generationID = 0
-
     #weight initializer
     initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev = 1.0)
 
@@ -45,7 +42,9 @@ class NeuralNetwork:
     self.compile()
 
   def evaluate(self, state, head):
-    return self.model.predict( [state.reshape(1,state.shape[0],state.shape[1],1).astype(np.float32), head.reshape(1,4).astype(np.float32)])
+    gridIn = state.reshape(1,state.shape[0],state.shape[1],1).astype(np.float32)
+    headIn = head.reshape(1,4).astype(np.float32)
+    return self.model( [gridIn, headIn], training=False)
 
   def compile(self):
     self.model.compile(loss={'policy':keras.losses.CategoricalCrossentropy(from_logits=True)},
@@ -64,7 +63,7 @@ class NeuralNetwork:
     #  tempM.append( keras.Model(inputs=self.model.input, outputs=layer.output) )
     #for i in range(len(tempM)):
     #  x.append( tempM[i].predict( [inputs[0].reshape(1,inputs[0].shape[0],inputs[0].shape[1],1).astype(np.float32), heads[0].reshape(1,4).astype(np.float32)]) )
-    self.save(generation)
+    #self.save(generation)
 
   def dispModel(self):
     print( self.model.summary() )

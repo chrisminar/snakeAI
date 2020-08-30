@@ -1,8 +1,13 @@
 # todo list
 # test for timeout
+# change trim function so we don't have the weird zigzaging, ie try to have a constant number of samples once saturated
+# try to progressively update nn, not reinit every time?
+# possible failure of trim game states after too many runs (numer of samples constantly increases)
+  #try to print out gameid length every game.
+# try init snake in middle (not 0,0)
+# possible stagnation around 250 score
 
-# investigate move differences... eg is it always going right
-  # I'm pretty sure rotation needs to be implemented again... if it goes right every time, and only scores when it goes right...
+# try training on more epochs? -- seems to stop benefitting around 2
 
 #stuff to do someday
   # do network pruning
@@ -38,6 +43,7 @@ class TrainRL():
     while 1:
       self.selfPlay(self.nn, generation)
       self.networkTrainer(generation)
+      print(generation, globe.getsize(self.nn))
       generation += 1
     return
 
@@ -59,12 +65,10 @@ class TrainRL():
   #outputs:
     #new neural network
   def networkTrainer(self, generation:int):
-    if not self.skip: #don't do this if the neural net produced garbage results
-      self.nn = NeuralNetwork()
-      trn = Trainer(self.nn)
-      trn.train(generation, self.gameStates, self.gameHeads, self.moves)
-    else:
-      self.tracker.appendTraining( 0, 0, 0 )
+    del self.nn
+    self.nn = NeuralNetwork()
+    trn = Trainer(self.nn)
+    trn.train(generation, self.gameStates, self.gameHeads, self.moves)
     return
 
   def addGamesToList(self, states, heads, scores, ids, moves):
@@ -79,14 +83,12 @@ class TrainRL():
     maxID = np.max(self.gameIDs)
     self.meanScore    = np.mean(self.gameScores)
     print('Mean score in generation {}: {}'.format(generation, self.meanScore))
-    self.skip = False
     if self.meanScore == -50: #if mean score is 0, restart
       self.gameStates = np.zeros((0,globe.GRID_X,globe.GRID_Y))
       self.gameHeads = np.zeros((0,4))
       self.gameScores = np.zeros((0,))
       self.gameIDs = np.zeros((0,))
       self.moves = np.zeros((0,4))
-      self.skip = True
     if (maxID - minId) > globe.NUM_TRAINING_GAMES: #if there are lots of good games, take the best
       validIdx        = np.nonzero(self.gameScores > self.meanScore)
     else:
@@ -97,3 +99,11 @@ class TrainRL():
     self.moves      = self.moves[validIdx]
     self.gameHeads  = self.gameHeads[validIdx]
     return
+
+  def sizeInfo(self):
+    print('self',       globe.getsize(self))
+    print('gameHeads',  globe.getsize(self.gameHeads))
+    print('gameids',    globe.getsize(self.gameIDs))
+    print('gameScores', globe.getsize(self.gameScores))
+    print('gameStates', globe.getsize(self.gameStates))
+    print('moves',      globe.getsize(self.moves))
