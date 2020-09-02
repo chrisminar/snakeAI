@@ -37,8 +37,10 @@ class NeuralNetwork:
     l6 = layers.Dense( 4,  activation = 'relu', name = 'last_fully_connected', kernel_initializer=initializer )( l5 )
 
     l7 = layers.Softmax(name = 'policy' ) (l6)
+
+    l8 = layers.Multiply(name = 'mult')([l7, head_input])
     
-    self.model = keras.Model(inputs=[block_input, head_input], outputs=l7)
+    self.model = keras.Model(inputs=[block_input, head_input], outputs=l8)
     self.compile()
 
   def evaluate(self, state, head):
@@ -47,11 +49,12 @@ class NeuralNetwork:
     return self.model( [gridIn, headIn], training=False)
 
   def compile(self):
-    self.model.compile(loss={'policy':keras.losses.CategoricalCrossentropy(from_logits=True)},
-                  optimizer=keras.optimizers.SGD(momentum=globe.MOMENTUM))
+    self.model.compile(loss={'mult':keras.losses.CategoricalCrossentropy(from_logits=True)},
+                  optimizer=keras.optimizers.SGD(momentum=globe.MOMENTUM),
+                  metrics = ['accuracy', 'accuracy'])
 
   def train(self, inputs, heads, predictions, generation):
-    history = self.model.fit({'input_game_state':inputs, 'input_head':heads}, {'policy':predictions},
+    history = self.model.fit({'input_game_state':inputs, 'input_head':heads}, {'mult':predictions},
                                batch_size=globe.BATCH_SIZE,
                                epochs=globe.EPOCHS,
                                validation_split=0.15,

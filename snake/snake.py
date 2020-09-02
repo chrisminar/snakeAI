@@ -19,8 +19,8 @@ class Snake():
     self.grid = np.zeros((self.sizeX,self.sizeY))-1 #grid                  -2 = food, -1 = empty, any number <= 0 is the position of the snakes body. eg if the snake has length 10 then 0 is the head and 9 is the tail
 
     #snake
-    self.X = int(0)               #snake head position x
-    self.Y = int(0)               #snake head position y
+    self.X = int(1)                          #snake head position x
+    self.Y = int(1)                          #snake head position y
     self.length = 0                          #current length of snake
     self.grid[self.X][self.Y] = 0            #set snake head on the grid
 

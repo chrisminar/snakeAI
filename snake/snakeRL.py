@@ -49,14 +49,14 @@ class SnakeRL(Snake):
     newDir = np.argmax(policy).astype(int)
 
     # check if nn direction is dead
-    if headView[newDir] == 0: #current trajotory is death
-      if np.sum(headView) > 0: #at least one direction is free
-        validIndex = np.where(headView)[0]
-        newDir = np.random.choice(validIndex)
-      else:
-        pass#no directions are free, death is immenent
-    else:
-      pass#current trajectory is ok
+    #if headView[newDir] == 0: #current trajotory is death
+    #  if np.sum(headView) > 0: #at least one direction is free
+    #    validIndex = np.where(headView)[0]
+    #    newDir = np.random.choice(validIndex)
+    #  else:
+    #    pass#no directions are free, death is immenent
+    #else:
+    #  pass#current trajectory is ok
 
     out[newDir] = 1
 
