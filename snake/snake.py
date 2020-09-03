@@ -27,7 +27,7 @@ class Snake():
     #scoring
     self.score = 0                           #current score
     self.score_per_food = 100                #point modification for eating food
-    self.score_per_move = 0                  #point modificaiton for moving
+    self.score_per_move = -1                  #point modificaiton for moving
     self.score_penalty_for_failure = -50     #point modification for dying
     self.gameoverThreshold = -self.sizeX*self.sizeY*2
     self.moveThreshold = self.sizeX*self.sizeY*2
@@ -96,7 +96,7 @@ class Snake():
       self.grid[self.foodX][self.foodY] = -2
       self.score += (self.score_per_food)
       ateThisTurn = True
-      self.moves = 0
+      self.movesSinceFood = 0
       if self.length > 15: #if snake is max length, the game has been won
         self.score+= 10000
         self.gameover = True

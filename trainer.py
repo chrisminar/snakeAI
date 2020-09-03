@@ -19,4 +19,3 @@ class Trainer():
 
       #train on them
       self.nn.train( statesP, heads, move_predictions, generation )
-      num_minibatch = statesP.shape[0]/globe.BATCH_SIZE

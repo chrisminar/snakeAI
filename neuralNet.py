@@ -54,11 +54,13 @@ class NeuralNetwork:
                   metrics = ['accuracy', 'accuracy'])
 
   def train(self, inputs, heads, predictions, generation):
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta = 0.01, verbose=1)
     history = self.model.fit({'input_game_state':inputs, 'input_head':heads}, {'mult':predictions},
                                batch_size=globe.BATCH_SIZE,
                                epochs=globe.EPOCHS,
                                validation_split=0.15,
-                               verbose=2)
+                               verbose=2,
+                               callbacks = [callback])
     #debug
     #tempM = []
     #x = []
@@ -66,7 +68,7 @@ class NeuralNetwork:
     #  tempM.append( keras.Model(inputs=self.model.input, outputs=layer.output) )
     #for i in range(len(tempM)):
     #  x.append( tempM[i].predict( [inputs[0].reshape(1,inputs[0].shape[0],inputs[0].shape[1],1).astype(np.float32), heads[0].reshape(1,4).astype(np.float32)]) )
-    #self.save(generation)
+    self.save(generation)
 
   def dispModel(self):
     print( self.model.summary() )

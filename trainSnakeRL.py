@@ -1,18 +1,28 @@
 # todo list
 # test for timeout
-# try to progressively update nn, not reinit every time?
 #experiemnt with different optimizers
-
 
 #################
 ### soon list ###
 #################
-# current scheme results in very low number of games played after the mean score increases.
-  # should change the game trimming to be a bit more complex, e.g. always keep ~10k games and remove the worst ones
+# try to progressively update nn, not reinit every time?
+
+# try different nn arcitectures
+  # one where it only uses head + direcion to food
+  # one where it only uses grid, multiplys by head at the end
 
 #################
 ### done list ###
 #################
+#figure out how stop doing additional epochs once the training plateaus
+  #stop training if accuracy and val accuracy are not improving
+# make histogram of game scores
+# try setting score_per_move to -1
+# save nn on generation completion
+#possible bug with gamelength
+  # fixed
+# current scheme results in very low number of games played after the mean score increases.
+  # should change the game trimming to be a bit more complex, e.g. always keep ~10k games and remove the worst ones
 # need to take the highest valid class output, not random if highest is invalid. Can do this in the nn itself.
 # change trim game list such that the highest mean score is remembered. Every time you pass Prune games below highest mean every pass.
 # possible failure of trim game states after too many runs (numer of samples constantly increases)
@@ -61,12 +71,17 @@ class TrainRL():
 
   def train(self):
     generation = 0
-    self.selfPlay(self.nn, generation, globe.NUM_TRAINING_GAMES) #do big first batch
-
     while 1:
-      self.selfPlay(self.nn, generation)
+      numberOfGames = len(np.unique(self.gameIDs))
+      n = globe.NUM_TRAINING_GAMES - numberOfGames
+      if n > globe.NUM_SELF_PLAY_GAMES: #if we need many more games, play many more games
+        pass
+      else: #if we already have a lot of games, use default amount
+        n = globe.NUM_SELF_PLAY_GAMES
+      print('num games to play {}'.format(n))
+      self.selfPlay(self.nn, generation, n)
       self.networkTrainer(generation)
-      print(generation, globe.getsize(self.nn))
+      #print(generation, globe.getsize(self.nn))
       self.genStatusPlot(generation)
       generation += 1
     return
@@ -77,20 +92,27 @@ class TrainRL():
     plt.subplot(3,1,1)
     plt.plot(self.meanScores)
     plt.title('Mean Score')
-      
+
     plt.subplot(3,1,2)
     plt.plot(self.maxScores)
     plt.title('Max Score')
-      
+
     plt.subplot(3,1,3)
     plt.plot(self.gamesUsed)
     plt.title('Training Games')
-      
+
     plt.suptitle('Generation: {}'.format(generation ))
 
     fig.savefig('mostrecent.png')
     plt.close()
     return
+
+  def genHistogram(self, unique, generation):
+    fig=plt.figure()
+    plt.title('Generation {}'.format(generation))
+    plt.hist(unique)
+    fig.savefig('hists/generation_{}.png'.format(generation))
+    plt.close()
 
   #operates on:
     #neural network
@@ -99,7 +121,7 @@ class TrainRL():
   def selfPlay(self, nn:NeuralNetwork, generation:int, num_games:int=globe.NUM_SELF_PLAY_GAMES ):
     spc = SelfPlay(nn)
     states, heads, scores, ids, moves = spc.playGames(generation, self.gameID, num_games)
-    self.gameID += globe.NUM_SELF_PLAY_GAMES
+    self.gameID += num_games
     print( 'Moves in this training set:  Up: ', np.sum(moves[:,0]), ', Right: ', np.sum(moves[:,1]), ', Down: ', np.sum(moves[:,2]), ', Left: ', np.sum(moves[:,3]))
     self.addGamesToList(states, heads, scores, ids, moves)
     self.trimGameList(generation)
@@ -162,6 +184,7 @@ class TrainRL():
 
     uni, indices = np.unique(self.gameIDs, return_index=True)
     numberOfGames = len(uni)
+    self.genHistogram(self.gameScores[indices], generation)
     
     meanScore = np.mean(self.gameScores[indices])
     if meanScore > self.meanScore:
@@ -169,15 +192,44 @@ class TrainRL():
 
     #trim based on selected id
     #if numberOfGames > globe.NUM_TRAINING_GAMES: #if there are lots of good games, take the best
-    validIdx        = np.nonzero(self.gameScores > self.meanScore)
-    self.gameIDs    = self.gameIDs[validIdx]
-    self.gameScores = self.gameScores[validIdx]
-    self.gameStates = self.gameStates[validIdx]
-    self.moves      = self.moves[validIdx]
-    self.gameHeads  = self.gameHeads[validIdx]
+    count = 0
+    badIdx = []
+    idx = 0
+    lowScore = np.min(self.gameScores)
+    while count < globe.NUM_PURGE:
+      startIdx = idx
+
+      # check if current game is bad
+      if (self.gameScores[idx] < self.meanScore) or (self.gameScores[idx] == lowScore):
+        count += 1
+        bad = True
+      else:
+        bad = False
+
+      #seek to next game and invalidate if nessiscary
+      flag = True
+      while flag:
+        if bad:
+          badIdx.append(idx)
+        idx += 1
+        if idx >= len(self.gameScores):
+          count = globe.NUM_SELF_PLAY_GAMES
+          flag = False
+        elif self.gameIDs[idx] != self.gameIDs[startIdx]:
+          flag = False
+
+    mask = np.ones(len(self.gameIDs), dtype=bool)
+    mask[badIdx] = False
+    self.gameIDs    = self.gameIDs[mask]
+    self.gameScores = self.gameScores[mask]
+    self.gameStates = self.gameStates[mask]
+    self.moves      = self.moves[mask]
+    self.gameHeads  = self.gameHeads[mask]
+
+    oldNumberOfGames = numberOfGames
+    numberOfGames = len(np.unique(self.gameIDs))
 
     #update statistics
-    numberOfGames = len(np.unique(self.gameIDs))
     self.meanScores.append(meanScore)
     self.gamesUsed.append(numberOfGames)
     self.maxScores.append(np.max(self.gameScores))
