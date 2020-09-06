@@ -14,9 +14,9 @@ Middle subplot shows the maximum score achieved in the training set. Scoring is 
 Bottom subplot is number of games in the training set.  
   
 ![](hists/sept-6-2020_slow.gif)  
-
-The score histogram of each training generation.
-
+  
+The score histogram of each training generation.  
+  
 ![](compare/compareGif.gif)  
-
-A sample game using the neural network from different generations of training.
+  
+A sample game using the neural network from different generations of training.  
