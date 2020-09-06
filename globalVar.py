@@ -5,9 +5,11 @@ import sys
 class Globe():
   GRID_X = 4                # x grid size of snake game
   GRID_Y = 4                # y grid size of snake game
-  NUM_SELF_PLAY_GAMES = 1000 # number of self play games to play
+  NUM_SELF_PLAY_GAMES = 500 # number of self play games to play
   NUM_PURGE = 500
-  NUM_TRAINING_GAMES = 10000 # number of self play games to train on
+  NUM_TRAINING_GAMES = 5000 # number of self play games to train on
+  VALIDATION_SPLIT = 0.15
+  EPOCH_DELTA = 0.001
   MOMENTUM = 0.9
   BATCH_SIZE = 64
   EPOCHS = 10

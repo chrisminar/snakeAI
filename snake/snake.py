@@ -98,7 +98,7 @@ class Snake():
       ateThisTurn = True
       self.movesSinceFood = 0
       if self.length > 15: #if snake is max length, the game has been won
-        self.score+= 10000
+        self.score+= 1000
         self.gameover = True
 
     #move body
@@ -132,7 +132,6 @@ class Snake():
     if count > 1:
       spot = random.randint(1,count-1)
     else:
-      print('no more valid spots')
       return(i,j)
 
     #print(mask)

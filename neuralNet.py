@@ -49,17 +49,18 @@ class NeuralNetwork:
     return self.model( [gridIn, headIn], training=False)
 
   def compile(self):
-    self.model.compile(loss={'mult':keras.losses.CategoricalCrossentropy(from_logits=True)},
+    #self.model.compile(loss={'mult':keras.losses.CategoricalCrossentropy(from_logits=True)},
+    self.model.compile(loss=keras.losses.CategoricalCrossentropy(from_logits=True),
                   optimizer=keras.optimizers.SGD(momentum=globe.MOMENTUM),
                   metrics = ['accuracy', 'accuracy'])
 
   def train(self, inputs, heads, predictions, generation):
-    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta = 0.01, verbose=1)
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta = globe.EPOCH_DELTA, verbose=1)
     history = self.model.fit({'input_game_state':inputs, 'input_head':heads}, {'mult':predictions},
                                batch_size=globe.BATCH_SIZE,
                                epochs=globe.EPOCHS,
-                               validation_split=0.15,
-                               verbose=2,
+                               validation_split=globe.VALIDATION_SPLIT,
+                               verbose=0,
                                callbacks = [callback])
     #debug
     #tempM = []
@@ -79,5 +80,5 @@ class NeuralNetwork:
   def save(self,generation):
     self.model.save(r'C:\Users\Chris Minar\Documents\Python\Snake\saves\generation_{}.ckpt'.format(generation))
 
-  def load(self,generation):
-    self.model = keras.models.load_model('saves/generation_{}.ckpt'.format(generation))
+  def load(self,path):
+    self.model = keras.models.load_model(path)
