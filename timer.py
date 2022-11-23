@@ -1,8 +1,11 @@
+"""Time context manager."""
+
 from __future__ import annotations
 
 import time
 
 
+# TODO move this thing into helper
 class Timer(object):
     def __init__(self, name='', verbose=False) -> None:
         self.verbose = verbose

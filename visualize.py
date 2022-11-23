@@ -1,3 +1,4 @@
+"""Visualize training."""
 from pathlib import Path
 
 import matplotlib.animation as animation

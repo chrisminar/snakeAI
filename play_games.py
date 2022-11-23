@@ -1,4 +1,4 @@
-
+"""Holder class for outputs form playing snake games."""
 
 from typing import Callable
 

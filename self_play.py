@@ -1,11 +1,15 @@
-from timer import Timer
-from play_games import PlayGames
-from neural_net import NeuralNetwork
-from helper import Globe as globe
+"""Play a bunch of games and track stores."""
+
 import numpy as np
 from snake_reinforcement_learning import SnakeRL as snake
 
+from helper import Globe as globe
+from neural_net import NeuralNetwork
+from play_games import PlayGames
+from timer import Timer
 
+
+# TODO merge this class with playgames
 #####################
 ## self play class ##
 #####################

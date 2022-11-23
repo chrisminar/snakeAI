@@ -1,3 +1,4 @@
+"""Not sure what this is for yet."""
 # todo write functions for save and load dataframes
 # todo: game id should be a second index, not a column
 # todo: move functionality that computes 'broad' statistics from 'detailed' statistics into a function in this class

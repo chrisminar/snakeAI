@@ -1,3 +1,4 @@
+"""Snake for reinforcement learning."""
 import random
 from typing import Callable, List, Tuple
 

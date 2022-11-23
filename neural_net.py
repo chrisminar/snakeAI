@@ -1,3 +1,4 @@
+"""Handle the neural network."""
 from pathlib import Path
 
 import numpy as np

@@ -1,4 +1,4 @@
-# snake
+"""Snake game base class."""
 
 import random
 from typing import Tuple

@@ -1,3 +1,5 @@
+"""Play snake game in GUI."""
+
 import random
 
 import numpy as np

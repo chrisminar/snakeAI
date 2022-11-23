@@ -38,11 +38,13 @@
 # track/understand what the neural network is doing
 # gui
 # pause/play
+"""Reinforcement learning."""
 
 from typing import List
 
 import numpy as np
 from matplotlib import pyplot as plt
+from numpy import typing as npt
 
 from helper import Globe as globe
 from neural_net import NeuralNetwork

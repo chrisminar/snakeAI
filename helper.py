@@ -1,3 +1,4 @@
+"""Global variables and helper functions."""
 import sys
 from gc import get_referents
 from types import FunctionType, ModuleType
