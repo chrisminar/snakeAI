@@ -17,13 +17,13 @@ class trainSnake_test(unittest.TestCase):
         spc = SelfPlay(nn)
         states, heads, scores, ids, moves = spc.play_games(0, 0, 5)
         t.add_games_to_list(states, heads, scores, ids, moves)
-        self.assertTrue(np.max(t.gameIDs), 4)
+        self.assertTrue(np.max(t.game_ids), 4)
         self.assertEqual(
-            t.gameStates.shape[0], t.gameIDs.shape[0], 'bad gameid shape')
+            t.game_states.shape[0], t.game_ids.shape[0], 'bad gameid shape')
         self.assertEqual(
-            t.gameStates.shape[0], t.gameScores.shape[0], 'bad score shape')
+            t.game_states.shape[0], t.game_scores.shape[0], 'bad score shape')
         self.assertEqual(
-            t.gameStates.shape[0], t.moves.shape[0], 'bad moves shape')
+            t.game_states.shape[0], t.moves.shape[0], 'bad moves shape')
 
     def test_trimGameList(self):
         num_games = globe.NUM_TRAINING_GAMES
@@ -48,14 +48,14 @@ class trainSnake_test(unittest.TestCase):
         t.add_games_to_list(states, heads, scores+100, gameIDs, moves)
         t.trim_game_list()
         self.assertEqual(
-            t.gameStates.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Gamestates trim unsuccessful')
+            t.game_states.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Gamestates trim unsuccessful')
         self.assertEqual(
             t.moves.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Moves trim unsuccessful')
         self.assertEqual(
-            t.gameScores.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Scores trim unsuccessful')
+            t.game_scores.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Scores trim unsuccessful')
         self.assertEqual(
-            t.gameIDs.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'game ids trim unsuccessful')
-        self.assertEqual(np.min(t.gameScores), 100, 'min scores not removed')
+            t.game_ids.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'game ids trim unsuccessful')
+        self.assertEqual(np.min(t.game_scores), 100, 'min scores not removed')
 
 
 if __name__ == '__main__':

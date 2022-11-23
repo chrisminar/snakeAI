@@ -37,9 +37,9 @@ def gen_compare() -> None:
     states = []
     generation = [0, 100, 200, 383]
     for i in range(4):
-        newnn = nn()
-        newnn.load('saves/generation_{}.ckpt'.format(generation[i]))
-        spc = SelfPlay(newnn)
+        new_nn = nn()
+        new_nn.load('saves/generation_{}.ckpt'.format(generation[i]))
+        spc = SelfPlay(new_nn)
         if i < 3:
             state, head, score, id, move = spc.play_games(0, 0, 1)
         else:
@@ -48,11 +48,11 @@ def gen_compare() -> None:
         states.append(state)
         print('done with generation {}'.format(i))
 
-    gamelength = []
+    game_length = []
     for i in range(4):
-        gamelength.append(len(states[i]))
+        game_length.append(len(states[i]))
 
-    for i in range(np.max(gamelength)):
+    for i in range(np.max(game_length)):
         fig = plt.figure()
         for j in range(4):
             ax = plt.subplot(2, 2, 1+j)
@@ -60,13 +60,13 @@ def gen_compare() -> None:
             plt.ylim([-0.5, 3.5])
             ax.axes.get_yaxis().set_visible(False)
             ax.axes.get_xaxis().set_visible(False)
-            if i < gamelength[j]:
+            if i < game_length[j]:
                 ax.imshow(states[j][i])
                 plt.title('Generation {}, move {}'.format(generation[j], i))
             else:
                 ax.imshow(states[j][-1])
                 plt.title('Generation {}, move {}'.format(
-                    generation[j], gamelength[j]))
+                    generation[j], game_length[j]))
         fig.savefig('compare/compare{}.png'.format(i))
         plt.close()
 
@@ -75,8 +75,8 @@ def find_best(states: npt.NDArray[np.int32],
               scores: npt.NDArray[np.int32],
               ids: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
     # get indexes
-    idxStart = np.argmax(scores)
-    idx = idxStart
+    idx_start = np.argmax(scores)
+    idx = idx_start
     index = []
     flag = True
     while flag:
@@ -84,7 +84,7 @@ def find_best(states: npt.NDArray[np.int32],
         idx += 1
         if idx >= len(scores):
             flag = False
-        elif ids[idx] != ids[idxStart]:
+        elif ids[idx] != ids[idx_start]:
             flag = False
 
     mask = np.zeros(len(ids), dtype=bool)

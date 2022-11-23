@@ -11,32 +11,32 @@ class SnakeHuman(Snake):
         super(SnakeHuman, self).__init__(*args, **kwargs)
         # init pygame
         pg.init()
-        self.DISPLAY = pg.display.set_mode(
+        self.pygame_display = pg.display.set_mode(
             (self.sizeX*21, self.sizeY*21), 0, 32)  # init display
         pg.display.set_caption('Snake')
-        self.DISPLAY.fill((255, 255, 255))  # fill with white
-        self.foodX, self.foodY = self.spawn_food()
-        self.grid[self.foodX][self.foodY] = -2  # set food on grid
-        self.displayState()
+        self.pygame_display.fill((255, 255, 255))  # fill with white
+        self.food_x, self.food_y = self.spawn_food()
+        self.grid[self.food_x][self.food_y] = -2  # set food on grid
+        self.display_state()
 
     def run(self) -> int:
-        while (not self.gameover):
+        while (not self.game_over):
             events = pg.event.get()
             for event in events:
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_LEFT:
-                        self.runSingle(-1, 0)
+                        self.run_single(-1, 0)
                         # print('left')
                     elif event.key == pg.K_RIGHT:
-                        self.runSingle(1, 0)
+                        self.run_single(1, 0)
                         # print('right')
                     elif event.key == pg.K_DOWN:
-                        self.runSingle(0, 1)
+                        self.run_single(0, 1)
                         # print('down')
                     elif event.key == pg.K_UP:
-                        self.runSingle(0, -1)
+                        self.run_single(0, -1)
                         # print('up')
-                    self.displayState()
+                    self.display_state()
         return self.score
 
 

@@ -39,6 +39,8 @@
 # gui
 # pause/play
 
+from typing import List
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -50,17 +52,17 @@ from trainer import Trainer
 
 class TrainRL:
     def __init__(self) -> None:
-        self.gameStates = np.zeros((0, globe.GRID_X, globe.GRID_Y))
-        self.gameHeads = np.zeros((0, 4))
-        self.gameScores = np.zeros((0,))
-        self.gameIDs = np.zeros((0,))
+        self.game_states = np.zeros((0, globe.GRID_X, globe.GRID_Y))
+        self.game_heads = np.zeros((0, 4))
+        self.game_scores = np.zeros((0,))
+        self.game_ids = np.zeros((0,))
         self.moves = np.zeros((0, 4))
-        self.nn = NeuralNetwork()
-        self.gameID = 0
-        self.meanScore = 0
-        self.meanScores = []
-        self.gamesUsed = []
-        self.maxScores = []
+        self.neural_net = NeuralNetwork()
+        self.game_id = 0
+        self.mean_score = 0
+        self.mean_scores: List[int] = []
+        self.games_used: List[int] = []
+        self.max_scores: List[int] = []
 
     def train(self) -> None:
         generation = 0
@@ -69,16 +71,15 @@ class TrainRL:
             print('######################')
             print('### Generation {}###'.format(generation))
             print('######################')
-            numberOfGames = len(np.unique(self.gameIDs))
-            n = globe.NUM_TRAINING_GAMES - numberOfGames
+            number_of_games = len(np.unique(self.game_ids))
+            n = globe.NUM_TRAINING_GAMES - number_of_games
             if n > globe.NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
                 pass
             else:  # if we already have a lot of games, use default amount
                 n = globe.NUM_SELF_PLAY_GAMES
             print('num games to play {}'.format(n))
-            self.self_play(self.nn, generation, n)
+            self.self_play(self.neural_net, generation, n)
             self.network_trainer(generation)
-            #print(generation, globe.getsize(self.nn))
             self.gen_status_plot(generation)
             generation += 1
 
@@ -86,15 +87,15 @@ class TrainRL:
     def gen_status_plot(self, generation: int) -> None:
         fig = plt.figure()
         plt.subplot(3, 1, 1)
-        plt.plot(self.meanScores)
+        plt.plot(self.mean_scores)
         plt.title('Mean Score')
 
         plt.subplot(3, 1, 2)
-        plt.plot(self.maxScores)
+        plt.plot(self.max_scores)
         plt.title('Max Score')
 
         plt.subplot(3, 1, 3)
-        plt.plot(self.gamesUsed)
+        plt.plot(self.games_used)
         plt.title('Training Games')
 
         plt.suptitle('Generation: {}'.format(generation))
@@ -117,8 +118,8 @@ class TrainRL:
     def self_play(self, nn: NeuralNetwork, generation: int, num_games: int = globe.NUM_SELF_PLAY_GAMES) -> None:
         spc = SelfPlay(nn)
         states, heads, scores, ids, moves = spc.play_games(
-            generation, self.gameID, num_games)
-        self.gameID += num_games
+            generation, self.game_id, num_games)
+        self.game_id += num_games
         print('Moves in this training set:  Up: ', np.sum(moves[:, 0]), ', Right: ', np.sum(
             moves[:, 1]), ', Down: ', np.sum(moves[:, 2]), ', Left: ', np.sum(moves[:, 3]))
         self.add_games_to_list(states, heads, scores, ids, moves, generation)
@@ -129,10 +130,10 @@ class TrainRL:
     # outputs:
         # new neural network
     def network_trainer(self, generation: int) -> None:
-        del self.nn
-        self.nn = NeuralNetwork()
-        trn = Trainer(self.nn)
-        trn.train(generation, self.gameStates, self.gameHeads, self.moves)
+        del self.neural_net
+        self.neural_net = NeuralNetwork()
+        trn = Trainer(self.neural_net)
+        trn.train(generation, self.game_states, self.game_heads, self.moves)
 
     def add_games_to_list(self,
                           states: npt.NDArray[np.int32],
@@ -142,60 +143,60 @@ class TrainRL:
                           moves: npt.NDArray[np.int32],
                           generation: int) -> None:
         uni, indices = np.unique(ids, return_index=True)
-        self.meanScore = np.mean(scores[indices])
+        self.mean_score = np.mean(scores[indices])
 
         # get rid of bad scores
         self.gen_histogram(scores[indices], generation)
 
-        if self.meanScore > 50:
-            cutoff = self.meanScore
+        if self.mean_score > 50:
+            cutoff = self.mean_score
         else:
             cutoff = 100
-        validIdx = scores > cutoff
-        ids = ids[validIdx]
-        scores = scores[validIdx]
-        states = states[validIdx]
-        moves = moves[validIdx]
-        heads = heads[validIdx]
+        valid_idx = scores > cutoff
+        ids = ids[valid_idx]
+        scores = scores[valid_idx]
+        states = states[valid_idx]
+        moves = moves[valid_idx]
+        heads = heads[valid_idx]
 
         uni, indices = np.unique(ids, return_index=True)
-        self.meanScoreAfter = np.mean(scores[indices])
+        self.mean_score_after = np.mean(scores[indices])
 
-        self.gameStates = np.concatenate((self.gameStates, states))
-        self.gameHeads = np.concatenate((self.gameHeads, heads))
-        self.gameScores = np.concatenate((self.gameScores, scores))
-        self.gameIDs = np.concatenate((self.gameIDs, ids))
+        self.game_states = np.concatenate((self.game_states, states))
+        self.game_heads = np.concatenate((self.game_heads, heads))
+        self.game_scores = np.concatenate((self.game_scores, scores))
+        self.game_ids = np.concatenate((self.game_ids, ids))
         self.moves = np.concatenate((self.moves, moves))
 
     def trim_game_list(self) -> None:
         # get rid of no-score games
-        validIdx = np.nonzero(self.gameScores > -50)
-        self.gameIDs = self.gameIDs[validIdx]
-        self.gameScores = self.gameScores[validIdx]
-        self.gameStates = self.gameStates[validIdx]
-        self.moves = self.moves[validIdx]
-        self.gameHeads = self.gameHeads[validIdx]
+        valid_idx = np.nonzero(self.game_scores > -50)
+        self.game_ids = self.game_ids[valid_idx]
+        self.game_scores = self.game_scores[valid_idx]
+        self.game_states = self.game_states[valid_idx]
+        self.moves = self.moves[valid_idx]
+        self.game_heads = self.game_heads[valid_idx]
 
-        uni, indices = np.unique(self.gameIDs, return_index=True)
-        numberOfGames = len(uni)
+        uni, indices = np.unique(self.game_ids, return_index=True)
+        number_of_games = len(uni)
 
         count = 0
-        badIdx = []
+        bad_idx = []
         idx = 0
-        lowScore = np.min(self.gameScores)
+        low_score = np.min(self.game_scores)
 
-        overallMean = np.mean(self.gameScores[indices])
+        overall_mean = np.mean(self.game_scores[indices])
 
         # if you have too many games, get rid of the worst
-        if numberOfGames > globe.NUM_TRAINING_GAMES:
-            purgeNum = numberOfGames - globe.NUM_TRAINING_GAMES
+        if number_of_games > globe.NUM_TRAINING_GAMES:
+            purge_num = number_of_games - globe.NUM_TRAINING_GAMES
         else:
-            purgeNum = 0
-        while count < purgeNum:
-            startIdx = idx
+            purge_num = 0
+        while count < purge_num:
+            start_idx = idx
 
             # check if current game is bad
-            if self.gameScores[idx] < overallMean:
+            if self.game_scores[idx] < overall_mean:
                 count += 1
                 bad = True
             else:
@@ -205,43 +206,43 @@ class TrainRL:
             flag = True
             while flag:
                 if bad:
-                    badIdx.append(idx)
+                    bad_idx.append(idx)
                 idx += 1
-                if idx >= len(self.gameScores):
-                    count = purgeNum
+                if idx >= len(self.game_scores):
+                    count = purge_num
                     flag = False
-                elif self.gameIDs[idx] != self.gameIDs[startIdx]:
+                elif self.game_ids[idx] != self.game_ids[start_idx]:
                     flag = False
 
-        mask = np.ones(len(self.gameIDs), dtype=bool)
-        mask[badIdx] = False
-        self.gameIDs = self.gameIDs[mask]
-        self.gameScores = self.gameScores[mask]
-        self.gameStates = self.gameStates[mask]
+        mask = np.ones(len(self.game_ids), dtype=bool)
+        mask[bad_idx] = False
+        self.game_ids = self.game_ids[mask]
+        self.game_scores = self.game_scores[mask]
+        self.game_states = self.game_states[mask]
         self.moves = self.moves[mask]
-        self.gameHeads = self.gameHeads[mask]
+        self.game_heads = self.game_heads[mask]
 
-        oldNumberOfGames = numberOfGames
-        uni, indices = np.unique(self.gameIDs, return_index=True)
-        numberOfGames = len(uni)
-        overallMeanAfter = np.mean(self.gameScores[indices])
+        old_number_of_games = number_of_games
+        uni, indices = np.unique(self.game_ids, return_index=True)
+        number_of_games = len(uni)
+        overall_mean_after = np.mean(self.game_scores[indices])
 
         # update statistics
-        self.meanScores.append(self.meanScore)
-        self.gamesUsed.append(numberOfGames)
-        self.maxScores.append(np.max(self.gameScores))
-        print('Generation mean score in  before/after purge: {}/{}.\n Over mean score before/after purge {}/{}.\n Best score of {} in {} games.'.format(self.meanScore,
-                                                                                                                                                        self.meanScoreAfter,
-                                                                                                                                                        overallMean,
-                                                                                                                                                        overallMeanAfter,
-                                                                                                                                                        self.maxScores[
+        self.mean_scores.append(self.mean_score)
+        self.games_used.append(number_of_games)
+        self.max_scores.append(np.max(self.game_scores))
+        print('Generation mean score in  before/after purge: {}/{}.\n Over mean score before/after purge {}/{}.\n Best score of {} in {} games.'.format(self.mean_score,
+                                                                                                                                                        self.mean_score_after,
+                                                                                                                                                        overall_mean,
+                                                                                                                                                        overall_mean_after,
+                                                                                                                                                        self.max_scores[
                                                                                                                                                             -1],
-                                                                                                                                                        self.gamesUsed[-1]))
+                                                                                                                                                        self.games_used[-1]))
 
     def size_info(self) -> None:
         print('self',       globe.get_size(self))
-        print('gameHeads',  globe.get_size(self.gameHeads))
-        print('gameids',    globe.get_size(self.gameIDs))
-        print('gameScores', globe.get_size(self.gameScores))
-        print('gameStates', globe.get_size(self.gameStates))
+        print('gameHeads',  globe.get_size(self.game_heads))
+        print('gameids',    globe.get_size(self.game_ids))
+        print('gameScores', globe.get_size(self.game_scores))
+        print('gameStates', globe.get_size(self.game_states))
         print('moves',      globe.get_size(self.moves))

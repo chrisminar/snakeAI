@@ -23,14 +23,15 @@ class Trainer:
               move_predictions: npt.NDArray[np.int32]) -> None:
         with Timer() as t:
             # get all permutations
-            statesP, movesP, headsP = Trainer.permute_inputs(
+            permuted_states, permuted_moves, permuted_heads = Trainer.permute_inputs(
                 inputs, move_predictions, heads)
 
-            statesP = np.reshape(
-                statesP, (statesP.shape[0], statesP.shape[1], statesP.shape[1], 1))  # reshape
+            permuted_states = np.reshape(
+                permuted_states, (permuted_states.shape[0], permuted_states.shape[1], permuted_states.shape[1], 1))  # reshape
 
             # train on them
-            self.nn.train(statesP, headsP, movesP, generation)
+            self.nn.train(permuted_states, permuted_heads,
+                          permuted_moves, generation)
 
     @staticmethod
     def permute_inputs(states: npt.NDArray[np.int32],
@@ -38,63 +39,63 @@ class Trainer:
                        heads: npt.NDArray[np.int32],) -> Tuple[npt.NDArray[np.int32],
                                                                npt.NDArray[np.int32],
                                                                npt.NDArray[np.int32], ]:
-        flipAxis = len(states.shape)-1
+        flip_axis = len(states.shape)-1
 
         # rotate 90
-        stateR90 = np.rot90(states, 1, (1, 2))
-        movesR90 = Trainer.rotate_moves(moves, 1)
-        headsR90 = Trainer.rotate_moves(heads, 1)
+        state_r90 = np.rot90(states, 1, (1, 2))
+        moves_r90 = Trainer.rotate_moves(moves, 1)
+        heads_r90 = Trainer.rotate_moves(heads, 1)
 
         # rotate 180
-        stateR180 = np.rot90(states, 2, (1, 2))
-        movesR180 = Trainer.rotate_moves(moves, 2)
-        headsR180 = Trainer.rotate_moves(heads, 2)
+        state_r180 = np.rot90(states, 2, (1, 2))
+        moves_r180 = Trainer.rotate_moves(moves, 2)
+        heads_r180 = Trainer.rotate_moves(heads, 2)
 
         # rotate 270
-        stateR270 = np.rot90(states, 3, (1, 2))
-        movesR270 = Trainer.rotate_moves(moves, 3)
-        headsR270 = Trainer.rotate_moves(heads, 3)
+        state_r270 = np.rot90(states, 3, (1, 2))
+        moves_r270 = Trainer.rotate_moves(moves, 3)
+        heads_r270 = Trainer.rotate_moves(heads, 3)
 
         # flip left - right
-        stateLR = np.flip(states, axis=flipAxis-1)
-        movesLR = Trainer.flip_move_left_right(moves)
-        headsLR = Trainer.flip_move_left_right(heads)
+        state_LR = np.flip(states, axis=flip_axis-1)
+        moves_LR = Trainer.flip_move_left_right(moves)
+        heads_LR = Trainer.flip_move_left_right(heads)
 
         # rotate lr 90
-        stateLRR90 = np.rot90(stateLR, 1, (1, 2))
-        movesLRR90 = Trainer.rotate_moves(movesLR, 1)
-        headsLRR90 = Trainer.rotate_moves(headsLR, 1)
+        state_LR_r90 = np.rot90(state_LR, 1, (1, 2))
+        moves_LR_r90 = Trainer.rotate_moves(moves_LR, 1)
+        heads_LR_r90 = Trainer.rotate_moves(heads_LR, 1)
 
         # rotate lr 180
-        stateLRR180 = np.rot90(stateLR, 2, (1, 2))
-        movesLRR180 = Trainer.rotate_moves(movesLR, 2)
-        headsLRR180 = Trainer.rotate_moves(headsLR, 2)
+        state_LR_r180 = np.rot90(state_LR, 2, (1, 2))
+        moves_LR_r180 = Trainer.rotate_moves(moves_LR, 2)
+        heads_LR_r180 = Trainer.rotate_moves(heads_LR, 2)
 
         # rotate lr 270
-        stateLRR270 = np.rot90(stateLR, 3, (1, 2))
-        movesLRR270 = Trainer.rotate_moves(movesLR, 3)
-        headsLRR270 = Trainer.rotate_moves(headsLR, 3)
+        state_LR_r270 = np.rot90(state_LR, 3, (1, 2))
+        moves_LR_r270 = Trainer.rotate_moves(moves_LR, 3)
+        heads_LR_r270 = Trainer.rotate_moves(heads_LR, 3)
 
-        stateOut = np.vstack([states, stateR90, stateR180, stateR270,
-                             stateLR, stateLRR90, stateLRR180, stateLRR270])
-        movesOut = np.vstack([moves, movesR90, movesR180, movesR270,
-                             movesLR, movesLRR90, movesLRR180, movesLRR270])
-        headsOut = np.vstack([heads, headsR90, headsR180, headsR270,
-                             headsLR, headsLRR90, headsLRR180, headsLRR270])
+        state_out = np.vstack([states, state_r90, state_r180, state_r270,
+                               state_LR, state_LR_r90, state_LR_r180, state_LR_r270])
+        moves_out = np.vstack([moves, moves_r90, moves_r180, moves_r270,
+                               moves_LR, moves_LR_r90, moves_LR_r180, moves_LR_r270])
+        heads_out = np.vstack([heads, heads_r90, heads_r180, heads_r270,
+                               heads_LR, heads_LR_r90, heads_LR_r180, heads_LR_r270])
 
-        return stateOut, movesOut, headsOut
+        return state_out, moves_out, heads_out
 
     @staticmethod
     def flip_move_left_right(moves: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
-        movesLR = np.copy(moves)
-        movesLR[:, 3], movesLR[:, 1] = moves[:, 1], moves[:, 3]
-        return movesLR
+        moves_LR = np.copy(moves)
+        moves_LR[:, 3], moves_LR[:, 1] = moves[:, 1], moves[:, 3]
+        return moves_LR
 
     @staticmethod
     def flip_move_up_down(moves: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
-        movesUD = np.copy(moves)
-        movesUD[:, 0], movesUD[:, 2] = moves[:, 2], moves[:, 0]
-        return movesUD
+        moves_UD = np.copy(moves)
+        moves_UD[:, 0], moves_UD[:, 2] = moves[:, 2], moves[:, 0]
+        return moves_UD
 
     @staticmethod
     def rotate_moves(moves: npt.NDArray[np.int32], quads: int) -> npt.NDArray[np.int32]:

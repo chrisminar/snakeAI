@@ -11,58 +11,58 @@ from helper import Globe as globe
 class Snake:
     def __init__(self, x_grid_size: int = 20, y_grid_size: int = 20) -> None:
         # grid
-        self.sizeX = x_grid_size  # width of grid
-        self.sizeY = y_grid_size  # height of grid
-        # grid                  -2 = food, -1 = empty, any number <= 0 is the position of the snakes body. eg if the snake has length 10 then 0 is the head and 9 is the tail
-        self.grid = np.zeros((self.sizeX, self.sizeY))-1
+        self.grid_size_x = x_grid_size  # width of grid
+        self.grid_size_y = y_grid_size  # height of grid
+        # grid  -2 = food, -1 = empty, any number <= 0 is the position of the snakes body. eg if the snake has length 10 then 0 is the head and 9 is the tail
+        self.grid = np.zeros((self.grid_size_x, self.grid_size_y))-1
 
         # snake
-        self.X = int(1)  # snake head position x
-        self.Y = int(1)  # snake head position y
+        self.head_x = int(1)  # snake head position x
+        self.head_y = int(1)  # snake head position y
         self.length = 0  # current length of snake
-        self.grid[self.X][self.Y] = 0  # set snake head on the grid
+        self.grid[self.head_x][self.head_y] = 0  # set snake head on the grid
 
         # scoring
         self.score = 0  # current score
         self.score_per_food = 100  # point modification for eating food
         self.score_per_move = -1  # point modificaiton for moving
         self.score_penalty_for_failure = -50  # point modification for dying
-        self.gameoverThreshold = -self.sizeX*self.sizeY*2
-        self.moveThreshold = self.sizeX*self.sizeY*2
+        self.game_over_threshold = -self.grid_size_x*self.grid_size_y*2
+        self.move_threshold = self.grid_size_x*self.grid_size_y*2
         self.moves = 0
 
-        self.movesSinceFood = 0
+        self.moves_since_food = 0
 
         # input
         dir = random.randint(0, 3)
         if dir == 0:
-            self.Xdir = 0  # 0,1,2,3 = up,right,down,left
-            self.Ydir = -1
+            self.direction_x = 0  # 0,1,2,3 = up,right,down,left
+            self.direction_y = -1
         elif dir == 1:
-            self.Xdir = 1
-            self.Ydir = 0
+            self.direction_x = 1
+            self.direction_y = 0
         elif dir == 2:
-            self.Xdir = 0
-            self.Ydir = -1
+            self.direction_x = 0
+            self.direction_y = -1
         else:
-            self.Xdir = -1
-            self.Ydir = 0
+            self.direction_x = -1
+            self.direction_y = 0
 
         # gamestate
-        self.gameover = False
+        self.game_over = False
 
-        self.foodX, self.foodY = self.spawn_food()
+        self.food_x, self.food_y = self.spawn_food()
 
     def run_single(self, x_direction: int, y_direction: int) -> None:
-        self.Xdir = x_direction
-        self.Ydir = y_direction
+        self.direction_x = x_direction
+        self.direction_y = y_direction
         self.step_time()
 
     def display_state(self) -> None:
         # draw grid
         # font = pg.font.Font('freesansbold.ttf',12)
-        for i in range(self.sizeX):
-            for j in range(self.sizeY):
+        for i in range(self.grid_size_x):
+            for j in range(self.grid_size_y):
                 pg.draw.rect(self.DISPLAY, self.grid_num_2_color(
                     self.grid[i][j]), (i*21, j*21, 20, 20))
                 # text = font.render(str(int(self.grid[i][j])), True, (255,255,255))
@@ -84,26 +84,26 @@ class Snake:
 
     def step_time(self) -> None:
         # move head
-        self.X += self.Xdir
-        self.Y += self.Ydir
+        self.head_x += self.direction_x
+        self.head_y += self.direction_y
         self.score += self.score_per_move
 
         # check if snake ate
         ateThisTurn = False
-        if (self.X == self.foodX) and (self.Y == self.foodY):
+        if (self.head_x == self.food_x) and (self.head_y == self.food_y):
             self.length += 1
-            self.foodX, self.foodY = self.spawn_food()
-            self.grid[self.foodX][self.foodY] = -2
+            self.food_x, self.food_y = self.spawn_food()
+            self.grid[self.food_x][self.food_y] = -2
             self.score += (self.score_per_food)
             ateThisTurn = True
-            self.movesSinceFood = 0
+            self.moves_since_food = 0
             if self.length > 15:  # if snake is max length, the game has been won
                 self.score += 1000
-                self.gameover = True
+                self.game_over = True
 
         # move body
-        for i in range(self.sizeX):
-            for j in range(self.sizeY):
+        for i in range(self.grid_size_x):
+            for j in range(self.grid_size_y):
                 if self.grid[i][j] >= 0:
                     self.grid[i][j] += 1
                     # if the gird length is longer than the actual length, delete the tail
@@ -111,20 +111,20 @@ class Snake:
                         self.grid[i][j] = -1
 
         # check if dead
-        self.gameover = self.check_game_over()
-        if self.gameover:
+        self.game_over = self.check_game_over()
+        if self.game_over:
             self.score += self.score_penalty_for_failure
 
-        if not self.gameover:
+        if not self.game_over:
             # set head on grid
-            self.grid[self.X][self.Y] = 0
+            self.grid[self.head_x][self.head_y] = 0
 
     def spawn_food(self) -> Tuple[int, int]:
         # generate mask matrix and count empty spots
-        mask = np.zeros((self.sizeX, self.sizeY))
+        mask = np.zeros((self.grid_size_x, self.grid_size_y))
         count = 1
-        for i in range(self.sizeX):
-            for j in range(self.sizeY):
+        for i in range(self.grid_size_x):
+            for j in range(self.grid_size_y):
                 if self.grid[i][j] == -1:
                     mask[i][j] = count
                     count += 1
@@ -139,8 +139,8 @@ class Snake:
         #print(spot, count)
 
         # find the x and y location of the spot
-        for i in range(self.sizeX):
-            for j in range(self.sizeY):
+        for i in range(self.grid_size_x):
+            for j in range(self.grid_size_y):
                 if (mask[i][j] == spot):
                     return (i, j)
         print('not found')
@@ -148,15 +148,15 @@ class Snake:
 
     def check_game_over(self) -> bool:
         # check if we ran into a wall
-        if (self.X < 0) or (self.X >= self.sizeX) or self.score < self.gameoverThreshold or self.moves > self.moveThreshold:
+        if (self.head_x < 0) or (self.head_x >= self.grid_size_x) or self.score < self.game_over_threshold or self.moves > self.move_threshold:
             return True
-        elif (self.Y < 0) or (self.Y >= self.sizeY):
+        elif (self.head_y < 0) or (self.head_y >= self.grid_size_y):
             return True
-        elif self.movesSinceFood > globe.TIMEOUT:
+        elif self.moves_since_food > globe.TIMEOUT:
             return True
 
         # check if we ran into the body
-        if (self.grid[self.X][self.Y] >= 0):
+        if (self.grid[self.head_x][self.head_y] >= 0):
             return True
 
         return False

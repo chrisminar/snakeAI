@@ -1,12 +1,12 @@
 
 
-from neural_net import NeuralNetwork
 from typing import Callable
 
 import numpy as np
 from numpy import typing as npt
 from snake_reinforcement_learning import SnakeRL as snake
 
+from neural_net import NeuralNetwork
 
 #####################
 ## self play class ##
@@ -17,12 +17,12 @@ class PlayGames:
     """description of class"""
 
     def __init__(self, neural_network: NeuralNetwork) -> None:
-        self.gamestates = []
+        self.game_states = []
         self.prediction = []
-        self.gameId = []
+        self.game_id = []
         self.scores = []
         self.heads = []
-        self.nn = neural_network
+        self.neural_net = neural_network
         self.gamestate_to_nn: Callable[[npt.NDArray[np.int32]],
                                        npt.NDArray[np.int32]] = np.vectorize(grid_val_to_neural_net)
 
