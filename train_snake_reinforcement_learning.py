@@ -46,7 +46,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
-from helper import Globe as globe
+from helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
+                    get_size)
 from neural_net import NeuralNetwork
 from self_play import SelfPlay
 from trainer import Trainer
@@ -54,7 +55,7 @@ from trainer import Trainer
 
 class TrainRL:
     def __init__(self) -> None:
-        self.game_states = np.zeros((0, globe.GRID_X, globe.GRID_Y))
+        self.game_states = np.zeros((0, GRID_X, GRID_Y))
         self.game_heads = np.zeros((0, 4))
         self.game_scores = np.zeros((0,))
         self.game_ids = np.zeros((0,))
@@ -74,11 +75,11 @@ class TrainRL:
             print('### Generation {}###'.format(generation))
             print('######################')
             number_of_games = len(np.unique(self.game_ids))
-            n = globe.NUM_TRAINING_GAMES - number_of_games
-            if n > globe.NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
+            n = NUM_TRAINING_GAMES - number_of_games
+            if n > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
                 pass
             else:  # if we already have a lot of games, use default amount
-                n = globe.NUM_SELF_PLAY_GAMES
+                n = NUM_SELF_PLAY_GAMES
             print('num games to play {}'.format(n))
             self.self_play(self.neural_net, generation, n)
             self.network_trainer(generation)
@@ -117,7 +118,7 @@ class TrainRL:
         # neural network
     # outputs:
         # 2000 game outputs
-    def self_play(self, nn: NeuralNetwork, generation: int, num_games: int = globe.NUM_SELF_PLAY_GAMES) -> None:
+    def self_play(self, nn: NeuralNetwork, generation: int, num_games: int = NUM_SELF_PLAY_GAMES) -> None:
         spc = SelfPlay(nn)
         states, heads, scores, ids, moves = spc.play_games(
             generation, self.game_id, num_games)
@@ -190,8 +191,8 @@ class TrainRL:
         overall_mean = np.mean(self.game_scores[indices])
 
         # if you have too many games, get rid of the worst
-        if number_of_games > globe.NUM_TRAINING_GAMES:
-            purge_num = number_of_games - globe.NUM_TRAINING_GAMES
+        if number_of_games > NUM_TRAINING_GAMES:
+            purge_num = number_of_games - NUM_TRAINING_GAMES
         else:
             purge_num = 0
         while count < purge_num:
@@ -242,9 +243,9 @@ class TrainRL:
                                                                                                                                                         self.games_used[-1]))
 
     def size_info(self) -> None:
-        print('self',       globe.get_size(self))
-        print('gameHeads',  globe.get_size(self.game_heads))
-        print('gameids',    globe.get_size(self.game_ids))
-        print('gameScores', globe.get_size(self.game_scores))
-        print('gameStates', globe.get_size(self.game_states))
-        print('moves',      globe.get_size(self.moves))
+        print('self',       get_size(self))
+        print('gameHeads',  get_size(self.game_heads))
+        print('gameids',    get_size(self.game_ids))
+        print('gameScores', get_size(self.game_scores))
+        print('gameStates', get_size(self.game_states))
+        print('moves',      get_size(self.moves))

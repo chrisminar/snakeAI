@@ -10,13 +10,13 @@ from snake_reinforcement_learning import SnakeRL
 
 class Snake_test(unittest.TestCase):
     def test_init(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         self.assertEqual(s.gameover, False)
         self.assertEqual(s.grid.shape, np.zeros(
-            (globe.GRID_X, globe.GRID_Y)).shape)
+            (GRID_X, GRID_Y)).shape)
 
     def test_run_single_no_food(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         x = s.X
         y = s.Y
         l = s.length
@@ -47,7 +47,7 @@ class Snake_test(unittest.TestCase):
         self.assertEqual(s.length, 0)
 
     def test_run_single_with_food(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         x = s.X
         y = s.Y
         l = s.length
@@ -61,7 +61,7 @@ class Snake_test(unittest.TestCase):
         self.assertEqual(s.length, l+1)
 
     def test_spawn_food(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         i = np.zeros((10,))
         j = np.zeros((10,))
         for food in range(10):
@@ -71,7 +71,7 @@ class Snake_test(unittest.TestCase):
         self.assertGreater(np.std(j), 0)
 
     def test_check_game_over_right(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         # head at 0,0
         s.runSingle(1, 0)  # head at 1,0
         self.assertFalse(s.gameover)
@@ -83,13 +83,13 @@ class Snake_test(unittest.TestCase):
         self.assertTrue(s.gameover)
 
     def test_checkGameOver_left(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         # head at 0,0
         s.runSingle(-1, 0)  # head at -1,0
         self.assertTrue(s.gameover)
 
     def test_checkGameOver_up(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         # head at 0,0
         s.runSingle(0, 1)  # head at 0,1
         self.assertFalse(s.gameover)
@@ -101,14 +101,14 @@ class Snake_test(unittest.TestCase):
         self.assertTrue(s.gameover)
 
     def test_checkGameOver_down(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         # head at 0,0
         self.assertFalse(s.gameover)
         s.runSingle(0, -1)  # head at 0,-1
         self.assertTrue(s.gameover)
 
     def test_checkGameOver_tail(self):
-        s = Snake(globe.GRID_X, globe.GRID_Y)
+        s = Snake(GRID_X, GRID_Y)
         s.grid[0][1] = -2  # place food at (0,1)
         s.foodX, s.foodY = 0, 1
         s.runSingle(0, 1)  # move up and eat
@@ -132,7 +132,7 @@ class SnakeRL_test(unittest.TestCase):
 
     def test_Runstep_no_food(self):
         nn = NeuralNetwork()
-        s = SnakeRL(nn=nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
+        s = SnakeRL(nn=nn, sizeX=GRID_X, sizeY=GRID_Y)
         x = s.X
         y = s.Y
         l = s.length
@@ -164,7 +164,7 @@ class SnakeRL_test(unittest.TestCase):
 
     def test_Runstep_with_food(self):
         nn = NeuralNetwork()
-        s = SnakeRL(nn=nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
+        s = SnakeRL(nn=nn, sizeX=GRID_X, sizeY=GRID_Y)
         x = s.X
         y = s.Y
         l = s.length
@@ -179,7 +179,7 @@ class SnakeRL_test(unittest.TestCase):
 
     def test_evaluateNext(self):
         nn = NeuralNetwork()
-        s = SnakeRL(nn=nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
+        s = SnakeRL(nn=nn, sizeX=GRID_X, sizeY=GRID_Y)
         g = PlayGames(nn)
         direction, move_array, head = s.evaluateNextStep(g.gamestate_to_nn)
         print(direction)
@@ -196,7 +196,7 @@ class SnakeRL_test(unittest.TestCase):
 
     def test_play(self):
         nn = NeuralNetwork()
-        s = SnakeRL(nn=nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
+        s = SnakeRL(nn=nn, sizeX=GRID_X, sizeY=GRID_Y)
         g = PlayGames(nn)
         s.play(g.gamestate_to_nn)
         self.assertTrue(s.gameover, False)

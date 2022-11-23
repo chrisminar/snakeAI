@@ -7,7 +7,7 @@ from numpy import typing as npt
 from tensorflow import keras
 from tensorflow.python.keras import layers
 
-from helper import Globe as globe
+from helper import BATCH_SIZE, EPOCH_DELTA, EPOCHS, MOMENTUM, VALIDATION_SPLIT
 
 
 class NeuralNetwork:
@@ -28,7 +28,7 @@ class NeuralNetwork:
 
         # grid side
         block_input = keras.Input(
-            shape=(globe.GRID_X, globe.GRID_Y, 1), name='input_game_state')
+            shape=(GRID_X, GRID_Y, 1), name='input_game_state')
 
         l1 = layers.Conv2D(16, 3, padding='same', activation='relu',
                            name='l1', kernel_initializer=initializer)(block_input)
@@ -57,15 +57,15 @@ class NeuralNetwork:
         self.compile()
 
     def evaluate(self, state: npt.NDArray[np.int32], head: npt.NDArray[np.int32]) -> None:
-        gridIn = state.reshape(
+        grid_in = state.reshape(
             1, state.shape[0], state.shape[1], 1).astype(np.float32)
-        headIn = head.reshape(1, 4).astype(np.float32)
-        return self.model([gridIn, headIn], training=False)
+        head_in = head.reshape(1, 4).astype(np.float32)
+        return self.model([grid_in, head_in], training=False)
 
     def compile(self) -> None:
         self.model.compile(loss=keras.losses.CategoricalCrossentropy(from_logits=True),
                            optimizer=keras.optimizers.SGD(
-                               momentum=globe.MOMENTUM),
+                               momentum=MOMENTUM),
                            metrics=['accuracy', 'accuracy'])
 
     def train(self, inputs: npt.NDArray[np.int32],
@@ -73,11 +73,11 @@ class NeuralNetwork:
               predictions: npt.NDArray[np.int32],
               generation: int,) -> None:
         callback = tf.keras.callbacks.EarlyStopping(
-            monitor='val_loss', min_delta=globe.EPOCH_DELTA, verbose=1)
+            monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1)
         history = self.model.fit({'input_game_state': inputs, 'input_head': heads}, {'mult': predictions},
-                                 batch_size=globe.BATCH_SIZE,
-                                 epochs=globe.EPOCHS,
-                                 validation_split=globe.VALIDATION_SPLIT,
+                                 batch_size=BATCH_SIZE,
+                                 epochs=EPOCHS,
+                                 validation_split=VALIDATION_SPLIT,
                                  verbose=0,
                                  callbacks=[callback])
         # debug

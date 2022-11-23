@@ -26,11 +26,11 @@ class trainSnake_test(unittest.TestCase):
             t.game_states.shape[0], t.moves.shape[0], 'bad moves shape')
 
     def test_trimGameList(self):
-        num_games = globe.NUM_TRAINING_GAMES
+        num_games = NUM_TRAINING_GAMES
         moves_per_game = 3
         n = num_games*moves_per_game
         moves = np.zeros((n, 4))
-        states = np.zeros((n, globe.GRID_X, globe.GRID_Y))
+        states = np.zeros((n, GRID_X, GRID_Y))
         scores = np.zeros((n,))
         gameIDs = np.zeros((moves_per_game,))
         heads = np.ones((n, 4))
@@ -48,13 +48,13 @@ class trainSnake_test(unittest.TestCase):
         t.add_games_to_list(states, heads, scores+100, gameIDs, moves)
         t.trim_game_list()
         self.assertEqual(
-            t.game_states.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Gamestates trim unsuccessful')
+            t.game_states.shape[0], NUM_TRAINING_GAMES*moves_per_game, 'Gamestates trim unsuccessful')
         self.assertEqual(
-            t.moves.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Moves trim unsuccessful')
+            t.moves.shape[0], NUM_TRAINING_GAMES*moves_per_game, 'Moves trim unsuccessful')
         self.assertEqual(
-            t.game_scores.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'Scores trim unsuccessful')
+            t.game_scores.shape[0], NUM_TRAINING_GAMES*moves_per_game, 'Scores trim unsuccessful')
         self.assertEqual(
-            t.game_ids.shape[0], globe.NUM_TRAINING_GAMES*moves_per_game, 'game ids trim unsuccessful')
+            t.game_ids.shape[0], NUM_TRAINING_GAMES*moves_per_game, 'game ids trim unsuccessful')
         self.assertEqual(np.min(t.game_scores), 100, 'min scores not removed')
 
 

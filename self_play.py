@@ -3,7 +3,7 @@
 import numpy as np
 from snake_reinforcement_learning import SnakeRL as snake
 
-from helper import Globe as globe
+from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES
 from neural_net import NeuralNetwork
 from play_games import PlayGames
 from timer import Timer
@@ -16,11 +16,11 @@ from timer import Timer
 class SelfPlay(PlayGames):
     """Generate self play games"""
 
-    def play_games(self, generation: int, start_id: int, num_games: int = globe.NUM_SELF_PLAY_GAMES):
+    def play_games(self, generation: int, start_id: int, num_games: int = NUM_SELF_PLAY_GAMES):
         for i in range(num_games):
             with Timer() as t:
                 g = snake(nn=self.neural_net,
-                          sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
+                          sizeX=GRID_X, sizeY=GRID_Y)
                 g.play(self.gamestate_to_nn)
                 if len(g.moveList) > 1:
                     self.game_states.append(np.stack(g.stateList[:-1]))

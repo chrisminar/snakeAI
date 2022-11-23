@@ -5,7 +5,7 @@ from typing import Tuple
 
 import numpy as np
 import pygame as pg
-from helper import Globe as globe
+from helper import TIMEOUT
 
 
 class Snake:
@@ -34,14 +34,14 @@ class Snake:
         self.moves_since_food = 0
 
         # input
-        dir = random.randint(0, 3)
-        if dir == 0:
+        direction = random.randint(0, 3)
+        if direction == 0:
             self.direction_x = 0  # 0,1,2,3 = up,right,down,left
             self.direction_y = -1
-        elif dir == 1:
+        elif direction == 1:
             self.direction_x = 1
             self.direction_y = 0
-        elif dir == 2:
+        elif direction == 2:
             self.direction_x = 0
             self.direction_y = -1
         else:
@@ -63,7 +63,7 @@ class Snake:
         # font = pg.font.Font('freesansbold.ttf',12)
         for i in range(self.grid_size_x):
             for j in range(self.grid_size_y):
-                pg.draw.rect(self.DISPLAY, self.grid_num_2_color(
+                pg.draw.rect(self.pygame_display, self.grid_num_2_color(
                     self.grid[i][j]), (i*21, j*21, 20, 20))
                 # text = font.render(str(int(self.grid[i][j])), True, (255,255,255))
                 # textRect = text.get_rect()
@@ -89,13 +89,13 @@ class Snake:
         self.score += self.score_per_move
 
         # check if snake ate
-        ateThisTurn = False
+        ate_this_turn = False
         if (self.head_x == self.food_x) and (self.head_y == self.food_y):
             self.length += 1
             self.food_x, self.food_y = self.spawn_food()
             self.grid[self.food_x][self.food_y] = -2
             self.score += (self.score_per_food)
-            ateThisTurn = True
+            ate_this_turn = True
             self.moves_since_food = 0
             if self.length > 15:  # if snake is max length, the game has been won
                 self.score += 1000
@@ -107,7 +107,7 @@ class Snake:
                 if self.grid[i][j] >= 0:
                     self.grid[i][j] += 1
                     # if the gird length is longer than the actual length, delete the tail
-                    if (self.grid[i][j] > self.length) and (not ateThisTurn):
+                    if (self.grid[i][j] > self.length) and (not ate_this_turn):
                         self.grid[i][j] = -1
 
         # check if dead
@@ -152,7 +152,7 @@ class Snake:
             return True
         elif (self.head_y < 0) or (self.head_y >= self.grid_size_y):
             return True
-        elif self.moves_since_food > globe.TIMEOUT:
+        elif self.moves_since_food > TIMEOUT:
             return True
 
         # check if we ran into the body
