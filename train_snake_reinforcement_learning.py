@@ -42,9 +42,9 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from globalVar import Globe as globe
-from neuralNet import NeuralNetwork
-from selfPlay import SelfPlay
+from helper import Globe as globe
+from neural_net import NeuralNetwork
+from self_play import SelfPlay
 from trainer import Trainer
 
 

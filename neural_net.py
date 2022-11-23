@@ -6,7 +6,7 @@ from numpy import typing as npt
 from tensorflow import keras
 from tensorflow.python.keras import layers
 
-from globalVar import Globe as globe
+from helper import Globe as globe
 
 
 class NeuralNetwork:

@@ -1,11 +1,11 @@
 import unittest
 
 import numpy as np
-from globalVar import Globe as globe
-from neuralNet import NeuralNetwork
-from playGames import PlayGames
+from helper import Globe as globe
+from neural_net import NeuralNetwork
+from play_games import PlayGames
 from snake import Snake
-from snakeRL import SnakeRL
+from snake_reinforcement_learning import SnakeRL
 
 
 class Snake_test(unittest.TestCase):

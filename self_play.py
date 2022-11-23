@@ -1,10 +1,9 @@
-import numpy as np
-from snakeRL import SnakeRL as snake
-
-from globalVar import Globe as globe
-from neuralNet import NeuralNetwork
-from playGames import PlayGames
 from timer import Timer
+from play_games import PlayGames
+from neural_net import NeuralNetwork
+from helper import Globe as globe
+import numpy as np
+from snake_reinforcement_learning import SnakeRL as snake
 
 
 #####################

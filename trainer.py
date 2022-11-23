@@ -3,8 +3,8 @@ from typing import Tuple
 import numpy as np
 from numpy import typing as npt
 
-from globalVar import Globe as globe
-from neuralNet import NeuralNetwork
+from helper import Globe as globe
+from neural_net import NeuralNetwork
 from timer import Timer
 
 

@@ -5,7 +5,7 @@ from typing import Tuple
 
 import numpy as np
 import pygame as pg
-from globalVar import Globe as globe
+from helper import Globe as globe
 
 
 class Snake:

@@ -1,12 +1,12 @@
 
 
+from neural_net import NeuralNetwork
 from typing import Callable
 
 import numpy as np
 from numpy import typing as npt
-from snakeRL import SnakeRL as snake
+from snake_reinforcement_learning import SnakeRL as snake
 
-from neuralNet import NeuralNetwork
 
 #####################
 ## self play class ##

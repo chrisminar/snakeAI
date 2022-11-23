@@ -1,10 +1,10 @@
 import unittest
 
 import numpy as np
-from globalVar import Globe as globe
-from neuralNet import NeuralNetwork
-from selfPlay import SelfPlay
-from trainSnakeRL import TrainRL
+from helper import Globe as globe
+from neural_net import NeuralNetwork
+from self_play import SelfPlay
+from train_snake_reinforcement_learning import TrainRL
 
 
 class trainSnake_test(unittest.TestCase):

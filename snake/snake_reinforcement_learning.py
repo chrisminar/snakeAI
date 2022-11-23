@@ -3,7 +3,7 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 import pygame as pg
-from globalVar import Globe as globe
+from helper import Globe as globe
 from numpy import typing as npt
 from timer import Timer
 

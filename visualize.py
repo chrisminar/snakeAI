@@ -5,8 +5,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
-from neuralNet import NeuralNetwork as nn
-from selfPlay import SelfPlay
+from neural_net import NeuralNetwork as nn
+from self_play import SelfPlay
 
 
 def run_a_sample(checkpoint: Path) -> None:

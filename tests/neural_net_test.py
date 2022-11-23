@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 import tensorflow as tf
-from globalVar import Globe as globe
-from neuralNet import NeuralNetwork
+from helper import Globe as globe
+from neural_net import NeuralNetwork
 from tensorflow import keras
 
 

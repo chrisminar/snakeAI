@@ -1,8 +1,8 @@
 import unittest
 
 import numpy as np
-from neuralNet import NeuralNetwork
-from selfPlay import SelfPlay
+from neural_net import NeuralNetwork
+from self_play import SelfPlay
 
 
 class SelfPlay_test(unittest.TestCase):
