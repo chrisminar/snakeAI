@@ -8,11 +8,8 @@ from helper import Timer
 from neural_net import NeuralNetwork
 
 
-###################
-## trainer class ##
-###################
 class Trainer:
-    """description of class"""
+    """Train neural network on game data."""
 
     def __init__(self, nn: NeuralNetwork) -> None:
         self.nn = nn

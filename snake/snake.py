@@ -157,7 +157,6 @@ class Snake(metaclass=ABCMeta):
                     return (i, j)
         return (i, j)
 
-    # todo move stagnation ones into RL child
     def check_game_over(self) -> bool:
         """Check if the game is over.
 

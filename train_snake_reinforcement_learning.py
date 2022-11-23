@@ -1,43 +1,11 @@
-# todo list
-# test for timeout
-# experiemnt with different optimizers
-
-#################
-### soon list ###
-#################
-# try to progressively update nn, not reinit every time?
-# there is some sort of bug that makes the game end too early
-
-#################
-### done list ###
-#################
-# figure out how stop doing additional epochs once the training plateaus
-# stop training if accuracy and val accuracy are not improving
-# make histogram of game scores
-# try setting score_per_move to -1
-# save nn on generation completion
-# possible bug with gamelength
-# fixed
-# current scheme results in very low number of games played after the mean score increases.
-# should change the game trimming to be a bit more complex, e.g. always keep ~10k games and remove the worst ones
-# need to take the highest valid class output, not random if highest is invalid. Can do this in the nn itself.
-# change trim game list such that the highest mean score is remembered. Every time you pass Prune games below highest mean every pass.
-# possible failure of trim game states after too many runs (numer of samples constantly increases)
-# need to rework. Currently takes newest game id - oldest game id. it should count the total number of game ids
-# possible stagnation
-# around 450
-# try training on more epochs? -- seems to stop benefitting around 2
-# try init snake in middle (not 0,0)
-# moved to 1,1
-
-###################
-### FUTURE LIST ###
-###################
-# stuff to do someday
-# do network pruning
-# track/understand what the neural network is doing
-# gui
-# pause/play
+# TODO test for timeout
+# TODO experiemnt with different optimizers
+# TODO try to progressively update nn, not reinit every time?
+# TODO there is some sort of bug that makes the game end too early
+# TODO do network pruning
+# TODO track/understand what the neural network is doing
+# TODO gui
+# TODO pause/play
 """Reinforcement learning."""
 
 from typing import List
