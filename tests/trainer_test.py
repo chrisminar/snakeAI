@@ -1,9 +1,7 @@
 import unittest
 
-import numpy as np
 from helper import Globe as globe
 from neural_net import NeuralNetwork
-from snake_reinforcement_learning import SnakeRL
 from trainer import Trainer
 
 

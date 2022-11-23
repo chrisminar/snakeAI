@@ -116,9 +116,9 @@ class TrainRL:
         Args:
             generation (int): Generation number.
         """
-        self.neural_net = NeuralNetwork()
-        trn = Trainer(self.neural_net)
-        trn.train(generation, self.game_states, self.game_heads, self.moves)
+        trn = Trainer()
+        self.neural_net = trn.train(
+            generation, self.game_states, self.game_heads, self.moves)
 
     def add_games_to_list(self,
                           states: npt.NDArray[np.int32],

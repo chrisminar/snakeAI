@@ -83,25 +83,25 @@ class NeuralNetwork:
 
     def train(self,
               grids: npt.NDArray[np.int32],
-              heads: npt.NDArray[np.int32],
-              predictions: npt.NDArray[np.int32],
+              heads: npt.NDArray[np.bool8],
+              predictions: npt.NDArray[np.float32],
               generation: int) -> None:
         """Train the weights and biases of the neural network.
 
         Args:
             grids (npt.NDArray[np.int32]): Pre-processed snake grids.
-            heads (npt.NDArray[np.int32]): Snake head availibliltiy.
-            predictions (npt.NDArray[np.int32]): The move that was chosen at each state.
+            heads (npt.NDArray[np.bool8]): Snake head availibliltiy.
+            predictions (npt.NDArray[np.float32]): The move that was chosen at each state.
             generation (int): Neural net generation for this training session.
         """
         callback = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1)
-        history = self.model.fit({'input_game_state': grids, 'input_head': heads}, {'mult': predictions},
-                                 batch_size=BATCH_SIZE,
-                                 epochs=EPOCHS,
-                                 validation_split=VALIDATION_SPLIT,
-                                 verbose=0,
-                                 callbacks=[callback])
+        self.model.fit({'input_game_state': grids, 'input_head': heads}, {'mult': predictions},
+                       batch_size=BATCH_SIZE,
+                       epochs=EPOCHS,
+                       validation_split=VALIDATION_SPLIT,
+                       verbose=0,
+                       callbacks=[callback])
         self.save(generation)
 
     def disp_model(self) -> None:
