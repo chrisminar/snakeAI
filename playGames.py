@@ -16,13 +16,13 @@ from neuralNet import NeuralNetwork
 class PlayGames:
     """description of class"""
 
-    def __init__(self, nn: NeuralNetwork) -> None:
+    def __init__(self, neural_network: NeuralNetwork) -> None:
         self.gamestates = []
         self.prediction = []
         self.gameId = []
         self.scores = []
         self.heads = []
-        self.nn = nn
+        self.nn = neural_network
         self.gamestate_to_nn: Callable[[npt.NDArray[np.int32]],
                                        npt.NDArray[np.int32]] = np.vectorize(grid_val_to_nn)
 

@@ -19,10 +19,6 @@ class SnakeHuman(Snake):
         self.grid[self.foodX][self.foodY] = -2  # set food on grid
         self.displayState()
 
-    def aiGameInit(self) -> None:
-        self.foodX, self.foodY = self.spawn_food()
-        self.grid[self.foodX][self.foodY] = -2  # set food on grid
-
     def run(self) -> int:
         while (not self.gameover):
             events = pg.event.get()

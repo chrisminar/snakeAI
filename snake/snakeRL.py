@@ -36,17 +36,17 @@ class SnakeRL(Snake):
             else:  # invalid direction = no input
                 self.runSingle(self.Xdir, self.Ydir)
 
-    def play(self, grid_fn: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> None:
+    def play(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> None:
         while not self.gameover:
-            newDir, move, headView = self.evaluateNextStep(grid_fn)
+            newDir, move, headView = self.evaluateNextStep(grid_func)
             self.moveList.append(move)
             self.stateList.append(np.copy(self.grid))
             self.headList.append(headView)
             self.runStep(newDir)
         return self.score
 
-    def evaluateNextStep(self, grid_fn: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> Tuple[int, List[int], npt.NDArray[np.int32]]:
-        pre_processed_grid = grid_fn(self.grid)  # preprocess grid
+    def evaluateNextStep(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> Tuple[int, List[int], npt.NDArray[np.int32]]:
+        pre_processed_grid = grid_func(self.grid)  # preprocess grid
         headView = SnakeRL.convertHead(
             self.X, self.Y, self.sizeX, self.sizeY, self.grid)
         policy = self.nn.evaluate(pre_processed_grid, headView)
@@ -70,7 +70,7 @@ class SnakeRL(Snake):
 
     # look at head, return a boolean array [up, right, down, left] 0 means not ok to move, and 1 means ok to move
     @staticmethod
-    def convertHead(x: int, y: int, sizeX: int, sizeY: int, grid: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
+    def convertHead(x: int, y: int, grid_size_x: int, grid_size_y: int, grid: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
         isFree = np.zeros((4,))
 
         if x == 0:  # on left wall
@@ -78,7 +78,7 @@ class SnakeRL(Snake):
         elif grid[x-1, y] < 0:  # is left empty or food
             isFree[3] = 1
 
-        if x == sizeX-1:  # on right wall wall
+        if x == grid_size_x-1:  # on right wall wall
             pass
         elif grid[x+1, y] < 0:  # is right empty or food
             isFree[1] = 1
@@ -88,7 +88,7 @@ class SnakeRL(Snake):
         elif grid[x, y-1] < 0:  # is below empty or food
             isFree[2] = 1
 
-        if y == sizeY-1:  # on top wall
+        if y == grid_size_y-1:  # on top wall
             pass
         elif grid[x, y+1] < 0:  # is above empty or food
             isFree[0] = 1

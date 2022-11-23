@@ -83,7 +83,7 @@ class TrainRL:
             generation += 1
 
     # save plot that shows status of training
-    def genStatusPlot(self, generation) -> None:
+    def genStatusPlot(self, generation: int) -> None:
         fig = plt.figure()
         plt.subplot(3, 1, 1)
         plt.plot(self.meanScores)
@@ -102,7 +102,7 @@ class TrainRL:
         fig.savefig('mostrecent.png')
         plt.close()
 
-    def genHistogram(self, unique, generation) -> None:
+    def genHistogram(self, unique: npt.NDArray[np.int32], generation: int) -> None:
         fig = plt.figure()
         plt.title('Generation {}'.format(generation))
         plt.hist(unique, bins=[0, 100, 200, 300, 400, 500, 600,
@@ -122,7 +122,7 @@ class TrainRL:
         print('Moves in this training set:  Up: ', np.sum(moves[:, 0]), ', Right: ', np.sum(
             moves[:, 1]), ', Down: ', np.sum(moves[:, 2]), ', Left: ', np.sum(moves[:, 3]))
         self.addGamesToList(states, heads, scores, ids, moves, generation)
-        self.trimGameList(generation)
+        self.trimGameList()
 
     # operates on:
         # last 10000 games of self play
@@ -134,7 +134,13 @@ class TrainRL:
         trn = Trainer(self.nn)
         trn.train(generation, self.gameStates, self.gameHeads, self.moves)
 
-    def addGamesToList(self, states, heads, scores, ids, moves, generation) -> None:
+    def addGamesToList(self,
+                       states: npt.NDArray[np.int32],
+                       heads: npt.NDArray[np.int32],
+                       scores: npt.NDArray[np.int32],
+                       ids: npt.NDArray[np.int32],
+                       moves: npt.NDArray[np.int32],
+                       generation: int) -> None:
         uni, indices = np.unique(ids, return_index=True)
         self.meanScore = np.mean(scores[indices])
 
@@ -161,7 +167,7 @@ class TrainRL:
         self.gameIDs = np.concatenate((self.gameIDs, ids))
         self.moves = np.concatenate((self.moves, moves))
 
-    def trimGameList(self, generation) -> None:
+    def trimGameList(self) -> None:
         # get rid of no-score games
         validIdx = np.nonzero(self.gameScores > -50)
         self.gameIDs = self.gameIDs[validIdx]
@@ -233,9 +239,9 @@ class TrainRL:
                                                                                                                                                         self.gamesUsed[-1]))
 
     def sizeInfo(self) -> None:
-        print('self',       globe.getsize(self))
-        print('gameHeads',  globe.getsize(self.gameHeads))
-        print('gameids',    globe.getsize(self.gameIDs))
-        print('gameScores', globe.getsize(self.gameScores))
-        print('gameStates', globe.getsize(self.gameStates))
-        print('moves',      globe.getsize(self.moves))
+        print('self',       globe.get_size(self))
+        print('gameHeads',  globe.get_size(self.gameHeads))
+        print('gameids',    globe.get_size(self.gameIDs))
+        print('gameScores', globe.get_size(self.gameScores))
+        print('gameStates', globe.get_size(self.gameStates))
+        print('moves',      globe.get_size(self.moves))

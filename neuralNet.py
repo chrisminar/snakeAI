@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
+from numpy import typing as npt
 from tensorflow import keras
 from tensorflow.python.keras import layers
 
@@ -54,20 +55,22 @@ class NeuralNetwork:
         self.model = keras.Model(inputs=[block_input, head_input], outputs=l8)
         self.compile()
 
-    def evaluate(self, state, head) -> None:
+    def evaluate(self, state: npt.NDArray[np.int32], head: npt.NDArray[np.int32]) -> None:
         gridIn = state.reshape(
             1, state.shape[0], state.shape[1], 1).astype(np.float32)
         headIn = head.reshape(1, 4).astype(np.float32)
         return self.model([gridIn, headIn], training=False)
 
     def compile(self) -> None:
-        # self.model.compile(loss={'mult':keras.losses.CategoricalCrossentropy(from_logits=True)},
         self.model.compile(loss=keras.losses.CategoricalCrossentropy(from_logits=True),
                            optimizer=keras.optimizers.SGD(
                                momentum=globe.MOMENTUM),
                            metrics=['accuracy', 'accuracy'])
 
-    def train(self, inputs, heads, predictions, generation) -> None:
+    def train(self, inputs: npt.NDArray[np.int32],
+              heads: npt.NDArray[np.int32],
+              predictions: npt.NDArray[np.int32],
+              generation: int,) -> None:
         callback = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss', min_delta=globe.EPOCH_DELTA, verbose=1)
         history = self.model.fit({'input_game_state': inputs, 'input_head': heads}, {'mult': predictions},
@@ -91,7 +94,7 @@ class NeuralNetwork:
         print(self.model.metrics_names)
         # keras.utils.plot_model( self.model, show_shapes = True )
 
-    def save(self, generation) -> None:
+    def save(self, generation: int) -> None:
         self.model.save(
             r'C:\Users\Chris Minar\Documents\Python\Snake\saves\generation_{}.ckpt'.format(generation))
 

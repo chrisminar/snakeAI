@@ -73,7 +73,7 @@ def gen_compare() -> None:
 
 def find_best(states: npt.NDArray[np.int32],
               scores: npt.NDArray[np.int32],
-              ids: npt.NDArray[np.int32],) -> npt.NDArray[np.int32]:
+              ids: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
     # get indexes
     idxStart = np.argmax(scores)
     idx = idxStart

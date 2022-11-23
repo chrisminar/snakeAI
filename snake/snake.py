@@ -7,18 +7,12 @@ import numpy as np
 import pygame as pg
 from globalVar import Globe as globe
 
-buttons = {0: "up",
-           1: "right",
-           2: "down",
-           3: "left",
-           4: "none"}
 
-
-class Snake():
-    def __init__(self, sizeX: int = 20, sizeY: int = 20) -> None:
+class Snake:
+    def __init__(self, x_grid_size: int = 20, y_grid_size: int = 20) -> None:
         # grid
-        self.sizeX = sizeX  # width of grid
-        self.sizeY = sizeY  # height of grid
+        self.sizeX = x_grid_size  # width of grid
+        self.sizeY = y_grid_size  # height of grid
         # grid                  -2 = food, -1 = empty, any number <= 0 is the position of the snakes body. eg if the snake has length 10 then 0 is the head and 9 is the tail
         self.grid = np.zeros((self.sizeX, self.sizeY))-1
 
@@ -59,9 +53,9 @@ class Snake():
 
         self.foodX, self.foodY = self.spawn_food()
 
-    def runSingle(self, xdir: int, ydir: int) -> None:
-        self.Xdir = xdir
-        self.Ydir = ydir
+    def runSingle(self, x_direction: int, y_direction: int) -> None:
+        self.Xdir = x_direction
+        self.Ydir = y_direction
         self.step_time()
 
     def displayState(self) -> None:
@@ -77,6 +71,7 @@ class Snake():
                 # self.DISPLAY.blit(text,textRect)
         pg.display.update()
 
+    # TODO change num to enum
     def gridNum2Color(self, num: int) -> Tuple[int, int, int]:
         if num == -2:  # food
             return (255, 0, 0)

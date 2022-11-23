@@ -11,13 +11,16 @@ from timer import Timer
 ###################
 ## trainer class ##
 ###################
-class Trainer():
+class Trainer:
     """description of class"""
 
     def __init__(self, nn: NeuralNetwork) -> None:
         self.nn = nn
 
-    def train(self, generation: int, inputs, heads, move_predictions) -> None:
+    def train(self, generation: int,
+              inputs: npt.NDArray[np.int32],
+              heads: npt.NDArray[np.int32],
+              move_predictions: npt.NDArray[np.int32]) -> None:
         with Timer() as t:
             # get all permutations
             statesP, movesP, headsP = Trainer.permute_inputs(

@@ -19,7 +19,7 @@ class Globe:
 
     SCORE_PER_FOOD = 100
 
-    def getsize(obj: Any) -> int:
+    def get_size(obj: Any) -> int:
         BLACKLIST = type, ModuleType, FunctionType
         """sum size of object & members."""
         if isinstance(obj, BLACKLIST):
