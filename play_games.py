@@ -4,7 +4,6 @@ from typing import Callable
 
 import numpy as np
 from numpy import typing as npt
-from snake_reinforcement_learning import SnakeRL as snake
 
 from neural_net import NeuralNetwork
 

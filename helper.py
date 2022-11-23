@@ -20,9 +20,9 @@ SCORE_PER_FOOD = 100
 
 
 def get_size(obj: Any) -> int:
-    BLACKLIST = type, ModuleType, FunctionType
+    black_list_types = type, ModuleType, FunctionType
     """sum size of object & members."""
-    if isinstance(obj, BLACKLIST):
+    if isinstance(obj, black_list_types):
         raise TypeError(
             'getsize() does not take argument of type: ' + str(type(obj)))
     seen_ids = set()
@@ -31,7 +31,7 @@ def get_size(obj: Any) -> int:
     while objects:
         need_referents = []
         for obj in objects:
-            if not isinstance(obj, BLACKLIST) and id(obj) not in seen_ids:
+            if not isinstance(obj, black_list_types) and id(obj) not in seen_ids:
                 seen_ids.add(id(obj))
                 size += sys.getsizeof(obj)
                 need_referents.append(obj)

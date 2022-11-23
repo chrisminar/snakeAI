@@ -6,12 +6,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
-from neural_net import NeuralNetwork as nn
+from neural_net import NeuralNetwork
 from self_play import SelfPlay
 
 
 def run_a_sample(checkpoint: Path) -> None:
-    newnn = nn()
+    newnn = NeuralNetwork()
     newnn.load(checkpoint)
     spc = SelfPlay(newnn)
     states, heads, scores, ids, moves = spc.play_games(0, 0, 1)

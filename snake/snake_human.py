@@ -1,8 +1,5 @@
 """Play snake game in GUI."""
 
-import random
-
-import numpy as np
 import pygame as pg
 
 from snake import Snake

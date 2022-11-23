@@ -1,12 +1,11 @@
 """Play a bunch of games and track stores."""
 
 import numpy as np
-from snake_reinforcement_learning import SnakeRL as snake
 
 from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES
-from neural_net import NeuralNetwork
 from play_games import PlayGames
 from timer import Timer
+from train_snake_reinforcement_learning import SnakeRL as snake
 
 
 # TODO merge this class with playgames

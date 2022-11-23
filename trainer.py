@@ -4,7 +4,6 @@ from typing import Tuple
 import numpy as np
 from numpy import typing as npt
 
-from helper import Globe as globe
 from neural_net import NeuralNetwork
 from timer import Timer
 
