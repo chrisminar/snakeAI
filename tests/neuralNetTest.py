@@ -14,7 +14,7 @@ class NeuralNet_test(unittest.TestCase):
 
     def test_display_model(self):
         nn = NeuralNetwork()
-        nn.dispModel()
+        nn.disp_model()
 
     def test_load(self):
         pass  # self.assertEqual(0,1)

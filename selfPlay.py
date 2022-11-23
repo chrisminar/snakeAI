@@ -13,7 +13,7 @@ from timer import Timer
 class SelfPlay(PlayGames):
     """Generate self play games"""
 
-    def play_games(self, generation: int, startID: int, num_games: int = globe.NUM_SELF_PLAY_GAMES):
+    def play_games(self, generation: int, start_id: int, num_games: int = globe.NUM_SELF_PLAY_GAMES):
         for i in range(num_games):
             with Timer() as t:
                 g = snake(nn=self.nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)
@@ -22,7 +22,7 @@ class SelfPlay(PlayGames):
                     self.gamestates.append(np.stack(g.stateList[:-1]))
                     self.heads.append(np.stack(g.headList[:-1]))
                     self.gameId.append(
-                        np.full((len(g.stateList[:-1]), ), startID+i))
+                        np.full((len(g.stateList[:-1]), ), start_id+i))
                     self.prediction.append(np.array(g.moveList[:-1]))
                     self.scores.append(
                         np.full((len(g.stateList[:-1]), ), g.score))

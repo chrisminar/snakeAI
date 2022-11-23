@@ -13,7 +13,7 @@ def run_a_sample(checkpoint: Path) -> None:
     newnn = nn()
     newnn.load(checkpoint)
     spc = SelfPlay(newnn)
-    states, heads, scores, ids, moves = spc.playGames(0, 0, 1)
+    states, heads, scores, ids, moves = spc.play_games(0, 0, 1)
 
     fig = plt.figure()
     ax = plt.axes(xlim=(-0.5, 3.5), ylim=(-0.5, 3.5))
@@ -41,9 +41,9 @@ def gen_compare() -> None:
         newnn.load('saves/generation_{}.ckpt'.format(generation[i]))
         spc = SelfPlay(newnn)
         if i < 3:
-            state, head, score, id, move = spc.playGames(0, 0, 1)
+            state, head, score, id, move = spc.play_games(0, 0, 1)
         else:
-            state, head, score, id, move = spc.playGames(0, 0, 50)
+            state, head, score, id, move = spc.play_games(0, 0, 50)
         state = find_best(state, score, id)
         states.append(state)
         print('done with generation {}'.format(i))
