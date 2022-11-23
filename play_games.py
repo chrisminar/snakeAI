@@ -9,13 +9,9 @@ from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, Timer
 from neural_net import NeuralNetwork
 from snake.snake_reinforcement_learning import SnakeRL as snake
 
-#####################
-## self play class ##
-#####################
-
 
 class PlayGames:
-    """description of class"""
+    """Play many games with a trained neural network."""
 
     def __init__(self, neural_network: NeuralNetwork) -> None:
         """Initialize game player.
