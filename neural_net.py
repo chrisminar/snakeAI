@@ -3,11 +3,12 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
+from keras import layers
 from numpy import typing as npt
 from tensorflow import keras
-from tensorflow.python.keras import layers
 
-from helper import BATCH_SIZE, EPOCH_DELTA, EPOCHS, MOMENTUM, VALIDATION_SPLIT
+from helper import (BATCH_SIZE, EPOCH_DELTA, EPOCHS, GRID_X, GRID_Y, MOMENTUM,
+                    VALIDATION_SPLIT)
 
 
 class NeuralNetwork:

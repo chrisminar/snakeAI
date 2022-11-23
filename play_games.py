@@ -26,11 +26,11 @@ class PlayGames:
                                        npt.NDArray[np.int32]] = np.vectorize(grid_val_to_neural_net)
 
 
-def grid_val_to_neural_net(input: int) -> int:
+def grid_val_to_neural_net(grid_val: int) -> int:
     """Convert input snake grid value to nn value."""
-    if input == -1:  # empty -1 -> 0
+    if grid_val == -1:  # empty -1 -> 0
         return 0
-    elif input == -2:  # food -2 -> -1
+    if grid_val == -2:  # food -2 -> -1
         return -1
-    else:  # head 0 -> 1, body positive -> 1
-        return 1
+    # head 0 -> 1, body positive -> 1
+    return 1
