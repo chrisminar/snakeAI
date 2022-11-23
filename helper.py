@@ -1,5 +1,8 @@
 """Global variables and helper functions."""
+from __future__ import annotations
+
 import sys
+import time
 from gc import get_referents
 from types import FunctionType, ModuleType
 from typing import Any, Final
@@ -37,3 +40,20 @@ def get_size(obj: Any) -> int:
                 need_referents.append(obj)
         objects = get_referents(*need_referents)
     return size
+
+
+class Timer(object):
+    def __init__(self, name='', verbose=False) -> None:
+        self.verbose = verbose
+        self.name = name
+
+    def __enter__(self) -> Timer:
+        self.start = time.perf_counter()
+        return self
+
+    def __exit__(self, *args) -> None:
+        self.end = time.perf_counter()
+        self.secs = self.end - self.start
+        self.msecs = self.secs * 1000  # millisecs
+        if self.verbose:
+            print('{} elapsed time: {:0.3f} ms'.format(self.name, self.secs))

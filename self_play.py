@@ -2,9 +2,8 @@
 
 import numpy as np
 
-from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES
+from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, Timer
 from play_games import PlayGames
-from timer import Timer
 from train_snake_reinforcement_learning import SnakeRL as snake
 
 

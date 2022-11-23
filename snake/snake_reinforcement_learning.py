@@ -2,8 +2,8 @@
 from typing import Callable, List, Tuple
 
 import numpy as np
+from helper import Timer
 from numpy import typing as npt
-from timer import Timer
 
 from snake import Snake
 
