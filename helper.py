@@ -10,9 +10,9 @@ from typing import Any, Final
 GRID_X: Final = 4                # x grid size of snake game
 GRID_Y: Final = 4                # y grid size of snake game
 NUM_SELF_PLAY_GAMES: Final = 500  # number of self play games to play
-NUM_PURGE: Final = 500
+NUM_PURGE: Final = 500  # number of games to purge every iteration
 NUM_TRAINING_GAMES: Final = 5000  # number of self play games to train on
-VALIDATION_SPLIT: Final = 0.15
+VALIDATION_SPLIT: Final = 0.15  # fraction of data to use for validation
 EPOCH_DELTA: Final = 0.001
 MOMENTUM: Final = 0.9
 BATCH_SIZE: Final = 64
@@ -27,6 +27,14 @@ SCORE_FOR_GAME_WIN: Final = 1000  # get this many points for winning the game
 
 
 def get_size(obj: Any) -> int:
+    """Size of object.
+
+    Args:
+        obj (Any): any object
+
+    Retruns:
+        (int): size of object 
+    """
     black_list_types = type, ModuleType, FunctionType
     """sum size of object & members."""
     if isinstance(obj, black_list_types):
@@ -46,8 +54,16 @@ def get_size(obj: Any) -> int:
     return size
 
 
-class Timer(object):
-    def __init__(self, name='', verbose=False) -> None:
+class Timer:
+    """Timing context manager."""
+
+    def __init__(self, name: str = '', verbose: bool = False) -> None:
+        """Initialize timer.
+
+        Args:
+            name (str, optional): Name of timer. Defaults to ''.
+            verbose (bool, optional): Should the timer print on exit. Defaults to False.
+        """
         self.verbose = verbose
         self.name = name
 
@@ -55,7 +71,7 @@ class Timer(object):
         self.start = time.perf_counter()
         return self
 
-    def __exit__(self, *args) -> None:
+    def __exit__(self) -> None:
         self.end = time.perf_counter()
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
