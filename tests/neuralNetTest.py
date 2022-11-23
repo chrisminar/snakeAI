@@ -1,21 +1,24 @@
-from neuralNet import NeuralNetwork
 import unittest
+
 import numpy as np
-from tensorflow import keras
-from globalVar import Globe as globe
 import tensorflow as tf
+from globalVar import Globe as globe
+from neuralNet import NeuralNetwork
+from tensorflow import keras
+
 
 class NeuralNet_test(unittest.TestCase):
-  def test_init(self):
-    nn = NeuralNetwork()
-    self.assertEqual(nn.model.get_layer('policy').output_shape, (None, 4) )
+    def test_init(self):
+        nn = NeuralNetwork()
+        self.assertEqual(nn.model.get_layer('policy').output_shape, (None, 4))
 
-  def test_displayModel(self):
-    nn=NeuralNetwork()
-    nn.dispModel()
+    def test_display_model(self):
+        nn = NeuralNetwork()
+        nn.dispModel()
 
-  def test_load(self):
-    pass #self.assertEqual(0,1)
+    def test_load(self):
+        pass  # self.assertEqual(0,1)
+
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

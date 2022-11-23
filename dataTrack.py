@@ -19,19 +19,19 @@ class DataTrack:
         self.training = pd.DataFrame(
             columns=self.training_column_names)  # index is generation #
 
-    def appendSelfPlayDetail(self, time: float, score: int, generation: int, game_id: int, id: int) -> None:
+    def append_self_play_detail(self, time: float, score: int, generation: int, game_id: int, id: int) -> None:
         self.self_play_detail.loc[(generation, id), :] = [time, score, game_id]
 
-    def appendSelfPlayBroad(self, time: float, mean_score: float) -> None:
+    def append_self_play_broad(self, time: float, mean_score: float) -> None:
         current_index = len(self.self_play_broad.index.values)
         self.self_play_broad.loc[current_index] = [time, mean_score]
 
-    def appendTraining(self, time: float, num_minibatch: int, mean_time_per_minibatch: float) -> None:
+    def append_training(self, time: float, num_minibatch: int, mean_time_per_minibatch: float) -> None:
         current_index = len(self.training.index.values)
         self.training.loc[current_index] = [
             time, num_minibatch, mean_time_per_minibatch]
 
-    def loadAllDataFrames(self, generation) -> None:
+    def load_all_data_frames(self, generation) -> None:
         self.self_play_detail = pd.read_pickle(
             r'C:\Users\Chris Minar\Documents\Python\Snake\saves\sp_detail_gen{}.pkl'.format(generation))
         self.self_play_broad = pd.read_pickle(
@@ -39,7 +39,7 @@ class DataTrack:
         self.training = pd.read_pickle(
             r'C:\Users\Chris Minar\Documents\Python\Snake\saves\train_gen{}.pkl'.format(generation))
 
-    def saveAllDataFrames(self, generation) -> None:
+    def save_all_data_frames(self, generation) -> None:
         self.self_play_detail.to_pickle(
             r'C:\Users\Chris Minar\Documents\Python\Snake\saves\sp_detail_gen{}.pkl'.format(generation))
         self.self_play_broad.to_pickle(

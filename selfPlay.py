@@ -13,7 +13,7 @@ from timer import Timer
 class SelfPlay(PlayGames):
     """Generate self play games"""
 
-    def playGames(self, generation: int, startID: int, num_games: int = globe.NUM_SELF_PLAY_GAMES):
+    def play_games(self, generation: int, startID: int, num_games: int = globe.NUM_SELF_PLAY_GAMES):
         for i in range(num_games):
             with Timer() as t:
                 g = snake(nn=self.nn, sizeX=globe.GRID_X, sizeY=globe.GRID_Y)

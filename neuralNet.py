@@ -88,7 +88,7 @@ class NeuralNetwork:
         #  x.append( tempM[i].predict( [inputs[0].reshape(1,inputs[0].shape[0],inputs[0].shape[1],1).astype(np.float32), heads[0].reshape(1,4).astype(np.float32)]) )
         self.save(generation)
 
-    def dispModel(self) -> None:
+    def disp_model(self) -> None:
         print(self.model.summary())
         print(self.model.layers)
         print(self.model.metrics_names)

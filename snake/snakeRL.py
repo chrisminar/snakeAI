@@ -21,7 +21,7 @@ class SnakeRL(Snake):
         self.moveList = []
         self.headList = []
 
-    def runStep(self, dir: str) -> None:
+    def run_step(self, dir: str) -> None:
         if not self.gameover:
             self.moves += 1
             self.movesSinceFood += 1
@@ -38,16 +38,16 @@ class SnakeRL(Snake):
 
     def play(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> None:
         while not self.gameover:
-            newDir, move, headView = self.evaluateNextStep(grid_func)
+            newDir, move, headView = self.evaluate_next_step(grid_func)
             self.moveList.append(move)
             self.stateList.append(np.copy(self.grid))
             self.headList.append(headView)
-            self.runStep(newDir)
+            self.run_step(newDir)
         return self.score
 
-    def evaluateNextStep(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> Tuple[int, List[int], npt.NDArray[np.int32]]:
+    def evaluate_next_step(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> Tuple[int, List[int], npt.NDArray[np.int32]]:
         pre_processed_grid = grid_func(self.grid)  # preprocess grid
-        headView = SnakeRL.convertHead(
+        headView = SnakeRL.convert_head(
             self.X, self.Y, self.sizeX, self.sizeY, self.grid)
         policy = self.nn.evaluate(pre_processed_grid, headView)
 
@@ -70,7 +70,7 @@ class SnakeRL(Snake):
 
     # look at head, return a boolean array [up, right, down, left] 0 means not ok to move, and 1 means ok to move
     @staticmethod
-    def convertHead(x: int, y: int, grid_size_x: int, grid_size_y: int, grid: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
+    def convert_head(x: int, y: int, grid_size_x: int, grid_size_y: int, grid: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
         isFree = np.zeros((4,))
 
         if x == 0:  # on left wall

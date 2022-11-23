@@ -76,14 +76,14 @@ class TrainRL:
             else:  # if we already have a lot of games, use default amount
                 n = globe.NUM_SELF_PLAY_GAMES
             print('num games to play {}'.format(n))
-            self.selfPlay(self.nn, generation, n)
-            self.networkTrainer(generation)
+            self.self_play(self.nn, generation, n)
+            self.network_trainer(generation)
             #print(generation, globe.getsize(self.nn))
-            self.genStatusPlot(generation)
+            self.gen_status_plot(generation)
             generation += 1
 
     # save plot that shows status of training
-    def genStatusPlot(self, generation: int) -> None:
+    def gen_status_plot(self, generation: int) -> None:
         fig = plt.figure()
         plt.subplot(3, 1, 1)
         plt.plot(self.meanScores)
@@ -102,7 +102,7 @@ class TrainRL:
         fig.savefig('mostrecent.png')
         plt.close()
 
-    def genHistogram(self, unique: npt.NDArray[np.int32], generation: int) -> None:
+    def gen_histogram(self, unique: npt.NDArray[np.int32], generation: int) -> None:
         fig = plt.figure()
         plt.title('Generation {}'.format(generation))
         plt.hist(unique, bins=[0, 100, 200, 300, 400, 500, 600,
@@ -114,38 +114,38 @@ class TrainRL:
         # neural network
     # outputs:
         # 2000 game outputs
-    def selfPlay(self, nn: NeuralNetwork, generation: int, num_games: int = globe.NUM_SELF_PLAY_GAMES) -> None:
+    def self_play(self, nn: NeuralNetwork, generation: int, num_games: int = globe.NUM_SELF_PLAY_GAMES) -> None:
         spc = SelfPlay(nn)
-        states, heads, scores, ids, moves = spc.playGames(
+        states, heads, scores, ids, moves = spc.play_games(
             generation, self.gameID, num_games)
         self.gameID += num_games
         print('Moves in this training set:  Up: ', np.sum(moves[:, 0]), ', Right: ', np.sum(
             moves[:, 1]), ', Down: ', np.sum(moves[:, 2]), ', Left: ', np.sum(moves[:, 3]))
-        self.addGamesToList(states, heads, scores, ids, moves, generation)
-        self.trimGameList()
+        self.add_games_to_list(states, heads, scores, ids, moves, generation)
+        self.trim_game_list()
 
     # operates on:
         # last 10000 games of self play
     # outputs:
         # new neural network
-    def networkTrainer(self, generation: int) -> None:
+    def network_trainer(self, generation: int) -> None:
         del self.nn
         self.nn = NeuralNetwork()
         trn = Trainer(self.nn)
         trn.train(generation, self.gameStates, self.gameHeads, self.moves)
 
-    def addGamesToList(self,
-                       states: npt.NDArray[np.int32],
-                       heads: npt.NDArray[np.int32],
-                       scores: npt.NDArray[np.int32],
-                       ids: npt.NDArray[np.int32],
-                       moves: npt.NDArray[np.int32],
-                       generation: int) -> None:
+    def add_games_to_list(self,
+                          states: npt.NDArray[np.int32],
+                          heads: npt.NDArray[np.int32],
+                          scores: npt.NDArray[np.int32],
+                          ids: npt.NDArray[np.int32],
+                          moves: npt.NDArray[np.int32],
+                          generation: int) -> None:
         uni, indices = np.unique(ids, return_index=True)
         self.meanScore = np.mean(scores[indices])
 
         # get rid of bad scores
-        self.genHistogram(scores[indices], generation)
+        self.gen_histogram(scores[indices], generation)
 
         if self.meanScore > 50:
             cutoff = self.meanScore
@@ -167,7 +167,7 @@ class TrainRL:
         self.gameIDs = np.concatenate((self.gameIDs, ids))
         self.moves = np.concatenate((self.moves, moves))
 
-    def trimGameList(self) -> None:
+    def trim_game_list(self) -> None:
         # get rid of no-score games
         validIdx = np.nonzero(self.gameScores > -50)
         self.gameIDs = self.gameIDs[validIdx]
@@ -238,7 +238,7 @@ class TrainRL:
                                                                                                                                                             -1],
                                                                                                                                                         self.gamesUsed[-1]))
 
-    def sizeInfo(self) -> None:
+    def size_info(self) -> None:
         print('self',       globe.get_size(self))
         print('gameHeads',  globe.get_size(self.gameHeads))
         print('gameids',    globe.get_size(self.gameIDs))

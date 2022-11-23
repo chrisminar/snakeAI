@@ -24,10 +24,10 @@ class PlayGames:
         self.heads = []
         self.nn = neural_network
         self.gamestate_to_nn: Callable[[npt.NDArray[np.int32]],
-                                       npt.NDArray[np.int32]] = np.vectorize(grid_val_to_nn)
+                                       npt.NDArray[np.int32]] = np.vectorize(grid_val_to_neural_net)
 
 
-def grid_val_to_nn(input: int) -> int:
+def grid_val_to_neural_net(input: int) -> int:
     """Convert input snake grid value to nn value."""
     if input == -1:  # empty -1 -> 0
         return 0

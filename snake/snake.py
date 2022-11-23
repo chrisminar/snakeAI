@@ -53,17 +53,17 @@ class Snake:
 
         self.foodX, self.foodY = self.spawn_food()
 
-    def runSingle(self, x_direction: int, y_direction: int) -> None:
+    def run_single(self, x_direction: int, y_direction: int) -> None:
         self.Xdir = x_direction
         self.Ydir = y_direction
         self.step_time()
 
-    def displayState(self) -> None:
+    def display_state(self) -> None:
         # draw grid
         # font = pg.font.Font('freesansbold.ttf',12)
         for i in range(self.sizeX):
             for j in range(self.sizeY):
-                pg.draw.rect(self.DISPLAY, self.gridNum2Color(
+                pg.draw.rect(self.DISPLAY, self.grid_num_2_color(
                     self.grid[i][j]), (i*21, j*21, 20, 20))
                 # text = font.render(str(int(self.grid[i][j])), True, (255,255,255))
                 # textRect = text.get_rect()
@@ -72,7 +72,7 @@ class Snake:
         pg.display.update()
 
     # TODO change num to enum
-    def gridNum2Color(self, num: int) -> Tuple[int, int, int]:
+    def grid_num_2_color(self, num: int) -> Tuple[int, int, int]:
         if num == -2:  # food
             return (255, 0, 0)
         elif num == 0:  # head
