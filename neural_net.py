@@ -12,6 +12,8 @@ from helper import (BATCH_SIZE, EPOCH_DELTA, EPOCHS, GRID_X, GRID_Y, MOMENTUM,
 
 
 class NeuralNetwork:
+    """Neural network to run snake."""
+
     def __init__(self) -> None:
         # weight initializer
         initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=1.0)
@@ -57,48 +59,72 @@ class NeuralNetwork:
         self.model = keras.Model(inputs=[block_input, head_input], outputs=l8)
         self.compile()
 
-    def evaluate(self, state: npt.NDArray[np.int32], head: npt.NDArray[np.int32]) -> None:
+    def evaluate(self, state: npt.NDArray[np.int32], head: npt.NDArray[np.bool8]) -> npt.NDArray[np.float32]:
+        """Evaluate inputs on neural network.
+
+        Args:
+            state (npt.NDArray[np.int32]): Grid cells.
+            head (npt.NDArray[np.bool8]): Array of if it's valid to move in a given direction.
+
+        Returns:
+            npt.NDArray[np.float32]: Confidence that each direction is the best choice.
+        """
         grid_in = state.reshape(
             1, state.shape[0], state.shape[1], 1).astype(np.float32)
         head_in = head.reshape(1, 4).astype(np.float32)
         return self.model([grid_in, head_in], training=False)
 
     def compile(self) -> None:
+        """Compile the neural network."""
         self.model.compile(loss=keras.losses.CategoricalCrossentropy(from_logits=True),
                            optimizer=keras.optimizers.SGD(
                                momentum=MOMENTUM),
                            metrics=['accuracy', 'accuracy'])
 
-    def train(self, inputs: npt.NDArray[np.int32],
+    def train(self,
+              grids: npt.NDArray[np.int32],
               heads: npt.NDArray[np.int32],
               predictions: npt.NDArray[np.int32],
-              generation: int,) -> None:
+              generation: int) -> None:
+        """Train the weights and biases of the neural network.
+
+        Args:
+            grids (npt.NDArray[np.int32]): Pre-processed snake grids.
+            heads (npt.NDArray[np.int32]): Snake head availibliltiy.
+            predictions (npt.NDArray[np.int32]): The move that was chosen at each state.
+            generation (int): Neural net generation for this training session.
+        """
         callback = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1)
-        history = self.model.fit({'input_game_state': inputs, 'input_head': heads}, {'mult': predictions},
+        history = self.model.fit({'input_game_state': grids, 'input_head': heads}, {'mult': predictions},
                                  batch_size=BATCH_SIZE,
                                  epochs=EPOCHS,
                                  validation_split=VALIDATION_SPLIT,
                                  verbose=0,
                                  callbacks=[callback])
-        # debug
-        # tempM = []
-        # x = []
-        # for layer in self.model.layers:
-        #  tempM.append( keras.Model(inputs=self.model.input, outputs=layer.output) )
-        # for i in range(len(tempM)):
-        #  x.append( tempM[i].predict( [inputs[0].reshape(1,inputs[0].shape[0],inputs[0].shape[1],1).astype(np.float32), heads[0].reshape(1,4).astype(np.float32)]) )
         self.save(generation)
 
     def disp_model(self) -> None:
+        """Display model for debugging."""
         print(self.model.summary())
         print(self.model.layers)
         print(self.model.metrics_names)
         # keras.utils.plot_model( self.model, show_shapes = True )
 
+    # TODO this path shouldn't be hardcoded
     def save(self, generation: int) -> None:
+        """Save neural network to disk.
+
+        Args:
+            generation (int): Training generation of this neural network.
+        """
         self.model.save(
             r'C:\Users\Chris Minar\Documents\Python\Snake\saves\generation_{}.ckpt'.format(generation))
 
     def load(self, path: Path) -> None:
+        """Load neural net from filpath.
+
+        Args:
+            path (Path): Path to neural network save file.
+        """
         self.model = keras.models.load_model(path)
