@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from helper import Globe as globe
 from neural_net import NeuralNetwork
-from self_play import SelfPlay
+from play_games import PlayGames
 from train_snake_reinforcement_learning import TrainRL
 
 
@@ -14,8 +14,8 @@ class trainSnake_test(unittest.TestCase):
     def test_addGamesToList(self):
         t = TrainRL()
         nn = NeuralNetwork()
-        spc = SelfPlay(nn)
-        states, heads, scores, ids, moves = spc.play_games(0, 0, 5)
+        spc = PlayGames(nn)
+        states, heads, scores, ids, moves = spc.play_games(0, 5)
         t.add_games_to_list(states, heads, scores, ids, moves)
         self.assertTrue(np.max(t.game_ids), 4)
         self.assertEqual(

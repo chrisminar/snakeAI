@@ -49,7 +49,7 @@ from numpy import typing as npt
 from helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
                     get_size)
 from neural_net import NeuralNetwork
-from self_play import SelfPlay
+from play_games import PlayGames
 from trainer import Trainer
 
 
@@ -119,9 +119,9 @@ class TrainRL:
     # outputs:
         # 2000 game outputs
     def self_play(self, nn: NeuralNetwork, generation: int, num_games: int = NUM_SELF_PLAY_GAMES) -> None:
-        spc = SelfPlay(nn)
+        spc = PlayGames(nn)
         states, heads, scores, ids, moves = spc.play_games(
-            generation, self.game_id, num_games)
+            self.game_id, num_games)
         self.game_id += num_games
         print('Moves in this training set:  Up: ', np.sum(moves[:, 0]), ', Right: ', np.sum(
             moves[:, 1]), ', Down: ', np.sum(moves[:, 2]), ', Left: ', np.sum(moves[:, 3]))

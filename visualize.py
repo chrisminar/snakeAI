@@ -7,14 +7,14 @@ from matplotlib import pyplot as plt
 from numpy import typing as npt
 
 from neural_net import NeuralNetwork
-from self_play import SelfPlay
+from play_games import PlayGames
 
 
 def run_a_sample(checkpoint: Path) -> None:
     newnn = NeuralNetwork()
     newnn.load(checkpoint)
-    spc = SelfPlay(newnn)
-    states, heads, scores, ids, moves = spc.play_games(0, 0, 1)
+    spc = PlayGames(newnn)
+    states, heads, scores, ids, moves = spc.play_games(0, 1)
 
     fig = plt.figure()
     ax = plt.axes(xlim=(-0.5, 3.5), ylim=(-0.5, 3.5))
@@ -40,11 +40,11 @@ def gen_compare() -> None:
     for i in range(4):
         new_nn = nn()
         new_nn.load('saves/generation_{}.ckpt'.format(generation[i]))
-        spc = SelfPlay(new_nn)
+        spc = PlayGames(new_nn)
         if i < 3:
-            state, head, score, id, move = spc.play_games(0, 0, 1)
+            state, head, score, id, move = spc.play_games(0, 1)
         else:
-            state, head, score, id, move = spc.play_games(0, 0, 50)
+            state, head, score, id, move = spc.play_games(0, 50)
         state = find_best(state, score, id)
         states.append(state)
         print('done with generation {}'.format(i))

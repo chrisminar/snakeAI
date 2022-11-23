@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 from neural_net import NeuralNetwork
-from self_play import SelfPlay
+from play_games import PlayGames
 
 
 class SelfPlay_test(unittest.TestCase):
@@ -10,9 +10,9 @@ class SelfPlay_test(unittest.TestCase):
     def test_play_games(self):
 
         nn = NeuralNetwork()
-        spc = SelfPlay(nn)  # make self play class
+        spc = PlayGames(nn)  # make self play class
         # call play games
-        state, head, score, id, prediction = spc.play_games(0, 0, num_games=2)
+        state, head, score, id, prediction = spc.play_games(0, num_games=2)
 
         print(state)
         print(score)
