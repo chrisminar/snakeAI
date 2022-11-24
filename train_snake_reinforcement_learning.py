@@ -25,11 +25,11 @@ class TrainRL:
     """Reinforcement learning loop."""
 
     def __init__(self) -> None:
-        self.game_states = np.zeros((0, GRID_X, GRID_Y))
-        self.game_heads = np.zeros((0, 4))
-        self.game_scores = np.zeros((0,))
-        self.game_ids = np.zeros((0,))
-        self.moves = np.zeros((0, 4))
+        self.game_states = np.zeros((0, GRID_X, GRID_Y), dtype=np.int32)
+        self.game_heads = np.zeros((0, 4), dtype=np.bool8)
+        self.game_scores = np.zeros((0,), dtype=np.int32)
+        self.game_ids = np.zeros((0,), dtype=np.int32)
+        self.moves = np.zeros((0, 4), dtype=np.float32)
         self.neural_net = NeuralNetwork()
         self.game_id = 0
         self.mean_score = 0
@@ -114,10 +114,10 @@ class TrainRL:
 
     def add_games_to_list(self,
                           states: npt.NDArray[np.int32],
-                          heads: npt.NDArray[np.int32],
+                          heads: npt.NDArray[np.bool8],
                           scores: npt.NDArray[np.int32],
                           ids: npt.NDArray[np.int32],
-                          moves: npt.NDArray[np.int32],
+                          moves: npt.NDArray[np.float32],
                           generation: int) -> None:
         """Add new games to overall game list.
 
@@ -135,7 +135,7 @@ class TrainRL:
         self.gen_histogram(scores[indices], generation)
 
         # get rid of low scoring games
-        cutoff = self.mean_score if self.mean_scores > 50 else 100
+        cutoff = self.mean_score if self.mean_score > 50 else 100
         valid_idx = scores > cutoff
         ids = ids[valid_idx]
         scores = scores[valid_idx]

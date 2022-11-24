@@ -30,7 +30,7 @@ class PlayGames:
 
     def play_games(self,
                    start_id: int,
-                   num_games: int = NUM_SELF_PLAY_GAMES) -> Tuple[npt.NDArray[np.uint32],
+                   num_games: int = NUM_SELF_PLAY_GAMES) -> Tuple[npt.NDArray[np.int32],
                                                                   npt.NDArray[np.bool8],
                                                                   npt.NDArray[np.int32],
                                                                   npt.NDArray[np.int32],
@@ -62,7 +62,11 @@ class PlayGames:
                     self.scores.append(
                         np.full((len(games.state_list[:-1]), ), games.score))
 
-        return self.gamestate_to_nn(np.concatenate(self.game_states)), np.concatenate(self.heads), np.concatenate(self.scores), np.concatenate(self.game_id), np.concatenate(self.prediction)
+        return (self.gamestate_to_nn(np.concatenate(self.game_states)),
+                np.concatenate(self.heads),
+                np.concatenate(self.scores),
+                np.concatenate(self.game_id),
+                np.concatenate(self.prediction))
 
 
 def grid_val_to_neural_net(grid_val: int) -> int:

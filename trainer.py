@@ -27,10 +27,10 @@ def train(generation: int,
     with Timer():
         # get all permutations
         permuted_states, permuted_heads, permuted_predictions = permute_inputs(
-            game_states, move_predictions, heads)
+            states=game_states, predictions=move_predictions, heads=heads)
 
         permuted_states = np.reshape(
-            permuted_states, (permuted_states.shape[0], permuted_states.shape[1], permuted_states.shape[1], 1))  # reshape
+            permuted_states, (permuted_states.shape[0], permuted_states.shape[1], permuted_states.shape[1], 1))
 
         # train on permutations
         neural_net.train(permuted_states, permuted_heads,
@@ -100,7 +100,7 @@ def permute_inputs(states: npt.NDArray[np.int32],
     return state_out, moves_out, heads_out
 
 
-def flip_predictions_left_right(predictions: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
+def flip_predictions_left_right(predictions: npt.NDArray[np.number | np.bool8]) -> npt.NDArray[np.number | np.bool8]:
     """Flip predictions left-right.
 
     Args:
@@ -114,7 +114,7 @@ def flip_predictions_left_right(predictions: npt.NDArray[np.int32]) -> npt.NDArr
     return moves_lr
 
 
-def flip_predictions_up_down(predictions: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
+def flip_predictions_up_down(predictions: npt.NDArray[np.number | np.bool8]) -> npt.NDArray[np.number | np.bool8]:
     """Flip predicitons up-down.
 
     Args:
@@ -128,7 +128,7 @@ def flip_predictions_up_down(predictions: npt.NDArray[np.int32]) -> npt.NDArray[
     return moves_ud
 
 
-def rotate_predictions(predictions: npt.NDArray[np.int32], quads: int) -> npt.NDArray[np.int32]:
+def rotate_predictions(predictions: npt.NDArray[np.number | np.bool8], quads: int) -> npt.NDArray[np.number | np.bool8]:
     """Rotate predictions 90 deg * quads.
 
     Args:

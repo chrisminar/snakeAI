@@ -65,10 +65,10 @@ class Timer:
         """
         self.verbose = verbose
         self.name = name
-        self.start = 0
-        self.end = 0
-        self.secs = 0
-        self.msecs = 0
+        self.start = 0.
+        self.end = 0.
+        self.secs = 0.
+        self.msecs = 0.
 
     def __enter__(self) -> Timer:
         self.start = time.perf_counter()

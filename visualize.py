@@ -44,7 +44,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
     states = []
     for i, generation in enumerate(generations):
         neural_net = NeuralNetwork()
-        neural_net.load(f'saves/generation_{generation}.ckpt')
+        neural_net.load(Path(f'saves/generation_{generation}.ckpt'))
         spc = PlayGames(neural_net)
         if i < 3:
             state, _, score, ids, _ = spc.play_games(0, 1)
@@ -66,10 +66,10 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
             axis.axes.get_xaxis().set_visible(False)
             if i < game_length:
                 axis.imshow(states[j][i])
-                plt.title(f'Generation {generation[j]}, move {i}')
+                plt.title(f'Generation {generations[j]}, move {i}')
             else:
                 axis.imshow(states[j][-1])
-                plt.title(f'Generation {generation[j]}, move {game_length}')
+                plt.title(f'Generation {generations[j]}, move {game_length}')
         fig.savefig(f'compare/compare{i}.png')
         plt.close()
 
