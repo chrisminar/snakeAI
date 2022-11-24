@@ -60,7 +60,7 @@ class NeuralNetwork:
             inputs=[block_input, head_input], outputs=layer_9)
         self.compile()
 
-    def evaluate(self, state: npt.NDArray[np.int32], head: npt.NDArray[np.bool8]) -> npt.NDArray[np.float32]:
+    def evaluate(self, *, state: npt.NDArray[np.int32], head: npt.NDArray[np.bool8]) -> npt.NDArray[np.float32]:
         """Evaluate inputs on neural network.
 
         Args:
@@ -83,7 +83,8 @@ class NeuralNetwork:
                            metrics=['accuracy', 'accuracy'])
 
     def train(self,
-              grids: npt.NDArray[np.int32],
+              *,
+              states: npt.NDArray[np.int32],
               heads: npt.NDArray[np.bool8],
               predictions: npt.NDArray[np.float32],
               generation: int) -> None:
@@ -97,7 +98,7 @@ class NeuralNetwork:
         """
         callback = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1)
-        self.model.fit({'input_game_state': grids, 'input_head': heads}, {'mult': predictions},
+        self.model.fit({'input_game_state': states, 'input_head': heads}, {'mult': predictions},
                        batch_size=BATCH_SIZE,
                        epochs=EPOCHS,
                        validation_split=VALIDATION_SPLIT,

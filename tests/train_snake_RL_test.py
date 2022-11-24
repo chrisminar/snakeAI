@@ -16,7 +16,8 @@ class trainSnake_test(unittest.TestCase):
         nn = NeuralNetwork()
         spc = PlayGames(nn)
         states, heads, scores, ids, moves = spc.play_games(0, 5)
-        t.add_games_to_list(states, heads, scores, ids, moves)
+        t.add_games_to_list(states=states, heads=heads,
+                            scores=scores, ids=ids, moves=moves)
         self.assertTrue(np.max(t.game_ids), 4)
         self.assertEqual(
             t.game_states.shape[0], t.game_ids.shape[0], 'bad gameid shape')
@@ -38,14 +39,16 @@ class trainSnake_test(unittest.TestCase):
             gameIDs = np.concatenate(
                 [gameIDs, np.zeros((moves_per_game,)) + i])
         t = TrainRL()
-        t.add_games_to_list(states, heads, scores, gameIDs, moves)
+        t.add_games_to_list(states=states, heads=heads,
+                            scores=scores, ids=gameIDs, moves=moves)
 
         offset = gameIDs[-1]+1
         gameIDs = np.zeros((moves_per_game,)) + offset
         for i in range(1, num_games):
             gameIDs = np.concatenate(
                 [gameIDs, np.zeros(moves_per_game,) + i + offset])
-        t.add_games_to_list(states, heads, scores+100, gameIDs, moves)
+        t.add_games_to_list(states=states, heads=heads,
+                            scores=scores+100, ids=gameIDs, moves=moves)
         t.trim_game_list()
         self.assertEqual(
             t.game_states.shape[0], NUM_TRAINING_GAMES*moves_per_game, 'Gamestates trim unsuccessful')

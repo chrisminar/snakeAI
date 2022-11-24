@@ -83,7 +83,7 @@ class TrainRL:
         fig.savefig('mostrecent.png')
         plt.close()
 
-    def gen_histogram(self, scores: Sequence[np.int32], generation: int) -> None:
+    def gen_histogram(self, *, scores: Sequence[np.int32], generation: int) -> None:
         """Plot histogram of game scores.
 
         Args:
@@ -110,9 +110,11 @@ class TrainRL:
         self.game_id += num_games
         print('Moves in this training set:  Up: ', np.sum(moves[:, 0]), ', Right: ', np.sum(
             moves[:, 1]), ', Down: ', np.sum(moves[:, 2]), ', Left: ', np.sum(moves[:, 3]))
-        self.add_games_to_list(states, heads, scores, ids, moves, generation)
+        self.add_games_to_list(states=states, heads=heads, scores=scores,
+                               ids=ids, moves=moves, generation=generation)
 
     def add_games_to_list(self,
+                          *,
                           states: npt.NDArray[np.int32],
                           heads: npt.NDArray[np.bool8],
                           scores: npt.NDArray[np.int32],
@@ -132,7 +134,7 @@ class TrainRL:
         _, indices = np.unique(ids, return_index=True)
         self.mean_score = np.mean(scores[indices])
 
-        self.gen_histogram(scores[indices], generation)
+        self.gen_histogram(scores=scores[indices], generation=generation)
 
         # get rid of low scoring games
         cutoff = self.mean_score if self.mean_score > 50 else 100

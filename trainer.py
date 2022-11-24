@@ -33,12 +33,13 @@ def train(generation: int,
             permuted_states, (permuted_states.shape[0], permuted_states.shape[1], permuted_states.shape[1], 1))
 
         # train on permutations
-        neural_net.train(permuted_states, permuted_heads,
-                         permuted_predictions, generation)
+        neural_net.train(states=permuted_states, heads=permuted_heads,
+                         predictions=permuted_predictions, generation=generation)
     return neural_net
 
 
-def permute_inputs(states: npt.NDArray[np.int32],
+def permute_inputs(*,
+                   states: npt.NDArray[np.int32],
                    heads: npt.NDArray[np.bool8],
                    predictions: npt.NDArray[np.float32]) -> Tuple[npt.NDArray[np.int32],
                                                                   npt.NDArray[np.bool8],

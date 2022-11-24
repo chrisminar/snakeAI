@@ -78,9 +78,8 @@ def grid_val_to_neural_net(grid_val: int) -> int:
     Returns:
         int: Pre-processed grid cell value.
     """
-    if grid_val == -1:  # empty -1 -> 0
+    if grid_val == -1:
         return 0
-    if grid_val == -2:  # food -2 -> -1
+    if grid_val == -2:
         return -1
-    # head 0 -> 1, body positive -> 1
     return 1

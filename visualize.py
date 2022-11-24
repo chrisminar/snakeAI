@@ -50,7 +50,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
             state, _, score, ids, _ = spc.play_games(0, 1)
         else:
             state, _, score, ids, _ = spc.play_games(0, 50)
-        state = find_best(state, score, ids)
+        state = find_best(states=state, scores=score, ids=ids)
         states.append(state)
         print(f'Done with generation {generation}')
 
@@ -74,7 +74,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
         plt.close()
 
 
-def find_best(states: npt.NDArray[np.int32],
+def find_best(*, states: npt.NDArray[np.int32],
               scores: npt.NDArray[np.int32],
               ids: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
     """Find best game.

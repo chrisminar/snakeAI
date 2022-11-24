@@ -64,7 +64,8 @@ class SnakeRL(Snake):
         """
         pre_processed_grid = grid_func(self.grid)
         head_view = self.convert_head()
-        policy = self.neural_net.evaluate(pre_processed_grid, head_view)
+        policy = self.neural_net.evaluate(
+            state=pre_processed_grid, head=head_view)
 
         out = [0, 0, 0, 0]
         new_dir = np.argmax(policy).astype(int)
