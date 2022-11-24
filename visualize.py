@@ -23,19 +23,19 @@ def run_a_sample(checkpoint: Path) -> None:
     states, _, _, _, _ = spc.play_games(start_id=0, num_games=1)
 
     fig = plt.figure()
-    ax = plt.axes(xlim=(-0.5, 3.5), ylim=(-0.5, 3.5))
-    ax.axes.get_yaxis().set_visible(False)
-    ax.axes.get_xaxis().set_visible(False)
+    axis = plt.axes(xlim=(-0.5, 3.5), ylim=(-0.5, 3.5))
+    axis.axes.get_yaxis().set_visible(False)
+    axis.axes.get_xaxis().set_visible(False)
 
-    ims = []
+    images = []
     for i, state in enumerate(states):
-        im = plt.imshow(state, animated=True)
-        title = ax.text(0.5, 1.05, str(i),
-                        size=plt.rcParams["axes.titlesize"],
-                        ha="center", transform=ax.transAxes, )
-        ims.append([im, title])
+        image = plt.imshow(state, animated=True)
+        title = axis.text(0.5, 1.05, str(i),
+                          size=plt.rcParams["axes.titlesize"],
+                          ha="center", transform=axis.transAxes, )
+        images.append([image, title])
 
-    animation.ArtistAnimation(fig, ims, interval=200, blit=False)
+    animation.ArtistAnimation(fig, images, interval=200, blit=False)
     plt.show()
 
 
@@ -47,10 +47,10 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
         neural_net.load(f'saves/generation_{generation}.ckpt')
         spc = PlayGames(neural_net)
         if i < 3:
-            state, _, score, id, _ = spc.play_games(0, 1)
+            state, _, score, ids, _ = spc.play_games(0, 1)
         else:
-            state, _, score, id, _ = spc.play_games(0, 50)
-        state = find_best(state, score, id)
+            state, _, score, ids, _ = spc.play_games(0, 50)
+        state = find_best(state, score, ids)
         states.append(state)
         print(f'Done with generation {generation}')
 
@@ -59,16 +59,16 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
     for i in range(np.max(game_lengths)):
         fig = plt.figure()
         for j, game_length in enumerate(game_lengths):
-            ax = plt.subplot(2, 2, 1+j)
+            axis = plt.subplot(2, 2, 1+j)
             plt.xlim([-0.5, 3.5])
             plt.ylim([-0.5, 3.5])
-            ax.axes.get_yaxis().set_visible(False)
-            ax.axes.get_xaxis().set_visible(False)
+            axis.axes.get_yaxis().set_visible(False)
+            axis.axes.get_xaxis().set_visible(False)
             if i < game_length:
-                ax.imshow(states[j][i])
+                axis.imshow(states[j][i])
                 plt.title(f'Generation {generation[j]}, move {i}')
             else:
-                ax.imshow(states[j][-1])
+                axis.imshow(states[j][-1])
                 plt.title(f'Generation {generation[j]}, move {game_length}')
         fig.savefig(f'compare/compare{i}.png')
         plt.close()

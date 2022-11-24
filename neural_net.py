@@ -33,30 +33,31 @@ class NeuralNetwork:
         block_input = keras.Input(
             shape=(GRID_X, GRID_Y, 1), name='input_game_state')
 
-        l1 = layers.Conv2D(16, 3, padding='same', activation='relu',
-                           name='l1', kernel_initializer=initializer)(block_input)
+        layer_1 = layers.Conv2D(16, 3, padding='same', activation='relu',
+                                name='l1', kernel_initializer=initializer)(block_input)
 
-        l2 = layers.Conv2D(16, 3, padding='same', activation='relu',
-                           name='l2', kernel_initializer=initializer)(l1)
+        layer_2 = layers.Conv2D(16, 3, padding='same', activation='relu',
+                                name='l2', kernel_initializer=initializer)(layer_1)
 
-        l3 = layers.Conv2D(4, 1, padding='same', activation='relu',
-                           name='l4', kernel_initializer=initializer)(l2)
+        layer_3 = layers.Conv2D(4, 1, padding='same', activation='relu',
+                                name='l4', kernel_initializer=initializer)(layer_2)
 
-        l4 = layers.GlobalAveragePooling2D(name='pool')(l3)
+        layer_4 = layers.GlobalAveragePooling2D(name='pool')(layer_3)
 
-        l5 = layers.BatchNormalization(name='norm')(l4)
+        layer_5 = layers.BatchNormalization(name='norm')(layer_4)
 
         # combine
-        l5 = layers.add([l5, l4_head], name='add')
+        layer_6 = layers.add([layer_5, l4_head], name='add')
 
-        l6 = layers.Dense(4,  activation='relu', name='last_fully_connected',
-                          kernel_initializer=initializer)(l5)
+        layer_y = layers.Dense(4,  activation='relu', name='last_fully_connected',
+                               kernel_initializer=initializer)(layer_6)
 
-        l7 = layers.Softmax(name='policy')(l6)
+        layer_8 = layers.Softmax(name='policy')(layer_y)
 
-        l8 = layers.Multiply(name='mult')([l7, head_input])
+        layer_9 = layers.Multiply(name='mult')([layer_8, head_input])
 
-        self.model = keras.Model(inputs=[block_input, head_input], outputs=l8)
+        self.model = keras.Model(
+            inputs=[block_input, head_input], outputs=layer_9)
         self.compile()
 
     def evaluate(self, state: npt.NDArray[np.int32], head: npt.NDArray[np.bool8]) -> npt.NDArray[np.float32]:
@@ -119,7 +120,7 @@ class NeuralNetwork:
             generation (int): Training generation of this neural network.
         """
         self.model.save(
-            r'C:\Users\Chris Minar\Documents\Python\Snake\saves\generation_{}.ckpt'.format(generation))
+            fr'C:\Users\Chris Minar\Documents\Python\Snake\saves\generation_{generation}.ckpt')
 
     def load(self, path: Path) -> None:
         """Load neural net from filpath.

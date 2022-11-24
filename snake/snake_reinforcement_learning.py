@@ -4,7 +4,6 @@ from typing import Callable, List, Tuple
 import numpy as np
 from helper import MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES
 from neural_net import NeuralNetwork
-from numpy import bool8
 from numpy import typing as npt
 
 from snake.snake import Direction, GridEnum, Snake
@@ -46,12 +45,12 @@ class SnakeRL(Snake):
         Returns:
             int: Score
         """
-        while not self.gameover:
+        while not self.game_over:
             new_direction, move, head_view = self.evaluate_next_step(grid_func)
             self.move_list.append(move)
             self.state_list.append(np.copy(self.grid))
             self.head_list.append(head_view)
-            self.run_single(self.direction_to_tuple(new_direction))
+            self.run_single(*self.direction_to_tuple(new_direction))
         return self.score
 
     def evaluate_next_step(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> Tuple[int, List[int], npt.NDArray[np.int32]]:
@@ -93,7 +92,7 @@ class SnakeRL(Snake):
         Returns:
             npt.NDArray[np.bool8]: Array of if it's valid to move in a given direction.
         """
-        is_free = np.zeros((4,), dtype=bool8)
+        is_free = np.zeros((4,), dtype=np.bool8)
 
         # is left empty or food
         if self.head_x > 0 and self.grid[self.head_x-1, self.head_y] < GridEnum.HEAD.value:

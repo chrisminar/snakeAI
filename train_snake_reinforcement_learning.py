@@ -18,7 +18,7 @@ from helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
                     get_size)
 from neural_net import NeuralNetwork
 from play_games import PlayGames
-from trainer import Trainer
+from trainer import train
 
 
 class TrainRL:
@@ -43,17 +43,19 @@ class TrainRL:
         while 1:
             print('')
             print('######################')
-            print('### Generation {}###'.format(generation))
+            print(f'### Generation {generation}###')
             print('######################')
-            n = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
-            if n > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
+            num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
+            if num_games > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
                 pass
             else:  # if we already have a lot of games, use default amount
-                n = NUM_SELF_PLAY_GAMES
-            print(f'num games to play {n}')
-            self.play_one_generation_of_games(self.neural_net, generation, n)
+                num_games = NUM_SELF_PLAY_GAMES
+            print(f'num games to play {num_games}')
+            self.play_one_generation_of_games(
+                self.neural_net, generation=generation, num_games=num_games)
             self.trim_game_list()
-            self.network_trainer(generation)
+            self.neural_net = train(
+                generation, self.game_states, self.game_heads, self.moves)
             self.gen_status_plot(generation)
             generation += 1
 
@@ -110,16 +112,6 @@ class TrainRL:
             moves[:, 1]), ', Down: ', np.sum(moves[:, 2]), ', Left: ', np.sum(moves[:, 3]))
         self.add_games_to_list(states, heads, scores, ids, moves, generation)
 
-    def network_trainer(self, generation: int) -> None:
-        """Train new neural network on training data.
-
-        Args:
-            generation (int): Generation number.
-        """
-        trn = Trainer()
-        self.neural_net = trn.train(
-            generation, self.game_states, self.game_heads, self.moves)
-
     def add_games_to_list(self,
                           states: npt.NDArray[np.int32],
                           heads: npt.NDArray[np.int32],
@@ -159,7 +151,6 @@ class TrainRL:
 
     def trim_game_list(self) -> None:
         """Remove lowest scoreing games from game list."""
-        score = self.mean_score
         uni, indices = np.unique(self.game_ids, return_index=True)
         sorted_scores = np.sort(self.game_states[indices])
         number_of_games = len(uni)

@@ -15,7 +15,7 @@ class SnakeHuman(Snake):
         # init pygame
         pg.init()
         self.pygame_display = pg.display.set_mode(
-            (self.sizeX*21, self.sizeY*21), 0, 32)  # init display
+            (self.grid_size_x*21, self.grid_size_y*21), 0, 32)  # init display
         pg.display.set_caption('Snake')
         self.pygame_display.fill((255, 255, 255))  # fill with white
         self.display_state()

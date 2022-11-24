@@ -31,7 +31,7 @@ class PlayGames:
     def play_games(self,
                    start_id: int,
                    num_games: int = NUM_SELF_PLAY_GAMES) -> Tuple[npt.NDArray[np.uint32],
-                                                                  npt.NDArray[npt.bool8],
+                                                                  npt.NDArray[np.bool8],
                                                                   npt.NDArray[np.int32],
                                                                   npt.NDArray[np.int32],
                                                                   npt.NDArray[np.float32]]:
@@ -50,17 +50,17 @@ class PlayGames:
         """
         for i in range(num_games):
             with Timer():
-                g = snake(nn=self.neural_net,
-                          sizeX=GRID_X, sizeY=GRID_Y)
-                g.play(self.gamestate_to_nn)
-                if len(g.moveList) > 1:
-                    self.game_states.append(np.stack(g.stateList[:-1]))
-                    self.heads.append(np.stack(g.headList[:-1]))
+                games = snake(neural_net=self.neural_net,
+                              x_grid_size=GRID_X, y_grid_size=GRID_Y)
+                games.play(self.gamestate_to_nn)
+                if len(games.move_list) > 1:
+                    self.game_states.append(np.stack(games.state_list[:-1]))
+                    self.heads.append(np.stack(games.head_list[:-1]))
                     self.game_id.append(
-                        np.full((len(g.stateList[:-1]), ), start_id+i))
-                    self.prediction.append(np.array(g.moveList[:-1]))
+                        np.full((len(games.state_list[:-1]), ), start_id+i))
+                    self.prediction.append(np.array(games.move_list[:-1]))
                     self.scores.append(
-                        np.full((len(g.stateList[:-1]), ), g.score))
+                        np.full((len(games.state_list[:-1]), ), games.score))
 
         return self.gamestate_to_nn(np.concatenate(self.game_states)), np.concatenate(self.heads), np.concatenate(self.scores), np.concatenate(self.game_id), np.concatenate(self.prediction)
 

@@ -5,7 +5,7 @@ import sys
 import time
 from gc import get_referents
 from types import FunctionType, ModuleType
-from typing import Any, Final
+from typing import Any, Final, Optional, Type
 
 GRID_X: Final = 4                # x grid size of snake game
 GRID_Y: Final = 4                # y grid size of snake game
@@ -33,13 +33,12 @@ def get_size(obj: Any) -> int:
         obj (Any): any object
 
     Retruns:
-        (int): size of object 
+        (int): size of object
     """
     black_list_types = type, ModuleType, FunctionType
-    """sum size of object & members."""
     if isinstance(obj, black_list_types):
         raise TypeError(
-            'getsize() does not take argument of type: ' + str(type(obj)))
+            f'getsize() does not take argument of type: {type(obj)}')
     seen_ids = set()
     size = 0
     objects = [obj]
@@ -66,14 +65,18 @@ class Timer:
         """
         self.verbose = verbose
         self.name = name
+        self.start = 0
+        self.end = 0
+        self.secs = 0
+        self.msecs = 0
 
     def __enter__(self) -> Timer:
         self.start = time.perf_counter()
         return self
 
-    def __exit__(self) -> None:
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc: Optional[BaseException], traceback: Any) -> None:
         self.end = time.perf_counter()
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
         if self.verbose:
-            print('{} elapsed time: {:0.3f} ms'.format(self.name, self.secs))
+            print(f'{self.name} elapsed time: {self.secs:0.3f}s')

@@ -11,6 +11,7 @@ from helper import (GRID_X, GRID_Y, SCORE_FOR_GAME_WIN,
 
 
 class GridEnum(IntEnum):
+    """Grid cell meanings."""
     FOOD = -2  # grid value that represents food
     EMPTY = -1  # grid value that represents an empty space
     HEAD = 0  # grid value that represents the head
@@ -18,6 +19,7 @@ class GridEnum(IntEnum):
 
 
 class Direction(IntEnum):
+    """2d direction enumerators."""
     UP = 0
     RIGHT = 1
     DOWN = 2
@@ -153,7 +155,7 @@ class Snake(metaclass=ABCMeta):
         # find the x and y location of the spot
         for i in range(self.grid_size_x):
             for j in range(self.grid_size_y):
-                if (mask[i][j] == spot):
+                if mask[i][j] == spot:
                     return (i, j)
         return (i, j)
 
@@ -172,7 +174,7 @@ class Snake(metaclass=ABCMeta):
             return True
         if self.head_y >= self.grid_size_y:  # lower wall
             return True
-        if (self.grid[self.head_x][self.head_y] >= GridEnum.HEAD.value):  # head ran into body
+        if self.grid[self.head_x][self.head_y] >= GridEnum.HEAD.value:  # head ran into body
             return True
 
         return False

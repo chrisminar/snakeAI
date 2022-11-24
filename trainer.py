@@ -11,7 +11,7 @@ from neural_net import NeuralNetwork
 def train(generation: int,
           game_states: npt.NDArray[np.int32],
           heads: npt.NDArray[np.bool8],
-          move_predictions: npt.NDArray[np.float32]) -> None:
+          move_predictions: npt.NDArray[np.float32]) -> NeuralNetwork:
     """Permute input data and train on it.
 
     Args:
@@ -19,6 +19,9 @@ def train(generation: int,
         game_states (npt.NDArray[np.int32]): grids
         heads (npt.NDArray[np.int32]): head availiblity
         move_predictions (npt.NDArray[np.int32]): predicted moves
+
+    Returns:
+        (NeuralNetwork): trained neural network
     """
     neural_net = NeuralNetwork()
     with Timer():
@@ -32,6 +35,7 @@ def train(generation: int,
         # train on permutations
         neural_net.train(permuted_states, permuted_heads,
                          permuted_predictions, generation)
+    return neural_net
 
 
 def permute_inputs(states: npt.NDArray[np.int32],
@@ -67,31 +71,31 @@ def permute_inputs(states: npt.NDArray[np.int32],
     heads_r270 = rotate_predictions(predictions, 3)
 
     # flip left - right
-    state_LR = np.flip(states, axis=flip_axis-1)
-    moves_LR = flip_predictions_left_right(heads)
-    heads_LR = flip_predictions_left_right(predictions)
+    state_lr = np.flip(states, axis=flip_axis-1)
+    moves_lr = flip_predictions_left_right(heads)
+    heads_lr = flip_predictions_left_right(predictions)
 
     # rotate lr 90
-    state_LR_r90 = np.rot90(state_LR, 1, (1, 2))
-    moves_LR_r90 = rotate_predictions(moves_LR, 1)
-    heads_LR_r90 = rotate_predictions(heads_LR, 1)
+    state_lr_r90 = np.rot90(state_lr, 1, (1, 2))
+    moves_lr_r90 = rotate_predictions(moves_lr, 1)
+    heads_lr_r90 = rotate_predictions(heads_lr, 1)
 
     # rotate lr 180
-    state_LR_r180 = np.rot90(state_LR, 2, (1, 2))
-    moves_LR_r180 = rotate_predictions(moves_LR, 2)
-    heads_LR_r180 = rotate_predictions(heads_LR, 2)
+    state_lr_r180 = np.rot90(state_lr, 2, (1, 2))
+    moves_lr_r180 = rotate_predictions(moves_lr, 2)
+    heads_lr_r180 = rotate_predictions(heads_lr, 2)
 
     # rotate lr 270
-    state_LR_r270 = np.rot90(state_LR, 3, (1, 2))
-    moves_LR_r270 = rotate_predictions(moves_LR, 3)
-    heads_LR_r270 = rotate_predictions(heads_LR, 3)
+    state_lr_r270 = np.rot90(state_lr, 3, (1, 2))
+    moves_lr_r270 = rotate_predictions(moves_lr, 3)
+    heads_lr_r270 = rotate_predictions(heads_lr, 3)
 
     state_out = np.vstack([states, state_r90, state_r180, state_r270,
-                           state_LR, state_LR_r90, state_LR_r180, state_LR_r270])
+                           state_lr, state_lr_r90, state_lr_r180, state_lr_r270])
     moves_out = np.vstack([heads, moves_r90, moves_r180, moves_r270,
-                           moves_LR, moves_LR_r90, moves_LR_r180, moves_LR_r270])
+                           moves_lr, moves_lr_r90, moves_lr_r180, moves_lr_r270])
     heads_out = np.vstack([predictions, heads_r90, heads_r180, heads_r270,
-                           heads_LR, heads_LR_r90, heads_LR_r180, heads_LR_r270])
+                           heads_lr, heads_lr_r90, heads_lr_r180, heads_lr_r270])
 
     return state_out, moves_out, heads_out
 
@@ -105,9 +109,9 @@ def flip_predictions_left_right(predictions: npt.NDArray[np.int32]) -> npt.NDArr
     Returns:
         npt.NDArray[np.int32]: Flipped predictions.
     """
-    moves_LR = np.copy(predictions)
-    moves_LR[:, 3], moves_LR[:, 1] = predictions[:, 1], predictions[:, 3]
-    return moves_LR
+    moves_lr = np.copy(predictions)
+    moves_lr[:, 3], moves_lr[:, 1] = predictions[:, 1], predictions[:, 3]
+    return moves_lr
 
 
 def flip_predictions_up_down(predictions: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
@@ -119,9 +123,9 @@ def flip_predictions_up_down(predictions: npt.NDArray[np.int32]) -> npt.NDArray[
     Returns:
         npt.NDArray[np.int32]: Flipped predictions.
     """
-    moves_UD = np.copy(predictions)
-    moves_UD[:, 0], moves_UD[:, 2] = predictions[:, 2], predictions[:, 0]
-    return moves_UD
+    moves_ud = np.copy(predictions)
+    moves_ud[:, 0], moves_ud[:, 2] = predictions[:, 2], predictions[:, 0]
+    return moves_ud
 
 
 def rotate_predictions(predictions: npt.NDArray[np.int32], quads: int) -> npt.NDArray[np.int32]:
