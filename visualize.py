@@ -1,5 +1,6 @@
 """Visualize training."""
 from pathlib import Path
+from typing import Tuple
 
 import matplotlib.animation as animation
 import numpy as np
@@ -11,10 +12,15 @@ from play_games import PlayGames
 
 
 def run_a_sample(checkpoint: Path) -> None:
-    newnn = NeuralNetwork()
-    newnn.load(checkpoint)
-    spc = PlayGames(newnn)
-    states, heads, scores, ids, moves = spc.play_games(0, 1)
+    """Run one game from a train checkpoint.
+
+    Args:
+        checkpoint (Path): Checkpoint path.
+    """
+    neural_net = NeuralNetwork()
+    neural_net.load(checkpoint)
+    spc = PlayGames(neural_net)
+    states, _, _, _, _ = spc.play_games(start_id=0, num_games=1)
 
     fig = plt.figure()
     ax = plt.axes(xlim=(-0.5, 3.5), ylim=(-0.5, 3.5))
@@ -22,59 +28,65 @@ def run_a_sample(checkpoint: Path) -> None:
     ax.axes.get_xaxis().set_visible(False)
 
     ims = []
-    for i in range(len(states)):
-        im = plt.imshow(states[i], animated=True)
-        title = ax.text(0.5, 1.05, "{}".format(i),
+    for i, state in enumerate(states):
+        im = plt.imshow(state, animated=True)
+        title = ax.text(0.5, 1.05, str(i),
                         size=plt.rcParams["axes.titlesize"],
                         ha="center", transform=ax.transAxes, )
         ims.append([im, title])
 
-    ani = animation.ArtistAnimation(fig, ims, interval=200, blit=False)
+    animation.ArtistAnimation(fig, ims, interval=200, blit=False)
     plt.show()
 
 
-def gen_compare() -> None:
-
+def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> None:
+    """Compare multiple generations."""
     states = []
-    generation = [0, 100, 200, 383]
-    for i in range(4):
-        new_nn = nn()
-        new_nn.load('saves/generation_{}.ckpt'.format(generation[i]))
-        spc = PlayGames(new_nn)
+    for i, generation in enumerate(generations):
+        neural_net = NeuralNetwork()
+        neural_net.load(f'saves/generation_{generation}.ckpt')
+        spc = PlayGames(neural_net)
         if i < 3:
-            state, head, score, id, move = spc.play_games(0, 1)
+            state, _, score, id, _ = spc.play_games(0, 1)
         else:
-            state, head, score, id, move = spc.play_games(0, 50)
+            state, _, score, id, _ = spc.play_games(0, 50)
         state = find_best(state, score, id)
         states.append(state)
-        print('done with generation {}'.format(i))
+        print(f'Done with generation {generation}')
 
-    game_length = []
-    for i in range(4):
-        game_length.append(len(states[i]))
+    game_lengths = [len(state) for state in states]
 
-    for i in range(np.max(game_length)):
+    for i in range(np.max(game_lengths)):
         fig = plt.figure()
-        for j in range(4):
+        for j, game_length in enumerate(game_lengths):
             ax = plt.subplot(2, 2, 1+j)
             plt.xlim([-0.5, 3.5])
             plt.ylim([-0.5, 3.5])
             ax.axes.get_yaxis().set_visible(False)
             ax.axes.get_xaxis().set_visible(False)
-            if i < game_length[j]:
+            if i < game_length:
                 ax.imshow(states[j][i])
-                plt.title('Generation {}, move {}'.format(generation[j], i))
+                plt.title(f'Generation {generation[j]}, move {i}')
             else:
                 ax.imshow(states[j][-1])
-                plt.title('Generation {}, move {}'.format(
-                    generation[j], game_length[j]))
-        fig.savefig('compare/compare{}.png'.format(i))
+                plt.title(f'Generation {generation[j]}, move {game_length}')
+        fig.savefig(f'compare/compare{i}.png')
         plt.close()
 
 
 def find_best(states: npt.NDArray[np.int32],
               scores: npt.NDArray[np.int32],
               ids: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
+    """Find best game.
+
+    Args:
+        states (npt.NDArray[np.int32]): Game states.
+        scores (npt.NDArray[np.int32]): Game scores.
+        ids (npt.NDArray[np.int32]): Game ids.
+
+    Returns:
+        npt.NDArray[np.int32]: Best game state.
+    """
     # get indexes
     idx_start = np.argmax(scores)
     idx = idx_start
