@@ -7,7 +7,7 @@ __pycache__/
 *.jpeg
 *.user
 *.pkl
-
+*.DS_Store
 
 saves/
 .vscode/

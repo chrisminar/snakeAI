@@ -7,16 +7,16 @@ This snake reinforcement learning performs the following steps:
 
 
 Below are the results of my ~3day training session.  
-![](sept-6-training.png)  
+![](media/pictures/sept-6-training.png)  
 
 Top subplot shows the mean score of all games in that generations training set before any games are filtered out.  
 Middle subplot shows the maximum score achieved in the training set. Scoring is +100 for food, -1 for move, +10000 for victory.  
 Bottom subplot is number of games in the training set.  
   
-![](hists/sept-6-2020_slow.gif)  
+![](media/gifs/sept-6-2020_slow.gif)  
   
 The score histogram of each training generation.  
   
-![](compare/compareGif.gif)  
+![](media/gifs/compareGif.gif)  
   
 A sample game using the neural network from different generations of training.  
