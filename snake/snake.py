@@ -6,6 +6,7 @@ from enum import IntEnum
 from typing import Any, Tuple, Union
 
 import numpy as np
+
 from helper import (GRID_X, GRID_Y, SCORE_FOR_GAME_WIN,
                     SCORE_PENALTY_FOR_FAILURE, SCORE_PER_FOOD, SCORE_PER_MOVE)
 

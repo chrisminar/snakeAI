@@ -1,5 +1,6 @@
 """Holder class for outputs form playing snake games."""
 
+from enum import IntEnum
 from typing import Callable, List, Tuple
 
 import numpy as np
@@ -8,6 +9,13 @@ from numpy import typing as npt
 from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, Timer
 from neural_net import NeuralNetwork
 from snake.snake_reinforcement_learning import SnakeRL as snake
+
+
+class PreProcessedGrid(IntEnum):
+    """Pre processed grid values."""
+    SNAKE = 1
+    EMPTY = 0
+    FOOD = -1
 
 
 class PlayGames:

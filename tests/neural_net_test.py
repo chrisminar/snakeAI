@@ -1,24 +1,23 @@
-import unittest
+"""Test neural network."""
 
-import numpy as np
-import tensorflow as tf
-from helper import Globe as globe
+import pytest
+
 from neural_net import NeuralNetwork
-from tensorflow import keras
 
 
-class NeuralNet_test(unittest.TestCase):
-    def test_init(self):
-        nn = NeuralNetwork()
-        self.assertEqual(nn.model.get_layer('policy').output_shape, (None, 4))
-
-    def test_display_model(self):
-        nn = NeuralNetwork()
-        nn.disp_model()
-
-    def test_load(self):
-        pass  # self.assertEqual(0,1)
+def test_init() -> None:
+    """Initialize neural net and check output layer shape."""
+    neural_net = NeuralNetwork()
+    assert neural_net.model.get_layer('policy').output_shape, (None, 4)
 
 
-if __name__ == '__main__':
-    unittest.main()
+@pytest.mark.skip()
+def test_display_model() -> None:
+    """Test model display."""
+    neural_network = NeuralNetwork()
+    neural_network.disp_model()
+
+
+@pytest.mark.skip()
+def test_load():
+    raise NotImplementedError

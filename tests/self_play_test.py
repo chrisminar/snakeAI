@@ -1,59 +1,53 @@
-import unittest
+"""Test playing games."""
 
 import numpy as np
 
 from neural_net import NeuralNetwork
-from play_games import PlayGames
+from play_games import PlayGames, PreProcessedGrid
+from snake.snake import GridEnum
 
 
-class SelfPlay_test(unittest.TestCase):
+def test_play_games() -> None:
+    """Plame some games."""
+    spc = PlayGames(NeuralNetwork())  # make self play class
+    state, _, score, ids, prediction = spc.play_games(0, num_games=2)
 
-    def test_play_games(self):
+    print(state)
+    print(score)
+    print(ids)
+    print(prediction)
+    # test gamestate list
+    assert state.shape[0] > 0
 
-        nn = NeuralNetwork()
-        spc = PlayGames(nn)  # make self play class
-        # call play games
-        state, head, score, id, prediction = spc.play_games(0, num_games=2)
+    # test gamescore
+    assert score.shape[0] > 0
 
-        print(state)
-        print(score)
-        print(id)
-        print(prediction)
-        # test gamestate list
-        self.assertGreater(state.shape[0], 0)
-        # test gamescore
-        self.assertGreater(score.shape[0], 0)
-        # test gameid
-        self.assertGreater(id.shape[0], 0)
-        self.assertEqual(np.max(id), 1)
-        # test prediction
-        self.assertGreater(prediction.shape[0], 0)
-        self.assertLessEqual(np.max(prediction), 3)
-        self.assertGreaterEqual(np.min(prediction), 0)
-        # need to add a timeout function to snakerl
+    # test gameid
+    assert ids.shape[0] > 0
+    assert np.max(ids) == 1
 
-    def test_grid_2_neural_network(self):
-        nn = NeuralNetwork()
-        spc = SelfPlay(nn)  # make self play class
-        grid = np.zeros((4, 4))
-        for i in range(4):
-            for j in range(4):
-                grid[i, j] = i*4+j  # body/head
-        grid[3, 3] = -2  # food
-        grid[3, 2] = -1  # empty
-
-        processed_grid = spc.gamestate_to_nn(grid)
-
-        for i in range(4):
-            for j in range(4):
-                if grid[i, j] == -2:  # food
-                    ans = -1
-                elif grid[i, j] == -1:  # empty
-                    ans = 0
-                else:  # snake
-                    ans = 1
-                self.assertEqual(ans, processed_grid[i, j])
+    # test prediction
+    assert prediction.shape[0] > 0
+    assert np.max(prediction) <= 3
+    assert np.min(prediction) >= 0
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_grid_2_neural_network() -> None:
+    """Convert grid to neural network input."""
+    neural_net = NeuralNetwork()
+    spc = PlayGames(neural_net)  # make self play class
+    grid = np.zeros((4, 4), dtype=np.int32) - 1  # set all values to empty
+    for i in range(3):
+        for j in range(3):
+            # body/head (this won't actually make a valid snake, but that is ok for this test)
+            grid[i, j] = i*3+j
+    grid[3, 3] = -2  # make one value food
+
+    processed_grid = spc.gamestate_to_nn(grid)
+
+    assert np.all(
+        processed_grid[grid >= GridEnum.HEAD.value] == PreProcessedGrid.SNAKE.value)
+    assert np.all(
+        processed_grid[grid == GridEnum.EMPTY.value] == PreProcessedGrid.EMPTY.value)
+    assert np.all(
+        processed_grid[grid == GridEnum.FOOD.value] == PreProcessedGrid.FOOD.value)

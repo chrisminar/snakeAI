@@ -1,16 +1,13 @@
-import unittest
+"""Test trainer."""
 
-from helper import Globe as globe
-from neural_net import NeuralNetwork
-from trainer import Trainer
+from trainer import train
 
 
-class Trainer_test(unittest.TestCase):
-
-    def test_train(self):
-        nn = NeuralNetwork()
-        t = Trainer(nn)
-
-
-if __name__ == '__main__':
-    unittest.main()
+# TODO needs work
+def test_train() -> None:
+    """Test trainer."""
+    game_states = []
+    heads = []
+    move_predictions = []
+    _ = train(generation=0, game_states=game_states,
+              heads=heads, move_predictions=move_predictions)
