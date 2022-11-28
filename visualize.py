@@ -55,7 +55,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
             state, _, score, ids, _ = spc.play_games(0, 50)
         state = find_best(states=state, scores=score, ids=ids)
         states.append(state)
-        LOGGER.info("Done with generation %d" generation)
+        LOGGER.info("Done with generation %d", generation)
 
     game_lengths = [len(state) for state in states]
 

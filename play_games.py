@@ -1,21 +1,14 @@
 """Holder class for outputs form playing snake games."""
 
-from enum import IntEnum
 from typing import Callable, List, Tuple
 
 import numpy as np
 from numpy import typing as npt
 
-from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, Timer
+from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, PreProcessedGrid, Timer
 from neural_net import NeuralNetwork
+from snake.snake import GridEnum
 from snake.snake_reinforcement_learning import SnakeRL as snake
-
-
-class PreProcessedGrid(IntEnum):
-    """Pre processed grid values."""
-    SNAKE = 1
-    EMPTY = 0
-    FOOD = -1
 
 
 class PlayGames:
@@ -86,8 +79,8 @@ def grid_val_to_neural_net(grid_val: int) -> int:
     Returns:
         int: Pre-processed grid cell value.
     """
-    if grid_val == -1:
-        return 0
-    if grid_val == -2:
-        return -1
-    return 1
+    if grid_val == GridEnum.FOOD.value:
+        return PreProcessedGrid.FOOD.value
+    if grid_val == GridEnum.EMPTY.value:
+        return PreProcessedGrid.EMPTY.value
+    return PreProcessedGrid.SNAKE.value

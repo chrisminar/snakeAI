@@ -32,11 +32,11 @@ def test_trim_game_list() -> None:
     num_games = NUM_TRAINING_GAMES
     moves_per_game = 3
     n_moves = num_games*moves_per_game
-    moves = np.zeros((n_moves, 4))
-    states = np.zeros((n_moves, GRID_X, GRID_Y))
-    scores = np.zeros((n_moves,))
-    game_ids = np.zeros((moves_per_game,))
-    heads = np.ones((n_moves, 4))
+    moves = np.zeros((n_moves, 4), dtype=np.float32)
+    states = np.zeros((n_moves, GRID_X, GRID_Y), dtype=np.int32)
+    scores = np.zeros((n_moves,), dtype=np.int32)
+    game_ids = np.zeros((moves_per_game,), dtype=np.int32)
+    heads = np.ones((n_moves, 4), dtype=np.bool8)
     for i in range(1, num_games):
         game_ids = np.concatenate(
             [game_ids, np.zeros((moves_per_game,)) + i])

@@ -2,8 +2,9 @@
 
 import numpy as np
 
+from helper import PreProcessedGrid
 from neural_net import NeuralNetwork
-from play_games import PlayGames, PreProcessedGrid
+from play_games import PlayGames
 from snake.snake import GridEnum
 
 

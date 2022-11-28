@@ -20,4 +20,5 @@ def test_display_model() -> None:
 
 @pytest.mark.skip()
 def test_load():
+    """To do."""
     raise NotImplementedError

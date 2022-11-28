@@ -1,13 +1,19 @@
 """Test functionality of snake base class."""
 
+from typing import Any, Tuple, Union
+
 import numpy as np
 
 from helper import GRID_X, GRID_Y
-from snake.snake import Snake
+from snake.snake import Direction, Snake
 
 
 class SnakeDummy(Snake):
     """Dummy child of Snake to test the functions of the base class."""
+
+    def direction_to_tuple(self, direction: Union[Direction, Any]) -> Tuple[int, int]:
+        """Dummy."""
+        raise NotImplementedError
 
 
 def test_init() -> None:

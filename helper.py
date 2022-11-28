@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import sys
 import time
+from enum import IntEnum
 from gc import get_referents
 from types import FunctionType, ModuleType
 from typing import Any, Final, Optional, Type
@@ -27,6 +28,13 @@ SCORE_PER_FOOD: Final = 100  # point modification for eating food
 SCORE_PER_MOVE: Final = -1  # point modificaiton for moving
 SCORE_PENALTY_FOR_FAILURE: Final = -50  # point modification for dying
 SCORE_FOR_GAME_WIN: Final = 1000  # get this many points for winning the game
+
+
+class PreProcessedGrid(IntEnum):
+    """Pre processed grid values."""
+    SNAKE = 1
+    EMPTY = 0
+    FOOD = -1
 
 
 def get_size(obj: Any) -> int:
