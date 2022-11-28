@@ -8,6 +8,7 @@
 # TODO pause/play
 """Reinforcement learning."""
 
+import logging
 from typing import List, Sequence
 
 import numpy as np
@@ -18,7 +19,10 @@ from helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
                     get_size)
 from neural_net import NeuralNetwork
 from play_games import PlayGames
+from snake.snake import Direction
 from trainer import train
+
+LOGGER = logging.getLogger(__name__)
 
 
 class TrainRL:
@@ -41,16 +45,13 @@ class TrainRL:
         """Training loop."""
         generation = 0
         while 1:
-            print('')
-            print('######################')
-            print(f'### Generation {generation}###')
-            print('######################')
+            LOGGER.info("Generation %d", generation)
             num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
             if num_games > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
                 pass
             else:  # if we already have a lot of games, use default amount
                 num_games = NUM_SELF_PLAY_GAMES
-            print(f'num games to play {num_games}')
+            LOGGER.info("Playing %d games.", num_games)
             self.play_one_generation_of_games(
                 self.neural_net, generation=generation, num_games=num_games)
             self.trim_game_list()
@@ -108,8 +109,11 @@ class TrainRL:
         states, heads, scores, ids, moves = spc.play_games(
             self.game_id, num_games)
         self.game_id += num_games
-        print('Moves in this training set:  Up: ', np.sum(moves[:, 0]), ', Right: ', np.sum(
-            moves[:, 1]), ', Down: ', np.sum(moves[:, 2]), ', Left: ', np.sum(moves[:, 3]))
+        LOGGER.debug('Moves in this training set:')
+        LOGGER.debug("  Up: %d", np.sum(moves[:, Direction.UP.value]))
+        LOGGER.debug("  Right: %d", np.sum(moves[:, Direction.RIGHT.value]))
+        LOGGER.debug("  Down: %d", np.sum(moves[:, Direction.DOWN.value]))
+        LOGGER.debug("  Left: %d", np.sum(moves[:, Direction.LEFT.value]))
         self.add_games_to_list(states=states, heads=heads, scores=scores,
                                ids=ids, moves=moves, generation=generation)
 
@@ -177,19 +181,22 @@ class TrainRL:
         self.mean_scores.append(self.mean_score)
         self.games_used.append(number_of_games)
         self.max_scores.append(np.max(self.game_scores))
-        # print('Generation mean score in  before/after purge: {}/{}.\n Over mean score before/after purge {}/{}.\n Best score of {} in {} games.'.format(self.mean_score,
-        #                                                                                                                                                self.mean_score_after,
-        #                                                                                                                                                overall_mean,
-        #                                                                                                                                                overall_mean_after,
-        #                                                                                                                                                self.max_scores[
-        #                                                                                                                                                    -1],
-        #                                                                                                                                                self.games_used[-1]))
+        try:
+            LOGGER.info("Previous generation mean score: %02f",
+                        self.mean_scores[-2])
+            LOGGER.info("Previous generation maximum score: %02f",
+                        self.max_scores[-2])
+        except IndexError:
+            pass  # don't print previous score
+        LOGGER.info("Generation mean score: %f", self.mean_scores[-1])
+        LOGGER.info("Generation mean score: %f", self.max_scores[-1])
+        LOGGER.info("Games in training set: %d", self.games_used[-1])
 
     def print_size_info(self) -> None:
         """Print size of various members."""
-        print('self',       get_size(self))
-        print('gameHeads',  get_size(self.game_heads))
-        print('gameids',    get_size(self.game_ids))
-        print('gameScores', get_size(self.game_scores))
-        print('gameStates', get_size(self.game_states))
-        print('moves',      get_size(self.moves))
+        LOGGER.debug('class %d', get_size(self))
+        LOGGER.debug('gameHeads %d', get_size(self.game_heads))
+        LOGGER.debug('gameids %d', get_size(self.game_ids))
+        LOGGER.debug('gameScores %d', get_size(self.game_scores))
+        LOGGER.debug('gameStates %d', get_size(self.game_states))
+        LOGGER.debug('moves %d', get_size(self.moves))

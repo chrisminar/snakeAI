@@ -1,6 +1,7 @@
 import unittest
 
 import numpy as np
+
 from neural_net import NeuralNetwork
 from play_games import PlayGames
 

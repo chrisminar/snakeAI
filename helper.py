@@ -1,11 +1,14 @@
 """Global variables and helper functions."""
 from __future__ import annotations
 
+import logging
 import sys
 import time
 from gc import get_referents
 from types import FunctionType, ModuleType
 from typing import Any, Final, Optional, Type
+
+LOGGER = logging.getLogger(__name__)
 
 GRID_X: Final = 4                # x grid size of snake game
 GRID_Y: Final = 4                # y grid size of snake game
@@ -56,14 +59,13 @@ def get_size(obj: Any) -> int:
 class Timer:
     """Timing context manager."""
 
-    def __init__(self, name: str = '', verbose: bool = False) -> None:
+    def __init__(self, name: str = '') -> None:
         """Initialize timer.
 
         Args:
             name (str, optional): Name of timer. Defaults to ''.
             verbose (bool, optional): Should the timer print on exit. Defaults to False.
         """
-        self.verbose = verbose
         self.name = name
         self.start = 0.
         self.end = 0.
@@ -78,5 +80,4 @@ class Timer:
         self.end = time.perf_counter()
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
-        if self.verbose:
-            print(f'{self.name} elapsed time: {self.secs:0.3f}s')
+        LOGGER.debug('%s elapsed time %03f', self.name, self.secs)

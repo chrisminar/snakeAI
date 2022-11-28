@@ -1,4 +1,5 @@
 """Visualize training."""
+import logging
 from pathlib import Path
 from typing import Tuple
 
@@ -9,6 +10,8 @@ from numpy import typing as npt
 
 from neural_net import NeuralNetwork
 from play_games import PlayGames
+
+LOGGER = logging.getLogger(__name__)
 
 
 def run_a_sample(checkpoint: Path) -> None:

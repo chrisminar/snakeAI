@@ -1,11 +1,12 @@
 import unittest
 
 import numpy as np
-from helper import Globe as globe
+
+from helper import GRID_X, GRID_Y
 from neural_net import NeuralNetwork
 from play_games import PlayGames
-from snake import Snake
-from snake_reinforcement_learning import SnakeRL
+from snake.snake import Snake
+from snake.snake_reinforcement_learning import SnakeRL
 
 
 class Snake_test(unittest.TestCase):
@@ -17,29 +18,29 @@ class Snake_test(unittest.TestCase):
 
     def test_run_single_no_food(self):
         s = Snake(GRID_X, GRID_Y)
-        x = s.X
-        y = s.Y
+        x = s.head_x
+        y = s.head_y
         l = s.length
         s.runSingle(1, 0)  # move right
         self.assertEqual(s.X, x+1)
         self.assertEqual(s.Y, y)
         self.assertEqual(s.length, 0)
-        x = s.X
-        y = s.Y
+        x = s.head_x
+        y = s.head_y
         l = s.length
         s.runSingle(-1, 0)  # move left
         self.assertEqual(s.X, x-1)
         self.assertEqual(s.Y, y)
         self.assertEqual(s.length, 0)
-        x = s.X
-        y = s.Y
+        x = s.head_x
+        y = s.head_y
         l = s.length
         s.runSingle(0, 1)  # move up
         self.assertEqual(s.X, x)
         self.assertEqual(s.Y, y+1)
         self.assertEqual(s.length, 0)
-        x = s.X
-        y = s.Y
+        x = s.head_x
+        y = s.head_y
         l = s.length
         s.runSingle(0, -1)  # move down
         self.assertEqual(s.X, x)
