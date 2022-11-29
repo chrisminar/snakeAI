@@ -2,10 +2,10 @@
 from typing import Callable, List, Tuple
 
 import numpy as np
-from helper import MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES
-from neural_net import NeuralNetwork
 from numpy import typing as npt
 
+from helper import MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES
+from neural_net import NeuralNetwork
 from snake.snake import Direction, GridEnum, Snake
 
 
@@ -71,7 +71,7 @@ class SnakeRL(Snake):
         new_dir = np.argmax(policy).astype(int)
         out[new_dir] = 1
 
-        return Direction[new_dir], out, head_view
+        return Direction[new_dir].value, out, head_view
 
     def check_game_over(self) -> bool:
         """Check if the game is over.
