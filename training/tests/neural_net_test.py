@@ -2,7 +2,7 @@
 
 import pytest
 
-from neural_net import NeuralNetwork
+from training.neural_net import NeuralNetwork
 
 
 def test_init() -> None:

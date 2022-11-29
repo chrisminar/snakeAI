@@ -1,6 +1,6 @@
 """Test trainer."""
 
-from trainer import train
+from training.trainer import train
 
 
 # TODO needs work

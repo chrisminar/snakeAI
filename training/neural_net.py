@@ -7,8 +7,8 @@ from keras import layers
 from numpy import typing as npt
 from tensorflow import keras
 
-from helper import (BATCH_SIZE, EPOCH_DELTA, EPOCHS, GRID_X, GRID_Y, MOMENTUM,
-                    VALIDATION_SPLIT)
+from training.helper import (BATCH_SIZE, EPOCH_DELTA, EPOCHS, GRID_X, GRID_Y,
+                             MOMENTUM, VALIDATION_SPLIT)
 
 
 class NeuralNetwork:

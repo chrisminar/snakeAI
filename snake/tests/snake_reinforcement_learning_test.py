@@ -5,11 +5,11 @@ from typing import Tuple
 import numpy as np
 import pytest
 
-from helper import GRID_X, GRID_Y
-from neural_net import NeuralNetwork
-from play_games import PlayGames
 from snake.snake import GridEnum
 from snake.snake_reinforcement_learning import SnakeRL
+from training.helper import GRID_X, GRID_Y
+from training.neural_net import NeuralNetwork
+from training.play_games import PlayGames
 
 
 def test_init() -> None:

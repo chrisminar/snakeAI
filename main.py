@@ -2,7 +2,7 @@
 
 import logging
 
-from train_snake_reinforcement_learning import TrainRL
+from training.train_snake_reinforcement_learning import TrainRL
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)

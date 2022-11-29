@@ -2,10 +2,10 @@
 
 import numpy as np
 
-from helper import GRID_X, GRID_Y, NUM_TRAINING_GAMES
-from neural_net import NeuralNetwork
-from play_games import PlayGames
-from train_snake_reinforcement_learning import TrainRL
+from training.helper import GRID_X, GRID_Y, NUM_TRAINING_GAMES
+from training.neural_net import NeuralNetwork
+from training.play_games import PlayGames
+from training.train_snake_reinforcement_learning import TrainRL
 
 
 def test_init() -> None:

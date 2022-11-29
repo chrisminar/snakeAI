@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from helper import Timer
+from training.helper import Timer
 
 
 def test_timer() -> None:

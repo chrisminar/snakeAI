@@ -4,9 +4,9 @@ from typing import Callable, List, Tuple
 import numpy as np
 from numpy import typing as npt
 
-from helper import MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES
-from neural_net import NeuralNetwork
 from snake.snake import Direction, GridEnum, Snake
+from training.helper import MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES
+from training.neural_net import NeuralNetwork
 
 
 class SnakeRL(Snake):

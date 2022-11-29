@@ -8,8 +8,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
-from neural_net import NeuralNetwork
-from play_games import PlayGames
+from training.neural_net import NeuralNetwork
+from training.play_games import PlayGames
 
 LOGGER = logging.getLogger(__name__)
 

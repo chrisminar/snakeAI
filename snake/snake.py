@@ -7,8 +7,9 @@ from typing import Any, Tuple, Union
 
 import numpy as np
 
-from helper import (GRID_X, GRID_Y, SCORE_FOR_GAME_WIN,
-                    SCORE_PENALTY_FOR_FAILURE, SCORE_PER_FOOD, SCORE_PER_MOVE)
+from training.helper import (GRID_X, GRID_Y, SCORE_FOR_GAME_WIN,
+                             SCORE_PENALTY_FOR_FAILURE, SCORE_PER_FOOD,
+                             SCORE_PER_MOVE)
 
 
 class GridEnum(IntEnum):

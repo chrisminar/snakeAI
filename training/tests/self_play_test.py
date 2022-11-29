@@ -2,10 +2,10 @@
 
 import numpy as np
 
-from helper import PreProcessedGrid
-from neural_net import NeuralNetwork
-from play_games import PlayGames
 from snake.snake import GridEnum
+from training.helper import PreProcessedGrid
+from training.neural_net import NeuralNetwork
+from training.play_games import PlayGames
 
 
 def test_play_games() -> None:

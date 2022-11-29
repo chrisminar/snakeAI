@@ -15,12 +15,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
-from helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
-                    get_size)
-from neural_net import NeuralNetwork
-from play_games import PlayGames
 from snake.snake import Direction
-from trainer import train
+from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
+                             NUM_TRAINING_GAMES, get_size)
+from training.neural_net import NeuralNetwork
+from training.play_games import PlayGames
+from training.trainer import train
 
 LOGGER = logging.getLogger(__name__)
 

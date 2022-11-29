@@ -5,10 +5,11 @@ from typing import Callable, List, Tuple
 import numpy as np
 from numpy import typing as npt
 
-from helper import GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES, PreProcessedGrid, Timer
-from neural_net import NeuralNetwork
 from snake.snake import GridEnum
 from snake.snake_reinforcement_learning import SnakeRL as snake
+from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
+                             PreProcessedGrid, Timer)
+from training.neural_net import NeuralNetwork
 
 
 class PlayGames:

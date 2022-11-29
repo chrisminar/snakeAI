@@ -4,8 +4,8 @@ from typing import Tuple
 import numpy as np
 from numpy import typing as npt
 
-from helper import Timer
-from neural_net import NeuralNetwork
+from training.helper import Timer
+from training.neural_net import NeuralNetwork
 
 
 def train(generation: int,

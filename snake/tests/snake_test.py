@@ -5,10 +5,10 @@ from typing import Any, Tuple, Union
 import numpy as np
 import pytest
 
-from helper import GRID_X, GRID_Y
-from neural_net import NeuralNetwork
 from snake.snake import Direction, GridEnum, Snake
 from snake.snake_reinforcement_learning import SnakeRL
+from training.helper import GRID_X, GRID_Y
+from training.neural_net import NeuralNetwork
 
 
 class SnakeDummy(Snake):
