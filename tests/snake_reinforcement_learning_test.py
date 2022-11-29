@@ -57,7 +57,7 @@ def test_convert_head(headx: int, heady: int, truth: Tuple[int, ...], foodx: int
     """Convert head with no food and some walls."""
     neural_net = NeuralNetwork()
     snake = SnakeRL(neural_net=neural_net,
-                    x_grid_size=GRID_X, y_grid_size=GRID_Y)
+                    x_grid_size=4, y_grid_size=4)
     # make grid empty
     snake.grid.fill(-1)
 
