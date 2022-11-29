@@ -42,7 +42,7 @@ class Snake(metaclass=ABCMeta):
         self.grid_size_x = x_grid_size  # width of grid
         self.grid_size_y = y_grid_size  # height of grid
         self.grid = np.zeros(
-            (self.grid_size_x, self.grid_size_y)) + GridEnum.EMPTY.value
+            (self.grid_size_x, self.grid_size_y)) + GridEnum.EMPTY.value # TODO set dtype
         self.grid_size = x_grid_size * y_grid_size
 
         # initialize snake
@@ -115,22 +115,17 @@ class Snake(metaclass=ABCMeta):
             self.moves_since_food += 1
 
         # move body
-        for i in range(self.grid_size_x):
-            for j in range(self.grid_size_y):
-                if self.grid[i][j] >= GridEnum.HEAD.value:
-                    self.grid[i][j] += 1
-                    # if the gird length is longer than the actual length, delete the tail
-                    if (self.grid[i][j] > self.length) and (not ate_this_turn):
-                        self.grid[i][j] = GridEnum.EMPTY.value
+        self.grid[self.grid >= GridEnum.HEAD.value] += 1
+        if not ate_this_turn:  # remove tail at end if the snake didn't grow
+            self.grid[self.grid>0] = GridEnum.EMPTY.value
 
         # check if dead
         self.game_over = self.check_game_over()
         if self.game_over:
             self.score += SCORE_PENALTY_FOR_FAILURE
-
-        if not self.game_over:
-            # set head on grid
+        else:
             self.grid[self.head_x][self.head_y] = GridEnum.HEAD.value
+            
 
     # TODO refactor function
     def spawn_food(self) -> Tuple[int, int]:

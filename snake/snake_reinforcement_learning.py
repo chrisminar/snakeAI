@@ -1,5 +1,5 @@
 """Snake for reinforcement learning."""
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Union
 
 import numpy as np
 from numpy import typing as npt
@@ -19,7 +19,7 @@ class SnakeRL(Snake):
         self.move_list: List[npt.NDArray[np.int32]] = []
         self.head_list: List[npt.NDArray[np.int32]] = []
 
-    def direction_to_tuple(self, direction: Direction) -> Tuple[int, int]:
+    def direction_to_tuple(self, direction: Union[Direction, int]) -> Tuple[int, int]:
         """Convert direction to delta x and delta y.
 
         Args:
@@ -28,13 +28,15 @@ class SnakeRL(Snake):
         Returns:
             Tuple[int,int]: Direction to move head in x and y.
         """
-        if direction is Direction.UP:
+        if direction == Direction.UP:
             return 0, -1
-        if direction is Direction.RIGHT:
+        if direction == Direction.RIGHT:
             return 1, 0
-        if direction is Direction.DOWN:
+        if direction == Direction.DOWN:
             return 0, -1
-        return -1, 0
+        if direction == Direction.LEFT:
+            return -1, 0
+        raise ValueError("Invalid direction passed.")
 
     def play(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> int:
         """Play a game of snake.
@@ -71,7 +73,7 @@ class SnakeRL(Snake):
         new_dir = np.argmax(policy).astype(int)
         out[new_dir] = 1
 
-        return Direction[new_dir].value, out, head_view
+        return Direction(new_dir).value, out, head_view
 
     def check_game_over(self) -> bool:
         """Check if the game is over.
@@ -79,7 +81,7 @@ class SnakeRL(Snake):
         Returns:
             bool: Is game over?
         """
-        if self.moves_since_food < MAXIMUM_MOVES_WITHOUT_EATING:  # prevent loops and stagnation
+        if self.moves_since_food > MAXIMUM_MOVES_WITHOUT_EATING:  # prevent loops and stagnation
             return True
         if self.moves > MAXIMUM_TOTAL_MOVES:  # upper limit on number of moves
             return True
