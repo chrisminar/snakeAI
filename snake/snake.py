@@ -3,7 +3,7 @@
 import random
 from abc import ABCMeta, abstractmethod
 from enum import IntEnum
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 
@@ -42,7 +42,7 @@ class Snake(metaclass=ABCMeta):
         self.grid_size_x = x_grid_size  # width of grid
         self.grid_size_y = y_grid_size  # height of grid
         self.grid = np.zeros(
-            (self.grid_size_x, self.grid_size_y)) + GridEnum.EMPTY.value # TODO set dtype
+            (self.grid_size_x, self.grid_size_y)) + GridEnum.EMPTY.value  # TODO set dtype
         self.grid_size = x_grid_size * y_grid_size
 
         # initialize snake
@@ -117,7 +117,7 @@ class Snake(metaclass=ABCMeta):
         # move body
         self.grid[self.grid >= GridEnum.HEAD.value] += 1
         if not ate_this_turn:  # remove tail at end if the snake didn't grow
-            self.grid[self.grid>0] = GridEnum.EMPTY.value
+            self.grid[self.grid > self.length] = GridEnum.EMPTY.value
 
         # check if dead
         self.game_over = self.check_game_over()
@@ -125,9 +125,9 @@ class Snake(metaclass=ABCMeta):
             self.score += SCORE_PENALTY_FOR_FAILURE
         else:
             self.grid[self.head_x][self.head_y] = GridEnum.HEAD.value
-            
 
     # TODO refactor function
+
     def spawn_food(self) -> Tuple[int, int]:
         """Spawn food in an empty location.
 
@@ -175,3 +175,42 @@ class Snake(metaclass=ABCMeta):
             return True
 
         return False
+
+    def _reset(self,
+               *,
+               head_x: int = 0,
+               head_y: int = 0,
+               food_x: Optional[int] = None,
+               food_y: Optional[int] = None) -> None:
+        """Reset the snake to the passed parameters.
+
+        This is for testing purposes.
+
+        Args:
+            head_x (int): Head x position.
+            head_y (int): Head y position.
+            food_x (int): Food x position.
+            food_y (int): Food y position.
+        """
+        if head_x == food_x and head_y == food_y:
+            raise ValueError("Head and food can't be on same spot.")
+        # reset grid
+        self.grid.fill(GridEnum.EMPTY.value)
+
+        # place head
+        self.head_x = head_x
+        self.head_y = head_y
+        if not 0 <= self.head_x < self.grid_size_x or not 0 <= self.head_y < self.grid_size_y:
+            raise ValueError("Invalid head position.")
+        self.grid[self.head_x, self.head_y] = GridEnum.HEAD.value
+
+        # place food
+        if food_x is None:
+            food_x = self.grid_size_x-1
+        if food_y is None:
+            food_y = self.grid_size_y-1
+        self.food_x = food_x
+        self.food_y = food_y
+        if not 0 <= self.food_x < self.grid_size_x or not 0 <= self.food_y < self.grid_size_y:
+            raise ValueError("Invalid food position")
+        self.grid[food_x, food_y] = GridEnum.FOOD.value

@@ -31,7 +31,8 @@ class PlayGames:
                                        npt.NDArray[np.int32]] = np.vectorize(grid_val_to_neural_net)
 
     def play_games(self,
-                   start_id: int,
+                   *,
+                   start_id: int = 0,
                    num_games: int = NUM_SELF_PLAY_GAMES) -> Tuple[npt.NDArray[np.int32],
                                                                   npt.NDArray[np.bool8],
                                                                   npt.NDArray[np.int32],

@@ -102,7 +102,7 @@ class SnakeRL(Snake):
             is_free[Direction.LEFT.value] = 1
 
         # is right empty or food
-        if self.head_x < self.grid_size_x and self.grid[self.head_x+1, self.head_y] < GridEnum.HEAD.value:
+        if self.head_x < self.grid_size_x-1 and self.grid[self.head_x+1, self.head_y] < GridEnum.HEAD.value:
             is_free[Direction.RIGHT.value] = 1
 
         # is above empty or food
@@ -110,7 +110,7 @@ class SnakeRL(Snake):
             is_free[Direction.UP.value] = 1
 
         # is below empty or food
-        if self.head_y < self.grid_size_y and self.grid[self.head_x, self.head_y+1] < GridEnum.HEAD.value:
+        if self.head_y < self.grid_size_y-1 and self.grid[self.head_x, self.head_y+1] < GridEnum.HEAD.value:
             is_free[Direction.DOWN.value] = 1
 
         return is_free

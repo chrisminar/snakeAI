@@ -94,7 +94,7 @@ class TrainRL:
         fig = plt.figure()
         plt.title(f'Generation {generation}')
         plt.hist(scores, bins=np.arange(start=0, stop=1700, step=100))
-        fig.savefig(f'hists/generation_{generation}.png')
+        fig.savefig(f'media/hists/generation_{generation}.png')
         plt.close()
 
     def play_one_generation_of_games(self, neural_net: NeuralNetwork, *, generation: int, num_games: int = NUM_SELF_PLAY_GAMES) -> None:
@@ -107,7 +107,7 @@ class TrainRL:
         """
         spc = PlayGames(neural_net)
         states, heads, scores, ids, moves = spc.play_games(
-            self.game_id, num_games)
+            start_id=self.game_id, num_games=num_games)
         self.game_id += num_games
         LOGGER.debug('Moves in this training set:')
         LOGGER.debug("  Up: %d", np.sum(moves[:, Direction.UP.value]))
@@ -138,30 +138,26 @@ class TrainRL:
         _, indices = np.unique(ids, return_index=True)
         self.mean_score = np.mean(scores[indices])
 
+        # TODO put this under a flag
         self.gen_histogram(scores=scores[indices], generation=generation)
 
         # get rid of low scoring games
-        cutoff = self.mean_score if self.mean_score > 50 else 100
-        valid_idx = scores > cutoff
-        ids = ids[valid_idx]
-        scores = scores[valid_idx]
-        states = states[valid_idx]
-        moves = moves[valid_idx]
-        heads = heads[valid_idx]
+        valid_idx = scores >= self.mean_score
 
-        self.game_states = np.concatenate((self.game_states, states))
-        self.game_heads = np.concatenate((self.game_heads, heads))
-        self.game_scores = np.concatenate((self.game_scores, scores))
-        self.game_ids = np.concatenate((self.game_ids, ids))
-        self.moves = np.concatenate((self.moves, moves))
+        self.game_states = np.concatenate(
+            (self.game_states, states[valid_idx]))
+        self.game_heads = np.concatenate((self.game_heads, heads[valid_idx]))
+        self.game_scores = np.concatenate(
+            (self.game_scores, scores[valid_idx]))
+        self.game_ids = np.concatenate((self.game_ids, ids[valid_idx]))
+        self.moves = np.concatenate((self.moves, moves[valid_idx]))
 
     def trim_game_list(self) -> None:
         """Remove lowest scoreing games from game list."""
         uni, indices = np.unique(self.game_ids, return_index=True)
-        sorted_scores = np.sort(self.game_states[indices])
+        sorted_scores = np.sort(self.game_scores[indices])
         number_of_games = len(uni)
-        purge_num = number_of_games - \
-            NUM_SELF_PLAY_GAMES if number_of_games > NUM_TRAINING_GAMES else 0
+        purge_num = NUM_SELF_PLAY_GAMES if number_of_games >= NUM_TRAINING_GAMES else 0
 
         # purge worst games or all games below 0 score
         purge_score = max(sorted_scores[purge_num], 0) if purge_num > 0 else 0
