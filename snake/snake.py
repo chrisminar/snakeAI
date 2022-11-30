@@ -63,6 +63,8 @@ class Snake(metaclass=ABCMeta):
         # gamestate
         self.game_over = False
 
+        self.rng = np.random.default_rng()
+
         # initialize food
         self.food_x, self.food_y = self.spawn_food()
         # set food on grid
@@ -126,35 +128,16 @@ class Snake(metaclass=ABCMeta):
         else:
             self.grid[self.head_x, self.head_y] = GridEnum.HEAD.value
 
-    # TODO refactor function
-
     def spawn_food(self) -> Tuple[int, int]:
         """Spawn food in an empty location.
 
         Returns:
             Tuple[int, int]: X and Y food location.
         """
-        # generate mask matrix and count empty spots
-        mask = np.zeros((self.grid_size_x, self.grid_size_y))
-        count = 1
-        for i in range(self.grid_size_x):
-            for j in range(self.grid_size_y):
-                if self.grid[i, j] == GridEnum.EMPTY.value:
-                    mask[i, j] = count
-                    count += 1
+        valid_food_spots = np.argwhere(self.grid == GridEnum.EMPTY.value)
+        food_x, food_y = self.rng.choice(valid_food_spots)
 
-        # generate a random number from 0-count
-        if count > 1:
-            spot = random.randint(1, count-1)
-        else:
-            return(i, j)
-
-        # find the x and y location of the spot
-        for i in range(self.grid_size_x):
-            for j in range(self.grid_size_y):
-                if mask[i][j] == spot:
-                    return (i, j)
-        return (i, j)
+        return food_x, food_y
 
     def check_game_over(self) -> bool:
         """Check if the game is over.
