@@ -42,14 +42,14 @@ class Snake(metaclass=ABCMeta):
         self.grid_size_x = x_grid_size  # width of grid
         self.grid_size_y = y_grid_size  # height of grid
         self.grid = np.zeros(
-            (self.grid_size_x, self.grid_size_y)) + GridEnum.EMPTY.value  # TODO set dtype
+            (self.grid_size_x, self.grid_size_y), dtype=np.int32) + GridEnum.EMPTY.value
         self.grid_size = x_grid_size * y_grid_size
 
         # initialize snake
         self.head_x = 1  # snake head position x
         self.head_y = 1  # snake head position y
         self.length = 0  # current length of snake
-        self.grid[self.head_x][self.head_y] = 0  # set snake head on the grid
+        self.grid[self.head_x, self.head_y] = 0  # set snake head on the grid
 
         # scoring
         self.score = 0  # current score
@@ -66,7 +66,7 @@ class Snake(metaclass=ABCMeta):
         # initialize food
         self.food_x, self.food_y = self.spawn_food()
         # set food on grid
-        self.grid[self.food_x][self.food_y] = GridEnum.FOOD.value
+        self.grid[self.food_x, self.food_y] = GridEnum.FOOD.value
 
     @abstractmethod
     def direction_to_tuple(self, direction: Union[Direction, Any]) -> Tuple[int, int]:
@@ -104,7 +104,7 @@ class Snake(metaclass=ABCMeta):
         if (self.head_x == self.food_x) and (self.head_y == self.food_y):
             self.length += 1
             self.food_x, self.food_y = self.spawn_food()
-            self.grid[self.food_x][self.food_y] = GridEnum.FOOD.value
+            self.grid[self.food_x, self.food_y] = GridEnum.FOOD.value
             self.score += SCORE_PER_FOOD
             ate_this_turn = True
             self.moves_since_food = 0
@@ -124,7 +124,7 @@ class Snake(metaclass=ABCMeta):
         if self.game_over:
             self.score += SCORE_PENALTY_FOR_FAILURE
         else:
-            self.grid[self.head_x][self.head_y] = GridEnum.HEAD.value
+            self.grid[self.head_x, self.head_y] = GridEnum.HEAD.value
 
     # TODO refactor function
 
@@ -139,8 +139,8 @@ class Snake(metaclass=ABCMeta):
         count = 1
         for i in range(self.grid_size_x):
             for j in range(self.grid_size_y):
-                if self.grid[i][j] == GridEnum.EMPTY.value:
-                    mask[i][j] = count
+                if self.grid[i, j] == GridEnum.EMPTY.value:
+                    mask[i, j] = count
                     count += 1
 
         # generate a random number from 0-count
@@ -171,7 +171,7 @@ class Snake(metaclass=ABCMeta):
             return True
         if self.head_y >= self.grid_size_y:  # lower wall
             return True
-        if self.grid[self.head_x][self.head_y] >= GridEnum.HEAD.value:  # head ran into body
+        if self.grid[self.head_x, self.head_y] >= GridEnum.HEAD.value:  # head ran into body
             return True
 
         return False

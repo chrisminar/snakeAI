@@ -1,11 +1,3 @@
-# TODO test for timeout
-# TODO experiemnt with different optimizers
-# TODO try to progressively update nn, not reinit every time?
-# TODO there is some sort of bug that makes the game end too early
-# TODO do network pruning
-# TODO track/understand what the neural network is doing
-# TODO gui
-# TODO pause/play
 """Reinforcement learning."""
 
 import logging
@@ -124,7 +116,8 @@ class TrainRL:
                           scores: npt.NDArray[np.int32],
                           ids: npt.NDArray[np.int32],
                           moves: npt.NDArray[np.float32],
-                          generation: int) -> None:
+                          generation: int,
+                          make_histogram: bool = True) -> None:
         """Add new games to overall game list.
 
         Args:
@@ -134,12 +127,13 @@ class TrainRL:
             ids (npt.NDArray[np.int32]): ids
             moves (npt.NDArray[np.int32]): moves
             generation (int): Generation number.
+            make_histogram (bool): Make a histogram for this set of games.
         """
         _, indices = np.unique(ids, return_index=True)
         self.mean_score = np.mean(scores[indices])
 
-        # TODO put this under a flag
-        self.gen_histogram(scores=scores[indices], generation=generation)
+        if make_histogram:
+            self.gen_histogram(scores=scores[indices], generation=generation)
 
         # get rid of low scoring games
         valid_idx = scores >= self.mean_score

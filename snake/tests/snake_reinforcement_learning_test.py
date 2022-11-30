@@ -12,6 +12,7 @@ from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 
 
+# pylint: disable=protected-access
 def test_init() -> None:
     """Test snake rl init."""
     snake = SnakeRL(neural_net=NeuralNetwork(),

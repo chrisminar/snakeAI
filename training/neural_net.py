@@ -113,7 +113,6 @@ class NeuralNetwork:
         print(self.model.metrics_names)
         # keras.utils.plot_model( self.model, show_shapes = True )
 
-    # TODO this path shouldn't be hardcoded
     def save(self, generation: int) -> None:
         """Save neural network to disk.
 
@@ -121,7 +120,7 @@ class NeuralNetwork:
             generation (int): Training generation of this neural network.
         """
         self.model.save(
-            fr'C:\Users\Chris Minar\Documents\Python\Snake\saves\generation_{generation}.ckpt')
+            fr'media\saves\generation_{generation}.ckpt')
 
     def load(self, path: Path) -> None:
         """Load neural net from filpath.

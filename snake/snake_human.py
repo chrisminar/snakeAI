@@ -37,6 +37,7 @@ class SnakeHuman(Snake):
             return 0, 1
         elif direction == pg.K_UP:
             return 0, -1
+        raise ValueError("Invalid key")
 
     def play(self) -> int:
         """Play a game of snake.

@@ -21,7 +21,7 @@ def test_add_games_to_list() -> None:
     spc = PlayGames(neural_network)
     states, heads, scores, ids, moves = spc.play_games(num_games=5)
     trainer.add_games_to_list(states=states, heads=heads,
-                              scores=scores, ids=ids, moves=moves, generation=0)
+                              scores=scores, ids=ids, moves=moves, generation=0, make_histogram=False)
     assert np.max(trainer.game_ids) < 5
     assert 0 <= np.min(trainer.game_ids)
     assert trainer.game_states.shape[0] == trainer.game_ids.shape[
@@ -47,7 +47,7 @@ def test_trim_game_list_1() -> None:
     # add games to list will keep all games because their scores are all the same
     trainer = TrainRL()
     trainer.add_games_to_list(states=states, heads=heads,
-                              scores=scores, ids=game_ids, moves=moves, generation=0)
+                              scores=scores, ids=game_ids, moves=moves, generation=0, make_histogram=False)
 
     # add a bunch more games of higher score, again add games to list will keep all games
     offset = game_ids[-1]+1
@@ -56,7 +56,7 @@ def test_trim_game_list_1() -> None:
         game_ids = np.concatenate(
             [game_ids, np.zeros(moves_per_game,) + i + offset])
     trainer.add_games_to_list(states=states, heads=heads,
-                              scores=scores+100, ids=game_ids, moves=moves, generation=1)
+                              scores=scores+100, ids=game_ids, moves=moves, generation=1, make_histogram=False)
 
     # lowest games will be removed
     trainer.trim_game_list()

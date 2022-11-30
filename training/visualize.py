@@ -47,7 +47,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
     states = []
     for i, generation in enumerate(generations):
         neural_net = NeuralNetwork()
-        neural_net.load(Path(f'saves/generation_{generation}.ckpt'))
+        neural_net.load(Path(f'media/saves/generation_{generation}.ckpt'))
         spc = PlayGames(neural_net)
         if i < 3:
             state, _, score, ids, _ = spc.play_games(num_games=1)
@@ -103,12 +103,12 @@ def find_best(*, states: npt.NDArray[np.int32],
         elif ids[idx] != ids[idx_start]:
             flag = False
 
-    mask = np.zeros(len(ids), dtype=bool)
+    mask = np.zeros(len(ids), dtype=np.bool8)
     mask[index] = True
     state = states[mask]
     return state
 
 
 if __name__ == "__main__":
-    # run_a_sample('saves/generation_383.ckpt')
+    # run_a_sample('media/saves/generation_383.ckpt')
     gen_compare()

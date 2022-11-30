@@ -17,7 +17,7 @@ class SnakeRL(Snake):
         self.neural_net = neural_net
         self.state_list: List[npt.NDArray[np.int32]] = []
         self.move_list: List[npt.NDArray[np.int32]] = []
-        self.head_list: List[npt.NDArray[np.int32]] = []
+        self.head_list: List[npt.NDArray[np.bool8]] = []
 
     def direction_to_tuple(self, direction: Union[Direction, int]) -> Tuple[int, int]:
         """Convert direction to delta x and delta y.
@@ -55,7 +55,7 @@ class SnakeRL(Snake):
             self.run_single(*self.direction_to_tuple(new_direction))
         return self.score
 
-    def evaluate_next_step(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> Tuple[int, List[int], npt.NDArray[np.int32]]:
+    def evaluate_next_step(self, grid_func: Callable[[npt.NDArray[np.int32]], npt.NDArray[np.int32]]) -> Tuple[int, npt.NDArray[np.int32], npt.NDArray[np.bool8]]:
         """Convert game step to neural net inputs, then run neural network.
 
         Args:
@@ -69,7 +69,7 @@ class SnakeRL(Snake):
         policy = self.neural_net.evaluate(
             state=pre_processed_grid, head=head_view)
 
-        out = [0, 0, 0, 0]
+        out = np.array([0, 0, 0, 0], dtype=np.int32)
         new_dir = np.argmax(policy).astype(int)
         out[new_dir] = 1
 
