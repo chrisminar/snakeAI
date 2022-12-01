@@ -11,7 +11,7 @@ from numpy import typing as npt
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("terminal")
 
 
 def run_a_sample(checkpoint: Path) -> None:
@@ -73,7 +73,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
             else:
                 axis.imshow(states[j][-1])
                 plt.title(f'Generation {generations[j]}, move {game_length}')
-        fig.savefig(f'compare/compare{i}.png')
+        fig.savefig(f'media/compare/compare{i}.png')
         plt.close()
 
 
@@ -110,5 +110,8 @@ def find_best(*, states: npt.NDArray[np.int32],
 
 
 if __name__ == "__main__":
-    # run_a_sample('media/saves/generation_383.ckpt')
-    gen_compare()
+    from pathlib import Path
+
+    from training.visualize import gen_compare, run_a_sample
+    run_a_sample(Path('media/saves/generation_100.ckpt'))
+    gen_compare((0, 25, 50, 100))

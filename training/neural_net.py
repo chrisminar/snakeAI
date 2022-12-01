@@ -80,7 +80,7 @@ class NeuralNetwork:
         self.model.compile(loss=keras.losses.CategoricalCrossentropy(from_logits=True),
                            optimizer=keras.optimizers.SGD(
                                momentum=MOMENTUM),
-                           metrics=['accuracy', 'accuracy'])
+                           metrics=['accuracy'])
 
     def train(self,
               *,
@@ -120,7 +120,7 @@ class NeuralNetwork:
             generation (int): Training generation of this neural network.
         """
         self.model.save(
-            fr'media\saves\generation_{generation}.ckpt')
+            f'media/saves/generation_{generation}.ckpt')
 
     def load(self, path: Path) -> None:
         """Load neural net from filpath.

@@ -14,7 +14,7 @@ from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 from training.trainer import train
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("terminal")
 
 
 class TrainRL:
@@ -28,7 +28,7 @@ class TrainRL:
         self.moves = np.zeros((0, 4), dtype=np.float32)
         self.neural_net = NeuralNetwork()
         self.game_id = 0
-        self.mean_score = 0
+        self.mean_score = -100
         self.mean_scores: List[int] = []
         self.games_used: List[int] = []
         self.max_scores: List[int] = []
@@ -37,6 +37,8 @@ class TrainRL:
         """Training loop."""
         generation = 0
         while 1:
+            LOGGER.info("")
+            LOGGER.info("")
             LOGGER.info("Generation %d", generation)
             num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
             if num_games > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
@@ -73,7 +75,7 @@ class TrainRL:
 
         plt.suptitle(f'Generation: {generation}')
 
-        fig.savefig('mostrecent.png')
+        fig.savefig('media/pictures/mostrecent.png')
         plt.close()
 
     def gen_histogram(self, *, scores: Sequence[np.int32], generation: int) -> None:
@@ -99,7 +101,7 @@ class TrainRL:
         """
         spc = PlayGames(neural_net)
         states, heads, scores, ids, moves = spc.play_games(
-            start_id=self.game_id, num_games=num_games)
+            start_id=self.game_id, num_games=num_games, minimum_score=self.mean_score)
         self.game_id += num_games
         LOGGER.debug('Moves in this training set:')
         LOGGER.debug("  Up: %d", np.sum(moves[:, Direction.UP.value]))
@@ -135,19 +137,16 @@ class TrainRL:
         if make_histogram:
             self.gen_histogram(scores=scores[indices], generation=generation)
 
-        # get rid of low scoring games
-        valid_idx = scores >= self.mean_score
-
         self.game_states = np.concatenate(
-            (self.game_states, states[valid_idx]))
-        self.game_heads = np.concatenate((self.game_heads, heads[valid_idx]))
+            (self.game_states, states))
+        self.game_heads = np.concatenate((self.game_heads, heads))
         self.game_scores = np.concatenate(
-            (self.game_scores, scores[valid_idx]))
-        self.game_ids = np.concatenate((self.game_ids, ids[valid_idx]))
-        self.moves = np.concatenate((self.moves, moves[valid_idx]))
+            (self.game_scores, scores))
+        self.game_ids = np.concatenate((self.game_ids, ids))
+        self.moves = np.concatenate((self.moves, moves))
 
     def trim_game_list(self) -> None:
-        """Remove lowest scoreing games from game list."""
+        """Remove lowest scoring games from game list."""
         uni, indices = np.unique(self.game_ids, return_index=True)
         sorted_scores = np.sort(self.game_scores[indices])
         number_of_games = len(uni)
@@ -172,14 +171,12 @@ class TrainRL:
         self.games_used.append(number_of_games)
         self.max_scores.append(np.max(self.game_scores))
         try:
-            LOGGER.info("Previous generation mean score: %02f",
-                        self.mean_scores[-2])
-            LOGGER.info("Previous generation maximum score: %02f",
-                        self.max_scores[-2])
+            LOGGER.info("Generation mean score: %02f -> %02f",
+                        self.mean_scores[-2], self.mean_scores[-1])
+            LOGGER.info("Generation maximum score: %02f -> %02f",
+                        self.max_scores[-2], self.max_scores[-1])
         except IndexError:
             pass  # don't print previous score
-        LOGGER.info("Generation mean score: %f", self.mean_scores[-1])
-        LOGGER.info("Generation mean score: %f", self.max_scores[-1])
         LOGGER.info("Games in training set: %d", self.games_used[-1])
 
     def print_size_info(self) -> None:

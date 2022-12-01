@@ -9,7 +9,7 @@ from gc import get_referents
 from types import FunctionType, ModuleType
 from typing import Any, Final, Optional, Type
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("terminal")
 
 GRID_X: Final = 4                # x grid size of snake game
 GRID_Y: Final = 4                # y grid size of snake game
@@ -27,7 +27,12 @@ MAXIMUM_TOTAL_MOVES: Final = MAXIMUM_MOVES_WITHOUT_EATING ** 2
 SCORE_PER_FOOD: Final = 100  # point modification for eating food
 SCORE_PER_MOVE: Final = -1  # point modificaiton for moving
 SCORE_PENALTY_FOR_FAILURE: Final = -50  # point modification for dying
-SCORE_FOR_GAME_WIN: Final = 1000  # get this many points for winning the game
+SCORE_FOR_GAME_WIN: Final = 100  # get this many points for winning the game
+
+# Odds of taking a random move to explore while training
+EXPLORATORY_MOVE_FRACTION: Final = 0.1
+
+SAVE_INTERVAL = 25
 
 
 class PreProcessedGrid(IntEnum):

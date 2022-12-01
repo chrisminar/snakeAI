@@ -24,7 +24,7 @@ def train(generation: int,
         (NeuralNetwork): trained neural network
     """
     neural_net = NeuralNetwork()
-    with Timer():
+    with Timer(name="Training"):
         # get all permutations
         permuted_states, permuted_heads, permuted_predictions = permute_inputs(
             states=game_states, predictions=move_predictions, heads=heads)

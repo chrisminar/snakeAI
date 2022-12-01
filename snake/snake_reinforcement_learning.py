@@ -5,19 +5,27 @@ import numpy as np
 from numpy import typing as npt
 
 from snake.snake import Direction, GridEnum, Snake
-from training.helper import MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES
+from training.helper import (EXPLORATORY_MOVE_FRACTION,
+                             MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES)
 from training.neural_net import NeuralNetwork
 
 
 class SnakeRL(Snake):
     """Reinforcement learning snake."""
 
-    def __init__(self, neural_net: NeuralNetwork, **kwargs) -> None:
+    def __init__(self, neural_net: NeuralNetwork, exploratory: bool, **kwargs) -> None:
+        """Intialize snakerl.
+
+        Args:
+            neural_net (NeuralNetwork): Neural network.
+            exploratory (bool, optional): Should the snake preform exploratory moves?
+        """
         super().__init__(**kwargs)
         self.neural_net = neural_net
         self.state_list: List[npt.NDArray[np.int32]] = []
         self.move_list: List[npt.NDArray[np.int32]] = []
         self.head_list: List[npt.NDArray[np.bool8]] = []
+        self.exploratory = exploratory
 
     def direction_to_tuple(self, direction: Union[Direction, int]) -> Tuple[int, int]:
         """Convert direction to delta x and delta y.
@@ -69,11 +77,18 @@ class SnakeRL(Snake):
         policy = self.neural_net.evaluate(
             state=pre_processed_grid, head=head_view)
 
-        out = np.array([0, 0, 0, 0], dtype=np.int32)
-        new_dir = np.argmax(policy).astype(int)
-        out[new_dir] = 1
+        next_direction_array = np.array([0, 0, 0, 0], dtype=np.int32)
 
-        return Direction(new_dir).value, out, head_view
+        # if explore mode is off, or explore mode is on 9/10 times
+        if not self.exploratory and np.random.rand() > EXPLORATORY_MOVE_FRACTION:
+            new_dir = np.argmax(policy).astype(int)
+        else:  # take a random move 1/10 times
+            valid_directions = np.argwhere(head_view)
+            new_dir = self.rng.choice(valid_directions)
+
+        next_direction_array[new_dir] = 1
+
+        return Direction(new_dir).value, next_direction_array, head_view
 
     def check_game_over(self) -> bool:
         """Check if the game is over.
