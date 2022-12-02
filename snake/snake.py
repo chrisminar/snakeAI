@@ -38,18 +38,21 @@ class Snake(metaclass=ABCMeta):
             x_grid_size (int, optional): grid size in x direction. Defaults to GRID_X.
             y_grid_size (int, optional): grid size in y direction. Defaults to GRID_Y.
         """
+        self.rng = np.random.default_rng()
+
         # initialize grid
         self.grid_size_x = x_grid_size  # width of grid
         self.grid_size_y = y_grid_size  # height of grid
-        self.grid = np.zeros(
-            (self.grid_size_x, self.grid_size_y), dtype=np.int32) + GridEnum.EMPTY.value
+        self.grid = np.full(
+            (self.grid_size_x, self.grid_size_y), GridEnum.EMPTY.value, dtype=np.int32)
         self.grid_size = x_grid_size * y_grid_size
 
         # initialize snake
-        self.head_x = 1  # snake head position x
-        self.head_y = 1  # snake head position y
+        self.head_x, self.head_y = self.rng.choice(
+            np.argwhere(self.grid == GridEnum.EMPTY.value))
         self.length = 0  # current length of snake
-        self.grid[self.head_x, self.head_y] = 0  # set snake head on the grid
+        # set snake head on the grid
+        self.grid[self.head_x, self.head_y] = GridEnum.HEAD.value
 
         # scoring
         self.score = 0  # current score
@@ -62,8 +65,6 @@ class Snake(metaclass=ABCMeta):
 
         # gamestate
         self.game_over = False
-
-        self.rng = np.random.default_rng()
 
         # initialize food
         self.food_x, self.food_y = self.spawn_food()

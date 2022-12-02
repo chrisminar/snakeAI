@@ -8,7 +8,7 @@ from numpy import typing as npt
 from tensorflow import keras
 
 from training.helper import (BATCH_SIZE, EPOCH_DELTA, EPOCHS, GRID_X, GRID_Y,
-                             MOMENTUM, VALIDATION_SPLIT)
+                             MOMENTUM, SAVE_INTERVAL, VALIDATION_SPLIT)
 
 
 class NeuralNetwork:
@@ -119,8 +119,9 @@ class NeuralNetwork:
         Args:
             generation (int): Training generation of this neural network.
         """
-        self.model.save(
-            f'media/saves/generation_{generation}.ckpt')
+        if generation % SAVE_INTERVAL == 0:
+            self.model.save(
+                f'media/saves/generation_{generation}.ckpt')
 
     def load(self, path: Path) -> None:
         """Load neural net from filpath.

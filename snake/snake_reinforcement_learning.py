@@ -83,8 +83,11 @@ class SnakeRL(Snake):
         if not self.exploratory and np.random.rand() > EXPLORATORY_MOVE_FRACTION:
             new_dir = np.argmax(policy).astype(int)
         else:  # take a random move 1/10 times
-            valid_directions = np.argwhere(head_view)
-            new_dir = self.rng.choice(valid_directions)
+            try:
+                new_dir = self.rng.choice(np.argwhere(head_view))
+            except ValueError:  # no valid choices
+                new_dir = self.rng.choice(
+                    np.argwhere(np.logical_not(head_view)))
 
         next_direction_array[new_dir] = 1
 

@@ -25,7 +25,7 @@ MAXIMUM_MOVES_WITHOUT_EATING: Final = GRID_X * GRID_Y
 MAXIMUM_TOTAL_MOVES: Final = MAXIMUM_MOVES_WITHOUT_EATING ** 2
 
 SCORE_PER_FOOD: Final = 100  # point modification for eating food
-SCORE_PER_MOVE: Final = -1  # point modificaiton for moving
+SCORE_PER_MOVE: Final = 0  # point modificaiton for moving
 SCORE_PENALTY_FOR_FAILURE: Final = -50  # point modification for dying
 SCORE_FOR_GAME_WIN: Final = 100  # get this many points for winning the game
 

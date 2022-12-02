@@ -109,9 +109,10 @@ def find_best(*, states: npt.NDArray[np.int32],
     return state
 
 
-if __name__ == "__main__":
-    from pathlib import Path
+"""
+from pathlib import Path
 
-    from training.visualize import gen_compare, run_a_sample
-    run_a_sample(Path('media/saves/generation_100.ckpt'))
-    gen_compare((0, 25, 50, 100))
+from training.visualize import gen_compare, run_a_sample
+run_a_sample(Path('media/saves/generation_75.ckpt'))
+gen_compare((0, 25, 50, 75))
+"""
