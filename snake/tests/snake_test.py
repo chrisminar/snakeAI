@@ -60,12 +60,12 @@ def test_reset(success: bool, headx: int, heady: int, foodx: int, foody: int) ->
     # place head
     snake.head_x = GRID_X-1
     snake.head_y = GRID_Y-1
-    snake.grid[snake.head_x, snake.head_y] = GridEnum.HEAD.value
+    snake.grid[snake.head_y, snake.head_x] = GridEnum.HEAD.value
 
     # place food
     snake.food_x = GRID_X-2
     snake.food_y = GRID_Y-1
-    snake.grid[snake.food_x, snake.food_y] = GridEnum.FOOD.value
+    snake.grid[snake.food_y, snake.food_x] = GridEnum.FOOD.value
 
     if success:
         if headx is None:
@@ -77,12 +77,12 @@ def test_reset(success: bool, headx: int, heady: int, foodx: int, foody: int) ->
             assert headx == snake.head_x
         if heady is not None:
             assert heady == snake.head_y
-        assert snake.grid[snake.head_x, snake.head_y] == GridEnum.HEAD.value
+        assert snake.grid[snake.head_y, snake.head_x] == GridEnum.HEAD.value
         if foodx is not None:
             assert foodx == snake.food_x
         if foody is not None:
             assert foody == snake.food_y
-        assert snake.grid[snake.food_x, snake.food_y] == GridEnum.FOOD.value
+        assert snake.grid[snake.food_y, snake.food_x] == GridEnum.FOOD.value
     else:
         with pytest.raises(ValueError):
             snake._reset(head_x=headx, head_y=heady,
@@ -119,6 +119,7 @@ def test_run_single_no_food(food: bool, head_x: int, head_y: int, x_dir: int, y_
     else:
         assert snake.length == 0
 
+
 def test_spawn_food() -> None:
     """Test that food can be spawned at a random valid location."""
     snake = SnakeDummy(GRID_X, GRID_Y)
@@ -131,12 +132,14 @@ def test_spawn_food() -> None:
         snake.grid[0, :] = GridEnum.HEAD.value  # fill first two rows with 0
         snake.grid[1, :] = GridEnum.HEAD.value
         food_x[food], food_y[food] = snake.spawn_food()
-    assert np.all(food_x>1)  # no food values where body is
+    assert np.all(food_x > 1)  # no food values where body is
     assert np.all(food_y >= 0)  # within legal bounds
     assert np.all(food_y < snake.grid_size_y)
     assert np.all(food_x < snake.grid_size_x)
-    assert len(np.unique(food_x)) > 1 # not pumping out the same value every time
-    assert len(np.unique(food_y)) > 1 # not pumping out the same value every time
+    # not pumping out the same value every time
+    assert len(np.unique(food_x)) > 1
+    # not pumping out the same value every time
+    assert len(np.unique(food_y)) > 1
 
 
 @pytest.mark.parametrize("direction", list(Direction))
@@ -166,14 +169,14 @@ def test_check_game_over_tail() -> None:
     # 1 -1
     snake.run_single(0, 1)  # move up
     snake.food_x = snake.food_y = 1   # place food at (1,1)
-    snake.grid[snake.food_x, snake.food_y] = GridEnum.FOOD.value  # set food
+    snake.grid[snake.food_y, snake.food_x] = GridEnum.FOOD.value  # set food
 
     # move right and eat
     # 1  0
     # 2 -2
     snake.run_single(1, 0)
     snake.food_x, snake.food_y = 1, 0  # place food at (1,0)
-    snake.grid[snake.food_x, snake.food_y] = GridEnum.FOOD.value
+    snake.grid[snake.food_y, snake.food_x] = GridEnum.FOOD.value
 
     # move down and eat
     # 2  1

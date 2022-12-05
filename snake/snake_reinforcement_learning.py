@@ -13,7 +13,7 @@ from training.neural_net import NeuralNetwork
 class SnakeRL(Snake):
     """Reinforcement learning snake."""
 
-    def __init__(self, neural_net: NeuralNetwork, exploratory: bool, **kwargs) -> None:
+    def __init__(self, neural_net: NeuralNetwork, exploratory: bool = False, **kwargs) -> None:
         """Intialize snakerl.
 
         Args:
@@ -41,7 +41,7 @@ class SnakeRL(Snake):
         if direction == Direction.RIGHT:
             return 1, 0
         if direction == Direction.DOWN:
-            return 0, -1
+            return 0, 1
         if direction == Direction.LEFT:
             return -1, 0
         raise ValueError("Invalid direction passed.")
@@ -76,6 +76,8 @@ class SnakeRL(Snake):
         head_view = self.convert_head()
         policy = self.neural_net.evaluate(
             state=pre_processed_grid, head=head_view)
+        if np.all(policy == 0):
+            policy = head_view  # type: ignore
 
         next_direction_array = np.array([0, 0, 0, 0], dtype=np.int32)
 
@@ -116,19 +118,19 @@ class SnakeRL(Snake):
         is_free = np.zeros((4,), dtype=np.bool8)
 
         # is left empty or food
-        if self.head_x > 0 and self.grid[self.head_x-1, self.head_y] < GridEnum.HEAD.value:
+        if self.head_x > 0 and self.grid[self.head_y, self.head_x-1] < GridEnum.HEAD.value:
             is_free[Direction.LEFT.value] = 1
 
         # is right empty or food
-        if self.head_x < self.grid_size_x-1 and self.grid[self.head_x+1, self.head_y] < GridEnum.HEAD.value:
+        if self.head_x < self.grid_size_x-1 and self.grid[self.head_y, self.head_x+1] < GridEnum.HEAD.value:
             is_free[Direction.RIGHT.value] = 1
 
         # is above empty or food
-        if self.head_y > 0 and self.grid[self.head_x, self.head_y-1] < GridEnum.HEAD.value:
+        if self.head_y > 0 and self.grid[self.head_y-1, self.head_x] < GridEnum.HEAD.value:
             is_free[Direction.UP.value] = 1
 
         # is below empty or food
-        if self.head_y < self.grid_size_y-1 and self.grid[self.head_x, self.head_y+1] < GridEnum.HEAD.value:
+        if self.head_y < self.grid_size_y-1 and self.grid[self.head_y+1, self.head_x] < GridEnum.HEAD.value:
             is_free[Direction.DOWN.value] = 1
 
         return is_free

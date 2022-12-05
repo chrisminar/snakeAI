@@ -44,15 +44,15 @@ class Snake(metaclass=ABCMeta):
         self.grid_size_x = x_grid_size  # width of grid
         self.grid_size_y = y_grid_size  # height of grid
         self.grid = np.full(
-            (self.grid_size_x, self.grid_size_y), GridEnum.EMPTY.value, dtype=np.int32)
+            (self.grid_size_y, self.grid_size_x), GridEnum.EMPTY.value, dtype=np.int32)
         self.grid_size = x_grid_size * y_grid_size
 
         # initialize snake
-        self.head_x, self.head_y = self.rng.choice(
+        self.head_y, self.head_x = self.rng.choice(
             np.argwhere(self.grid == GridEnum.EMPTY.value))
         self.length = 0  # current length of snake
         # set snake head on the grid
-        self.grid[self.head_x, self.head_y] = GridEnum.HEAD.value
+        self.grid[self.head_y, self.head_x] = GridEnum.HEAD.value
 
         # scoring
         self.score = 0  # current score
@@ -69,7 +69,7 @@ class Snake(metaclass=ABCMeta):
         # initialize food
         self.food_x, self.food_y = self.spawn_food()
         # set food on grid
-        self.grid[self.food_x, self.food_y] = GridEnum.FOOD.value
+        self.grid[self.food_y, self.food_x] = GridEnum.FOOD.value
 
     @abstractmethod
     def direction_to_tuple(self, direction: Union[Direction, Any]) -> Tuple[int, int]:
@@ -102,18 +102,16 @@ class Snake(metaclass=ABCMeta):
         self.score += SCORE_PER_MOVE
         self.moves += 1
 
-        # check if snake ate
-        ate_this_turn = False
-        if (self.head_x == self.food_x) and (self.head_y == self.food_y):
+        ate_this_turn = (self.head_x == self.food_x) and (
+            self.head_y == self.food_y)
+        if ate_this_turn:
             self.length += 1
-            self.food_x, self.food_y = self.spawn_food()
-            self.grid[self.food_x, self.food_y] = GridEnum.FOOD.value
             self.score += SCORE_PER_FOOD
-            ate_this_turn = True
             self.moves_since_food = 0
-            if self.length == self.grid_size - 1:  # if snake is max length, the game has been won
+            if self.length == self.grid_size - 1:
                 self.score += SCORE_FOR_GAME_WIN
                 self.game_over = True
+                return
         else:
             self.moves_since_food += 1
 
@@ -122,12 +120,17 @@ class Snake(metaclass=ABCMeta):
         if not ate_this_turn:  # remove tail at end if the snake didn't grow
             self.grid[self.grid > self.length] = GridEnum.EMPTY.value
 
+        # spawn new food
+        if ate_this_turn:
+            self.food_x, self.food_y = self.spawn_food()
+            self.grid[self.food_y, self.food_x] = GridEnum.FOOD.value
+
         # check if dead
         self.game_over = self.check_game_over()
         if self.game_over:
             self.score += SCORE_PENALTY_FOR_FAILURE
         else:
-            self.grid[self.head_x, self.head_y] = GridEnum.HEAD.value
+            self.grid[self.head_y, self.head_x] = GridEnum.HEAD.value
 
     def spawn_food(self) -> Tuple[int, int]:
         """Spawn food in an empty location.
@@ -136,7 +139,13 @@ class Snake(metaclass=ABCMeta):
             Tuple[int, int]: X and Y food location.
         """
         valid_food_spots = np.argwhere(self.grid == GridEnum.EMPTY.value)
-        food_x, food_y = self.rng.choice(valid_food_spots)
+        try:
+            food_y, food_x = self.rng.choice(valid_food_spots)
+        except ValueError:
+            print(self.grid)
+            print(self.score)
+            print(self.length)
+            print(self.moves)
 
         return food_x, food_y
 
@@ -155,7 +164,7 @@ class Snake(metaclass=ABCMeta):
             return True
         if self.head_y >= self.grid_size_y:  # lower wall
             return True
-        if self.grid[self.head_x, self.head_y] >= GridEnum.HEAD.value:  # head ran into body
+        if self.grid[self.head_y, self.head_x] >= GridEnum.HEAD.value:  # head ran into body
             return True
 
         return False
@@ -186,7 +195,7 @@ class Snake(metaclass=ABCMeta):
         self.head_y = head_y
         if not 0 <= self.head_x < self.grid_size_x or not 0 <= self.head_y < self.grid_size_y:
             raise ValueError("Invalid head position.")
-        self.grid[self.head_x, self.head_y] = GridEnum.HEAD.value
+        self.grid[self.head_y, self.head_x] = GridEnum.HEAD.value
 
         # place food
         if food_x is None:
@@ -197,4 +206,4 @@ class Snake(metaclass=ABCMeta):
         self.food_y = food_y
         if not 0 <= self.food_x < self.grid_size_x or not 0 <= self.food_y < self.grid_size_y:
             raise ValueError("Invalid food position")
-        self.grid[food_x, food_y] = GridEnum.FOOD.value
+        self.grid[food_y, food_x] = GridEnum.FOOD.value

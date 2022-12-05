@@ -49,10 +49,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
         neural_net = NeuralNetwork()
         neural_net.load(Path(f'media/saves/generation_{generation}.ckpt'))
         spc = PlayGames(neural_net)
-        if i < 3:
-            state, _, score, ids, _ = spc.play_games(num_games=1)
-        else:
-            state, _, score, ids, _ = spc.play_games(num_games=50)
+        state, _, score, ids, _ = spc.play_games(num_games=50)
         state = find_best(states=state, scores=score, ids=ids)
         states.append(state)
         LOGGER.info("Done with generation %d", generation)
@@ -114,5 +111,5 @@ from pathlib import Path
 
 from training.visualize import gen_compare, run_a_sample
 run_a_sample(Path('media/saves/generation_75.ckpt'))
-gen_compare((0, 25, 50, 75))
+gen_compare((0, 25, 50, 125))
 """

@@ -14,7 +14,7 @@ from training.helper import (BATCH_SIZE, EPOCH_DELTA, EPOCHS, GRID_X, GRID_Y,
 class NeuralNetwork:
     """Neural network to run snake."""
 
-    def __init__(self) -> None:
+    def __init__(self, x_size: int = GRID_X, y_size: int = GRID_Y) -> None:
         # weight initializer
         initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=1.0)
 
@@ -31,7 +31,7 @@ class NeuralNetwork:
 
         # grid side
         block_input = keras.Input(
-            shape=(GRID_X, GRID_Y, 1), name='input_game_state')
+            shape=(x_size, y_size, 1), name='input_game_state')
 
         layer_1 = layers.Conv2D(16, 3, padding='same', activation='relu',
                                 name='l1', kernel_initializer=initializer)(block_input)

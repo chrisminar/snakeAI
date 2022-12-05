@@ -9,7 +9,7 @@ from numpy import typing as npt
 
 from snake.snake import Direction
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
-                             NUM_TRAINING_GAMES, get_size)
+                             NUM_TRAINING_GAMES, SCORE_PER_FOOD, get_size)
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 from training.trainer import train
@@ -28,7 +28,7 @@ class TrainRL:
         self.moves = np.zeros((0, 4), dtype=np.float32)
         self.neural_net = NeuralNetwork()
         self.game_id = 0
-        self.mean_score = -100
+        self.mean_score = -SCORE_PER_FOOD
         self.mean_scores: List[int] = []
         self.games_used: List[int] = []
         self.max_scores: List[int] = []
@@ -40,11 +40,11 @@ class TrainRL:
             LOGGER.info("")
             LOGGER.info("")
             LOGGER.info("Generation %d", generation)
-            num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
-            if num_games > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
-                pass
-            else:  # if we already have a lot of games, use default amount
-                num_games = NUM_SELF_PLAY_GAMES
+            #num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
+            # if num_games > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
+            #    pass
+            # else:  # if we already have a lot of games, use default amount
+            num_games = NUM_SELF_PLAY_GAMES
             LOGGER.info("Playing %d games.", num_games)
             self.play_one_generation_of_games(
                 self.neural_net, generation=generation, num_games=num_games)
@@ -100,8 +100,9 @@ class TrainRL:
             num_games (int, optional): Number of games to play. Defaults to NUM_SELF_PLAY_GAMES.
         """
         spc = PlayGames(neural_net)
+        minimum_score = 0 if self.game_scores.size == 0 else self.game_scores.min()
         states, heads, scores, ids, moves = spc.play_games(
-            start_id=self.game_id, num_games=num_games, minimum_score=self.mean_score)
+            start_id=self.game_id, num_games=num_games, minimum_score=minimum_score)
         self.game_id += num_games
         LOGGER.debug('Moves in this training set:')
         LOGGER.debug("  Up: %d", np.sum(moves[:, Direction.UP.value]))
@@ -153,10 +154,13 @@ class TrainRL:
         purge_num = NUM_SELF_PLAY_GAMES if number_of_games >= NUM_TRAINING_GAMES else 0
 
         # purge worst games or all games below 0 score
+        # the problem with this method is that you get rid of too many at once
+        # ideally I think we just want to purge the worst 500
         purge_score = max(sorted_scores[purge_num], 0) if purge_num > 0 else 0
 
         # get rid of low score games
         valid_idx = np.nonzero(self.game_scores > purge_score)
+
         self.game_ids = self.game_ids[valid_idx]
         self.game_scores = self.game_scores[valid_idx]
         self.game_states = self.game_states[valid_idx]

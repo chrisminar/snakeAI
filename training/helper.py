@@ -11,11 +11,11 @@ from typing import Any, Final, Optional, Type
 
 LOGGER = logging.getLogger("terminal")
 
-GRID_X: Final = 4                # x grid size of snake game
-GRID_Y: Final = 4                # y grid size of snake game
+GRID_X: Final = 6                # x grid size of snake game
+GRID_Y: Final = 6                # y grid size of snake game
 NUM_SELF_PLAY_GAMES: Final = 500  # number of self play games to play
 NUM_PURGE: Final = 500  # number of games to purge every iteration
-NUM_TRAINING_GAMES: Final = 5000  # number of self play games to train on
+NUM_TRAINING_GAMES: Final = 10000  # number of self play games to train on
 VALIDATION_SPLIT: Final = 0.15  # fraction of data to use for validation
 EPOCH_DELTA: Final = 0.001
 MOMENTUM: Final = 0.9
@@ -25,14 +25,14 @@ MAXIMUM_MOVES_WITHOUT_EATING: Final = GRID_X * GRID_Y
 MAXIMUM_TOTAL_MOVES: Final = MAXIMUM_MOVES_WITHOUT_EATING ** 2
 
 SCORE_PER_FOOD: Final = 100  # point modification for eating food
-SCORE_PER_MOVE: Final = 0  # point modificaiton for moving
+SCORE_PER_MOVE: Final = -1  # point modificaiton for moving
 SCORE_PENALTY_FOR_FAILURE: Final = -50  # point modification for dying
 SCORE_FOR_GAME_WIN: Final = 100  # get this many points for winning the game
 
 # Odds of taking a random move to explore while training
 EXPLORATORY_MOVE_FRACTION: Final = 0.1
 
-SAVE_INTERVAL = 25
+SAVE_INTERVAL: Final = 25  # save every x generations
 
 
 class PreProcessedGrid(IntEnum):

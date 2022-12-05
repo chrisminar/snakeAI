@@ -78,7 +78,7 @@ class SnakeHuman(Snake):
         for i in range(self.grid_size_x):
             for j in range(self.grid_size_y):
                 pg.draw.rect(self.pygame_display, self.grid_num_2_color(
-                    self.grid[i, j]), (i*21, j*21, 20, 20))
+                    self.grid[j, i]), (j*21, i*21, 20, 20))
         pg.display.update()
 
 

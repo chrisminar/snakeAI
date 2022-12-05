@@ -60,7 +60,7 @@ class PlayGames:
         """
         num_accepted = 0
         num_played = 0
-        while num_accepted < num_games and not num_played > NUM_TRAINING_GAMES:
+        while num_accepted < num_games and num_played <= NUM_TRAINING_GAMES:
             games = snake(neural_net=self.neural_net,
                           exploratory=exploratory,
                           x_grid_size=GRID_X, y_grid_size=GRID_Y)
@@ -69,7 +69,6 @@ class PlayGames:
             if minimum_score is None or games.score > minimum_score:
                 if len(games.move_list) == 1:
                     continue
-                num_accepted += 1
                 self.game_states.append(np.stack(games.state_list[:-1]))
                 self.heads.append(np.stack(games.head_list[:-1]))
                 self.game_id.append(
@@ -77,6 +76,7 @@ class PlayGames:
                 self.prediction.append(np.array(games.move_list[:-1]))
                 self.scores.append(
                     np.full((len(games.state_list[:-1]), ), games.score))
+                num_accepted += 1
         LOGGER.debug(
             "Played %d games above minimum score in %d attempts", num_accepted, num_played)
 
