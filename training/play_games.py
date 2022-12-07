@@ -101,3 +101,6 @@ def grid_val_to_neural_net(grid_val: int) -> int:
     if grid_val == GridEnum.EMPTY.value:
         return PreProcessedGrid.EMPTY.value
     return PreProcessedGrid.SNAKE.value
+
+
+grid_2_nn = np.vectorize(grid_val_to_neural_net)

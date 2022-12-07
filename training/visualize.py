@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
+from training.helper import GRID_X, GRID_Y
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 
@@ -60,8 +61,8 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> 
         fig = plt.figure()
         for j, game_length in enumerate(game_lengths):
             axis = plt.subplot(2, 2, 1+j)
-            plt.xlim([-0.5, 3.5])
-            plt.ylim([-0.5, 3.5])
+            plt.xlim([-0.5, GRID_X-0.5])
+            plt.ylim([-0.5, GRID_Y-0.5])
             axis.axes.get_yaxis().set_visible(False)
             axis.axes.get_xaxis().set_visible(False)
             if i < game_length:
@@ -109,7 +110,6 @@ def find_best(*, states: npt.NDArray[np.int32],
 """
 from pathlib import Path
 
-from training.visualize import gen_compare, run_a_sample
-run_a_sample(Path('media/saves/generation_75.ckpt'))
-gen_compare((0, 25, 50, 125))
+from training.visualize import gen_compare
+gen_compare((0, 0, 0, 0))
 """

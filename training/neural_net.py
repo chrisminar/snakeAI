@@ -70,9 +70,14 @@ class NeuralNetwork:
         Returns:
             npt.NDArray[np.float32]: Confidence that each direction is the best choice.
         """
-        grid_in = state.reshape(
-            1, state.shape[0], state.shape[1], 1).astype(np.float32)
-        head_in = head.reshape(1, 4).astype(np.float32)
+        if state.ndim == 3:  # evaluating more than one
+            grid_in = state.astype(np.float32)
+            head_in = state.astype(np.float32)
+        else:
+            grid_in = state.reshape(
+                1, state.shape[0], state.shape[1], 1).astype(np.float32)
+            head_in = head.reshape(1, 4).astype(np.float32)
+
         return self.model([grid_in, head_in], training=False)
 
     def compile(self) -> None:
