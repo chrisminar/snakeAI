@@ -2,13 +2,13 @@
 
 import pytest
 
-from snake.snake import Direction
 from snake.snake_reinforcement_learning import SnakeRL
-from training.helper import GRID_X, GRID_Y
+from training.helper import GRID_X, GRID_Y, Direction
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 
 
+# pylint: disable=protected-access
 def test_init() -> None:
     """Initialize neural net and check output layer shape."""
     neural_net = NeuralNetwork()

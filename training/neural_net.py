@@ -31,7 +31,7 @@ class NeuralNetwork:
 
         # grid side
         block_input = keras.Input(
-            shape=(x_size, y_size, 1), name='input_game_state')
+            shape=(y_size, x_size, 1), name='input_game_state')
 
         layer_1 = layers.Conv2D(16, 3, padding='same', activation='relu',
                                 name='l1', kernel_initializer=initializer)(block_input)
@@ -71,14 +71,14 @@ class NeuralNetwork:
             npt.NDArray[np.float32]: Confidence that each direction is the best choice.
         """
         if state.ndim == 3:  # evaluating more than one
-            grid_in = state.astype(np.float32)
-            head_in = state.astype(np.float32)
+            grid_in = state.reshape(*state.shape, 1).astype(np.float32)
+            head_in = head.reshape(*head.shape, 1).astype(np.float32)
         else:
             grid_in = state.reshape(
                 1, state.shape[0], state.shape[1], 1).astype(np.float32)
             head_in = head.reshape(1, 4).astype(np.float32)
 
-        return self.model([grid_in, head_in], training=False)
+        return self.model.predict([grid_in, head_in], verbose=0)
 
     def compile(self) -> None:
         """Compile the neural network."""

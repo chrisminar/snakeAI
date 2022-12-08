@@ -4,9 +4,10 @@ from typing import Callable, List, Tuple, Union
 import numpy as np
 from numpy import typing as npt
 
-from snake.snake import Direction, GridEnum, Snake
+from snake.snake import Snake
 from training.helper import (EXPLORATORY_MOVE_FRACTION,
-                             MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES)
+                             MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES,
+                             Direction, GridEnum)
 from training.neural_net import NeuralNetwork
 
 

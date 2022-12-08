@@ -7,11 +7,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
-from snake.snake import Direction
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
-                             NUM_TRAINING_GAMES, SCORE_PER_FOOD, get_size)
+                             NUM_TRAINING_GAMES, SCORE_PER_FOOD, Direction,
+                             get_size)
 from training.neural_net import NeuralNetwork
-from training.play_games import PlayGames
+from training.play_games import PlayBig, PlayGames
 from training.trainer import train
 
 LOGGER = logging.getLogger("terminal")
@@ -21,7 +21,7 @@ class TrainRL:
     """Reinforcement learning loop."""
 
     def __init__(self) -> None:
-        self.game_states = np.zeros((0, GRID_X, GRID_Y), dtype=np.int32)
+        self.game_states = np.zeros((0, GRID_Y, GRID_X), dtype=np.int32)
         self.game_heads = np.zeros((0, 4), dtype=np.bool8)
         self.game_scores = np.zeros((0,), dtype=np.int32)
         self.game_ids = np.zeros((0,), dtype=np.int32)
@@ -49,6 +49,7 @@ class TrainRL:
             self.play_one_generation_of_games(
                 self.neural_net, generation=generation, num_games=num_games)
             self.trim_game_list()
+            self.neural_net = NeuralNetwork()
             self.neural_net = train(
                 generation, self.game_states, self.game_heads, self.moves)
             self.gen_status_plot(generation)
@@ -99,10 +100,18 @@ class TrainRL:
             generation (int): Generation number.
             num_games (int, optional): Number of games to play. Defaults to NUM_SELF_PLAY_GAMES.
         """
-        spc = PlayGames(neural_net)
-        minimum_score = 0 if self.game_scores.size == 0 else self.game_scores.min()
-        states, heads, scores, ids, moves = spc.play_games(
-            start_id=self.game_id, num_games=num_games, minimum_score=minimum_score)
+        #spc = PlayGames(neural_net)
+        counter = 0
+        while 1:  # play games until a generation has at least one succesful game
+            counter += 1
+            spc = PlayBig(neural_network=neural_net)
+            minimum_score = 0 if self.game_scores.size == 0 else self.game_scores.min()
+            states, heads, scores, ids, moves = spc.play_games(
+                start_id=self.game_id, num_games=num_games, minimum_score=minimum_score, exploratory=True)
+            if ids.size > 0:
+                break
+        LOGGER.debug(
+            "Took %d generations to create a game above the minimum score", counter)
         self.game_id += num_games
         LOGGER.debug('Moves in this training set:')
         LOGGER.debug("  Up: %d", np.sum(moves[:, Direction.UP.value]))
@@ -151,7 +160,8 @@ class TrainRL:
         uni, indices = np.unique(self.game_ids, return_index=True)
         sorted_scores = np.sort(self.game_scores[indices])
         number_of_games = len(uni)
-        purge_num = NUM_SELF_PLAY_GAMES if number_of_games >= NUM_TRAINING_GAMES else 0
+        purge_num = number_of_games - \
+            NUM_TRAINING_GAMES-1 if number_of_games >= NUM_TRAINING_GAMES else 0
 
         # purge worst games or all games below 0 score
         # the problem with this method is that you get rid of too many at once

@@ -4,7 +4,8 @@ from typing import Any, Tuple
 
 import pygame as pg
 
-from snake.snake import GridEnum, Snake
+from snake.snake import Snake
+from training.helper import GridEnum
 
 
 class SnakeHuman(Snake):

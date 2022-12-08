@@ -10,7 +10,7 @@ from numpy import typing as npt
 
 from training.helper import GRID_X, GRID_Y
 from training.neural_net import NeuralNetwork
-from training.play_games import PlayGames
+from training.play_games import PlayBig as PlayGames
 
 LOGGER = logging.getLogger("terminal")
 
@@ -88,28 +88,15 @@ def find_best(*, states: npt.NDArray[np.int32],
     Returns:
         npt.NDArray[np.int32]: Best game state.
     """
-    # get indexes
-    idx_start = np.argmax(scores)
-    idx = idx_start
-    index = []
-    flag = True
-    while flag:
-        index.append(idx)
-        idx += 1
-        if idx >= len(scores):
-            flag = False
-        elif ids[idx] != ids[idx_start]:
-            flag = False
-
-    mask = np.zeros(len(ids), dtype=np.bool8)
-    mask[index] = True
-    state = states[mask]
-    return state
+    best_index = np.argmax(scores)
+    best_id = ids[best_index]
+    best_game_indicies = ids == best_id
+    return states[best_game_indicies]
 
 
 """
 from pathlib import Path
 
 from training.visualize import gen_compare
-gen_compare((0, 0, 0, 0))
+gen_compare((0, 0, 25, 25))
 """

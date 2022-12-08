@@ -3,8 +3,8 @@
 import numpy as np
 import pytest
 
-from snake.snake import Direction, GridEnum, Snake
-from training.helper import GRID_X, GRID_Y
+from snake.snake import Snake
+from training.helper import GRID_X, GRID_Y, Direction, GridEnum
 
 
 # pylint: disable=protected-access

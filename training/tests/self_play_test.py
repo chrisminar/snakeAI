@@ -2,8 +2,7 @@
 
 import numpy as np
 
-from snake.snake import GridEnum
-from training.helper import PreProcessedGrid
+from training.helper import GridEnum, PreProcessedGrid
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 

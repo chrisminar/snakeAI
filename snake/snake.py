@@ -2,30 +2,13 @@
 
 import random
 from abc import ABCMeta, abstractmethod
-from enum import IntEnum
 from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 
 from training.helper import (GRID_X, GRID_Y, SCORE_FOR_GAME_WIN,
                              SCORE_PENALTY_FOR_FAILURE, SCORE_PER_FOOD,
-                             SCORE_PER_MOVE)
-
-
-class GridEnum(IntEnum):
-    """Grid cell meanings."""
-    FOOD = -2  # grid value that represents food
-    EMPTY = -1  # grid value that represents an empty space
-    HEAD = 0  # grid value that represents the head
-    BODY = 1  # grid value that represents the body
-
-
-class Direction(IntEnum):
-    """2d direction enumerators."""
-    UP = 0
-    RIGHT = 1
-    DOWN = 2
-    LEFT = 3
+                             SCORE_PER_MOVE, Direction, GridEnum)
 
 
 class Snake(metaclass=ABCMeta):
