@@ -8,9 +8,9 @@ from numpy import typing as npt
 
 from snake.big_snake import ParSnake as BigSnake
 from snake.snake_reinforcement_learning import SnakeRL as snake
-from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
-                             NUM_TRAINING_GAMES, USE_EXPLORATION_CUTOFF,
-                             GridEnum, grid_2_nn)
+from training.helper import (GENERATION_SIZE, GRID_X, GRID_Y,
+                             NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
+                             USE_EXPLORATION_CUTOFF, GridEnum, grid_2_nn)
 from training.neural_net import NeuralNetwork
 
 LOGGER = logging.getLogger("terminal")
@@ -127,7 +127,7 @@ class PlayBig:
         game_player = BigSnake(neural_net=self.neural_net,
                                exploratory=exploratory and (
                                    minimum_score is not None and minimum_score < USE_EXPLORATION_CUTOFF),
-                               num_games=NUM_TRAINING_GAMES)
+                               num_games=GENERATION_SIZE)
         game_player.play()
         state, head, score, game_id, move = game_player.aggregate_results()
 

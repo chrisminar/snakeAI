@@ -1,6 +1,8 @@
 """Reinforcement learning."""
 
 import logging
+import re
+from pathlib import Path
 from typing import List, Sequence
 
 import numpy as np
@@ -20,13 +22,24 @@ LOGGER = logging.getLogger("terminal")
 class TrainRL:
     """Reinforcement learning loop."""
 
-    def __init__(self) -> None:
+    def __init__(self, minimum: int = 0) -> None:
+        self.minimum = minimum
         self.game_states = np.zeros((0, GRID_Y, GRID_X), dtype=np.int32)
         self.game_heads = np.zeros((0, 4), dtype=np.bool8)
         self.game_scores = np.zeros((0,), dtype=np.int32)
         self.game_ids = np.zeros((0,), dtype=np.int32)
         self.moves = np.zeros((0, 4), dtype=np.float32)
+        saves = list(Path("./media/saves").glob("*.ckpt"))
         self.neural_net = NeuralNetwork()
+        self.generation = 0
+        if len(saves) > 0:
+            biggest_generation = max(
+                [int(re.findall(r'\d+', save.name)[0]) for save in saves])
+            biggest_path = Path(
+                f"./media/saves/generation_{biggest_generation}.ckpt")
+            self.neural_net.load(biggest_path)
+            self.generation = biggest_generation
+            LOGGER.debug("Loaded checkpoint %d", biggest_generation)
         self.game_id = 0
         self.mean_score = -SCORE_PER_FOOD
         self.mean_scores: List[int] = []
@@ -35,21 +48,20 @@ class TrainRL:
 
     def train(self) -> None:
         """Training loop."""
-        generation = 0
+        generation = self.generation
         while 1:
             LOGGER.info("")
             LOGGER.info("")
             LOGGER.info("Generation %d", generation)
-            #num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
-            # if num_games > NUM_SELF_PLAY_GAMES:  # if we need many more games, play many more games
-            #    pass
-            # else:  # if we already have a lot of games, use default amount
-            num_games = NUM_SELF_PLAY_GAMES
+            num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
+            if ((generation+1) % 10) == 0:
+                num_games = max(num_games / 5, NUM_TRAINING_GAMES / 5)
+            else:  # if we already have a lot of games, use default amount
+                num_games = NUM_SELF_PLAY_GAMES
             LOGGER.info("Playing %d games.", num_games)
             self.play_one_generation_of_games(
                 self.neural_net, generation=generation, num_games=num_games)
             self.trim_game_list()
-            self.neural_net = NeuralNetwork()
             self.neural_net = train(
                 generation, self.game_states, self.game_heads, self.moves)
             self.gen_status_plot(generation)
@@ -102,14 +114,28 @@ class TrainRL:
         """
         #spc = PlayGames(neural_net)
         counter = 0
-        while 1:  # play games until a generation has at least one succesful game
-            counter += 1
-            spc = PlayBig(neural_network=neural_net)
-            minimum_score = 0 if self.game_scores.size == 0 else self.game_scores.min()
+        state_l = []
+        head_l = []
+        scores_l = []
+        ids_l = []
+        moves_l = []
+
+        spc = PlayBig(neural_network=neural_net)
+        minimum_score = self.minimum if self.game_scores.size == 0 else self.game_scores.min()
+
+        while counter < num_games:  # play games until a generation has at least one succesful game
             states, heads, scores, ids, moves = spc.play_games(
                 start_id=self.game_id, num_games=num_games, minimum_score=minimum_score, exploratory=True)
-            if ids.size > 0:
-                break
+
+            counter += len(np.unique(ids))
+            self.game_id += counter
+
+            state_l.append(states)
+            head_l.append(heads)
+            scores_l.append(scores)
+            ids_l.append(ids)
+            moves_l.append(moves)
+
         LOGGER.debug(
             "Took %d generations to create a game above the minimum score", counter)
         self.game_id += num_games
@@ -118,8 +144,12 @@ class TrainRL:
         LOGGER.debug("  Right: %d", np.sum(moves[:, Direction.RIGHT.value]))
         LOGGER.debug("  Down: %d", np.sum(moves[:, Direction.DOWN.value]))
         LOGGER.debug("  Left: %d", np.sum(moves[:, Direction.LEFT.value]))
-        self.add_games_to_list(states=states, heads=heads, scores=scores,
-                               ids=ids, moves=moves, generation=generation)
+        self.add_games_to_list(states=np.concatenate(state_l),
+                               heads=np.concatenate(head_l),
+                               scores=np.concatenate(scores_l),
+                               ids=np.concatenate(ids_l),
+                               moves=np.concatenate(moves_l),
+                               generation=generation)
 
     def add_games_to_list(self,
                           *,
@@ -161,7 +191,7 @@ class TrainRL:
         sorted_scores = np.sort(self.game_scores[indices])
         number_of_games = len(uni)
         purge_num = number_of_games - \
-            NUM_TRAINING_GAMES-1 if number_of_games >= NUM_TRAINING_GAMES else 0
+            NUM_TRAINING_GAMES if number_of_games >= NUM_TRAINING_GAMES else 0
 
         # purge worst games or all games below 0 score
         # the problem with this method is that you get rid of too many at once

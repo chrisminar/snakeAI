@@ -22,5 +22,5 @@ LOGGER.propagate = False  # prevent keras from doing annoying things with the lo
 
 
 if __name__ == "__main__":
-    trainer = TrainRL()
+    trainer = TrainRL(0)
     trainer.train()

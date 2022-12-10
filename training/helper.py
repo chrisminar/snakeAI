@@ -13,11 +13,12 @@ import numpy as np
 
 LOGGER = logging.getLogger("terminal")
 
-GRID_X: Final = 4                # x grid size of snake game
-GRID_Y: Final = 4                # y grid size of snake game
+GRID_X: Final = 6                # x grid size of snake game
+GRID_Y: Final = 6                # y grid size of snake game
 NUM_SELF_PLAY_GAMES: Final = 500  # number of self play games to play
+GENERATION_SIZE: Final = 20000
 NUM_PURGE: Final = 500  # number of games to purge every iteration
-NUM_TRAINING_GAMES: Final = 5000  # number of self play games to train on
+NUM_TRAINING_GAMES: Final = 10000  # number of self play games to train on
 VALIDATION_SPLIT: Final = 0.15  # fraction of data to use for validation
 EPOCH_DELTA: Final = 0.001
 MOMENTUM: Final = 0.9
