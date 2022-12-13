@@ -78,7 +78,7 @@ class PlayGames:
                 self.scores.append(
                     np.full((len(games.state_list[:-1]), ), games.score))
                 num_accepted += 1
-        LOGGER.debug(
+        LOGGER.info(
             "Played %d games above minimum score in %d attempts", num_accepted, num_played)
 
         return (self.gamestate_to_nn(np.concatenate(self.game_states)),

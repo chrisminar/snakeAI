@@ -3,17 +3,17 @@
 import logging
 import re
 from pathlib import Path
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
-                             NUM_TRAINING_GAMES, SCORE_PER_FOOD, Direction,
-                             get_size)
+                             NUM_TRAINING_GAMES, SAVE_INTERVAL, SCORE_PER_FOOD,
+                             Direction, get_size)
 from training.neural_net import NeuralNetwork
-from training.play_games import PlayBig, PlayGames
+from training.play_games import PlayBig
 from training.trainer import train
 
 LOGGER = logging.getLogger("terminal")
@@ -31,6 +31,7 @@ class TrainRL:
         self.moves = np.zeros((0, 4), dtype=np.float32)
         saves = list(Path("./media/saves").glob("*.ckpt"))
         self.neural_net = NeuralNetwork()
+        self.best_neural_net = NeuralNetwork()
         self.generation = 0
         if len(saves) > 0:
             biggest_generation = max(
@@ -38,11 +39,17 @@ class TrainRL:
             biggest_path = Path(
                 f"./media/saves/generation_{biggest_generation}.ckpt")
             self.neural_net.load(biggest_path)
+            self.best_neural_net.load(biggest_path)
             self.generation = biggest_generation
             LOGGER.debug("Loaded checkpoint %d", biggest_generation)
         self.game_id = 0
-        self.mean_score = -SCORE_PER_FOOD
-        self.mean_scores: List[int] = []
+        # mean score of all games in training set
+        self.mean_training_score = -SCORE_PER_FOOD
+        self.mean_score = -SCORE_PER_FOOD  # mean score of the last set of games
+        # mean scores of each set of games
+        self.mean_generation_scores: List[int] = []
+        # mean score of all games in training set
+        self.training_mean_scores: List[int] = []
         self.games_used: List[int] = []
         self.max_scores: List[int] = []
 
@@ -53,18 +60,23 @@ class TrainRL:
             LOGGER.info("")
             LOGGER.info("")
             LOGGER.info("Generation %d", generation)
-            num_games = NUM_TRAINING_GAMES - len(np.unique(self.game_ids))
-            if ((generation+1) % 10) == 0:
-                num_games = max(num_games / 5, NUM_TRAINING_GAMES / 5)
-            else:  # if we already have a lot of games, use default amount
-                num_games = NUM_SELF_PLAY_GAMES
-            LOGGER.info("Playing %d games.", num_games)
-            self.play_one_generation_of_games(
-                self.neural_net, generation=generation, num_games=num_games)
-            self.trim_game_list()
+            self.play_n_games(
+                generation=generation, num_games=NUM_SELF_PLAY_GAMES)
+            # purge_num = len(np.unique(self.game_ids)) * 2.5 / \
+            #    5 if ((generation+1) %
+            #          10) == 0 else max(len(np.unique(self.game_ids)) - NUM_TRAINING_GAMES, NUM_SELF_PLAY_GAMES)
+            purge_num = max(len(np.unique(self.game_ids)) -
+                            NUM_TRAINING_GAMES, NUM_SELF_PLAY_GAMES)
+            self.trim_game_list(int(purge_num))
             self.neural_net = train(
                 generation, self.game_states, self.game_heads, self.moves)
             self.gen_status_plot(generation)
+            if generation % SAVE_INTERVAL == 0:
+                p = Path(f"./media/saves/generation_{generation}.ckpt")
+                self.game_states.tofile(p/"states.bin")
+                self.game_heads.tofile(p/"heads.bin")
+                self.moves.tofile(p/"moves.bin")
+
             generation += 1
 
     def gen_status_plot(self, generation: int) -> None:
@@ -75,7 +87,9 @@ class TrainRL:
         """
         fig = plt.figure()
         plt.subplot(3, 1, 1)
-        plt.plot(self.mean_scores)
+        plt.plot(self.training_mean_scores, label="Training")
+        plt.plot(self.mean_generation_scores, label="Generation")
+        plt.legend(loc="best")
         plt.title('Mean Score')
 
         plt.subplot(3, 1, 2)
@@ -104,15 +118,13 @@ class TrainRL:
         fig.savefig(f'media/hists/generation_{generation}.png')
         plt.close()
 
-    def play_one_generation_of_games(self, neural_net: NeuralNetwork, *, generation: int, num_games: int = NUM_SELF_PLAY_GAMES) -> None:
+    def play_n_games(self, *, generation: int, num_games: int = NUM_SELF_PLAY_GAMES) -> None:
         """Play one generation worth of snake games.
 
         Args:
-            neural_net (NeuralNetwork): Neural network to play games with.
             generation (int): Generation number.
             num_games (int, optional): Number of games to play. Defaults to NUM_SELF_PLAY_GAMES.
         """
-        #spc = PlayGames(neural_net)
         counter = 0
         state_l = []
         head_l = []
@@ -120,10 +132,32 @@ class TrainRL:
         ids_l = []
         moves_l = []
 
-        spc = PlayBig(neural_network=neural_net)
+        spc = PlayBig(neural_network=self.neural_net)
+
         minimum_score = self.minimum if self.game_scores.size == 0 else self.game_scores.min()
 
-        while counter < num_games:  # play games until a generation has at least one succesful game
+        # play one set with last neural net
+        states, heads, scores, ids, moves, count = self.play_one_set_of_games(
+            self.neural_net, minimum_score=minimum_score)
+        state_l.append(states)
+        head_l.append(heads)
+        scores_l.append(scores)
+        ids_l.append(ids)
+        moves_l.append(moves)
+        counter += count
+        _, indices = np.unique(ids, return_index=True)
+        mean_score = np.mean(scores[indices])
+        try:
+            max_score = max(self.mean_generation_scores)
+        except ValueError:
+            max_score = self.mean_score
+        if mean_score > max_score:
+            LOGGER.info("New best neural net created (%02f -> %02f).",
+                        max_score, mean_score)
+            self.best_neural_net = self.neural_net
+
+        spc = PlayBig(neural_network=self.best_neural_net)
+        while counter < num_games:
             states, heads, scores, ids, moves = spc.play_games(
                 start_id=self.game_id, num_games=num_games, minimum_score=minimum_score, exploratory=True)
 
@@ -135,21 +169,38 @@ class TrainRL:
             scores_l.append(scores)
             ids_l.append(ids)
             moves_l.append(moves)
+            LOGGER.info("%d games so far.", counter)
 
-        LOGGER.debug(
-            "Took %d generations to create a game above the minimum score", counter)
-        self.game_id += num_games
-        LOGGER.debug('Moves in this training set:')
-        LOGGER.debug("  Up: %d", np.sum(moves[:, Direction.UP.value]))
-        LOGGER.debug("  Right: %d", np.sum(moves[:, Direction.RIGHT.value]))
-        LOGGER.debug("  Down: %d", np.sum(moves[:, Direction.DOWN.value]))
-        LOGGER.debug("  Left: %d", np.sum(moves[:, Direction.LEFT.value]))
         self.add_games_to_list(states=np.concatenate(state_l),
                                heads=np.concatenate(head_l),
                                scores=np.concatenate(scores_l),
                                ids=np.concatenate(ids_l),
                                moves=np.concatenate(moves_l),
                                generation=generation)
+
+    def play_one_set_of_games(self, neural_net: NeuralNetwork, *, minimum_score: int) -> Tuple[npt.NDArray[np.int32],
+                                                                                               npt.NDArray[np.bool8],
+                                                                                               npt.NDArray[np.int32],
+                                                                                               npt.NDArray[np.int32],
+                                                                                               npt.NDArray[np.float32],
+                                                                                               int]:
+        """Play one generation worth of snake games.
+
+        Args:
+            neural_net: (NeuralNetwork):
+            generation (int): Generation number.
+        """
+        # spc = PlayGames(neural_net)
+
+        spc = PlayBig(neural_network=neural_net)
+
+        states, heads, scores, ids, moves = spc.play_games(
+            start_id=self.game_id, minimum_score=minimum_score, exploratory=True)
+
+        counter = len(np.unique(ids))
+
+        self.game_id += counter
+        return states, heads, scores, ids, moves, counter
 
     def add_games_to_list(self,
                           *,
@@ -185,13 +236,11 @@ class TrainRL:
         self.game_ids = np.concatenate((self.game_ids, ids))
         self.moves = np.concatenate((self.moves, moves))
 
-    def trim_game_list(self) -> None:
+    def trim_game_list(self, purge_num: int) -> None:
         """Remove lowest scoring games from game list."""
         uni, indices = np.unique(self.game_ids, return_index=True)
         sorted_scores = np.sort(self.game_scores[indices])
         number_of_games = len(uni)
-        purge_num = number_of_games - \
-            NUM_TRAINING_GAMES if number_of_games >= NUM_TRAINING_GAMES else 0
 
         # purge worst games or all games below 0 score
         # the problem with this method is that you get rid of too many at once
@@ -200,6 +249,8 @@ class TrainRL:
 
         # get rid of low score games
         valid_idx = np.nonzero(self.game_scores > purge_score)
+        LOGGER.info("Keeping %d games out of %d", np.sum(
+            sorted_scores > purge_score), len(sorted_scores))
 
         self.game_ids = self.game_ids[valid_idx]
         self.game_scores = self.game_scores[valid_idx]
@@ -210,18 +261,19 @@ class TrainRL:
         # update tracking statistics
         uni, indices = np.unique(self.game_ids, return_index=True)
         number_of_games = len(uni)
-        self.mean_score = np.mean(self.game_scores[indices])
-        self.mean_scores.append(self.mean_score)
+        self.mean_generation_scores.append(self.mean_score)
+        self.training_mean_scores.append(np.mean(self.game_scores[indices]))
         self.games_used.append(number_of_games)
         self.max_scores.append(np.max(self.game_scores))
         try:
+            LOGGER.info("Training mean score: %02f -> %02f",
+                        self.training_mean_scores[-2], self.training_mean_scores[-1])
             LOGGER.info("Generation mean score: %02f -> %02f",
-                        self.mean_scores[-2], self.mean_scores[-1])
+                        self.mean_generation_scores[-2], self.mean_generation_scores[-1])
             LOGGER.info("Generation maximum score: %02f -> %02f",
                         self.max_scores[-2], self.max_scores[-1])
         except IndexError:
             pass  # don't print previous score
-        LOGGER.info("Games in training set: %d", self.games_used[-1])
 
     def print_size_info(self) -> None:
         """Print size of various members."""

@@ -13,10 +13,10 @@ import numpy as np
 
 LOGGER = logging.getLogger("terminal")
 
-GRID_X: Final = 6                # x grid size of snake game
-GRID_Y: Final = 6                # y grid size of snake game
+GRID_X: Final = 4                # x grid size of snake game
+GRID_Y: Final = 4                # y grid size of snake game
 NUM_SELF_PLAY_GAMES: Final = 500  # number of self play games to play
-GENERATION_SIZE: Final = 20000
+GENERATION_SIZE: Final = 50000
 NUM_PURGE: Final = 500  # number of games to purge every iteration
 NUM_TRAINING_GAMES: Final = 10000  # number of self play games to train on
 VALIDATION_SPLIT: Final = 0.15  # fraction of data to use for validation
@@ -24,7 +24,7 @@ EPOCH_DELTA: Final = 0.001
 MOMENTUM: Final = 0.9
 BATCH_SIZE: Final = 64
 EPOCHS: Final = 10
-MAXIMUM_MOVES_WITHOUT_EATING: Final = GRID_X * GRID_Y
+MAXIMUM_MOVES_WITHOUT_EATING: Final = GRID_X * GRID_Y * 2
 MAXIMUM_TOTAL_MOVES: Final = MAXIMUM_MOVES_WITHOUT_EATING ** 2
 
 SCORE_PER_FOOD: Final = 100  # point modification for eating food
@@ -35,9 +35,9 @@ SCORE_FOR_GAME_WIN: Final = 100  # get this many points for winning the game
 # Odds of taking a random move to explore while training
 EXPLORATORY_MOVE_FRACTION: Final = 0.1
 
-SAVE_INTERVAL: Final = 25  # save every x generations
+SAVE_INTERVAL: Final = 10  # save every x generations
 
-USE_EXPLORATION_CUTOFF: Final = 200
+USE_EXPLORATION_CUTOFF: Final = 1000
 
 
 class GridEnum(IntEnum):
@@ -128,7 +128,7 @@ class Timer:
         self.end = time.perf_counter()
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
-        LOGGER.debug('%s elapsed time %03f', self.name, self.secs)
+        LOGGER.info('%s elapsed time %03f', self.name, self.secs)
 
 
 def grid_val_to_neural_net(grid_val: int) -> int:
