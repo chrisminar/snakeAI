@@ -7,20 +7,20 @@ import time
 from enum import IntEnum
 from gc import get_referents
 from types import FunctionType, ModuleType
-from typing import Any, Final, Optional, Tuple, Type
+from typing import Any, Final, Optional, Sequence, Tuple, Type
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 LOGGER = logging.getLogger("terminal")
 
 GRID_X: Final = 4                # x grid size of snake game
 GRID_Y: Final = 4                # y grid size of snake game
 NUM_SELF_PLAY_GAMES: Final = 500  # number of self play games to play
-GENERATION_SIZE: Final = 50000
-NUM_PURGE: Final = 500  # number of games to purge every iteration
+NUM_GAMES_PER_BATCH: Final = 10000
 NUM_TRAINING_GAMES: Final = 10000  # number of self play games to train on
 VALIDATION_SPLIT: Final = 0.15  # fraction of data to use for validation
-EPOCH_DELTA: Final = 0.001
+EPOCH_DELTA: Final = 0.0001
 MOMENTUM: Final = 0.9
 BATCH_SIZE: Final = 64
 EPOCHS: Final = 10
@@ -77,6 +77,40 @@ class PreProcessedGrid(IntEnum):
     FOOD = -1
 
 
+def gen_histogram(*, scores: Sequence[np.int32], generation: int) -> None:
+    """Plot histogram of game scores.
+
+    Args:
+        unique (npt.NDArray[np.int32]): Game scores
+        generation (int): Most recent generation.
+    """
+    fig = plt.figure()
+    plt.title(f'Generation {generation}')
+    plt.hist(scores, bins=np.arange(start=-SCORE_PER_FOOD, stop=(
+        GRID_X*GRID_Y+1)*SCORE_PER_FOOD, step=SCORE_PER_FOOD))
+    plt.yscale('log', nonpositive='clip')
+    fig.savefig(f'media/hists/generation_{generation}.png')
+    plt.close()
+
+
+def get_perf(scores, ids, gen, plot: bool = True) -> float:
+    """Access performance.
+
+    Args:
+        scores (_type_): Game scores
+        ids (_type_): game ids
+        gen (_type_): Generation
+        plot (bool, optional): Should it be plotted. Defaults to True.
+
+    Returns:
+        float: mean value
+    """
+    _, idx = np.unique(ids, return_index=True)
+    if plot:
+        gen_histogram(scores=scores[idx], generation=gen)
+    return np.mean(scores[idx])
+
+
 def get_size(obj: Any) -> int:
     """Size of object.
 
@@ -131,7 +165,7 @@ class Timer:
         LOGGER.info('%s elapsed time %03f', self.name, self.secs)
 
 
-def grid_val_to_neural_net(grid_val: int) -> int:
+def grid_val_to_neural_net(grid_val: np.int32) -> np.int32:
     """Convert input snake grid value to nn value.
 
     Args:
@@ -141,10 +175,10 @@ def grid_val_to_neural_net(grid_val: int) -> int:
         int: Pre-processed grid cell value.
     """
     if grid_val == GridEnum.FOOD.value:
-        return PreProcessedGrid.FOOD.value
+        return np.int32(PreProcessedGrid.FOOD.value)
     if grid_val == GridEnum.EMPTY.value:
-        return PreProcessedGrid.EMPTY.value
-    return PreProcessedGrid.SNAKE.value
+        return np.int32(PreProcessedGrid.EMPTY.value)
+    return np.int32(PreProcessedGrid.SNAKE.value)
 
 
 grid_2_nn = np.vectorize(grid_val_to_neural_net)

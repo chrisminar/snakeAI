@@ -11,7 +11,8 @@ from training.neural_net import NeuralNetwork
 def train(generation: int,
           game_states: npt.NDArray[np.int32],
           heads: npt.NDArray[np.bool8],
-          move_predictions: npt.NDArray[np.float32]) -> NeuralNetwork:
+          move_predictions: npt.NDArray[np.float32],
+          verbose: int = 0) -> NeuralNetwork:
     """Permute input data and train on it.
 
     Args:
@@ -30,11 +31,11 @@ def train(generation: int,
             states=game_states, predictions=move_predictions, heads=heads)
 
         permuted_states = np.reshape(
-            permuted_states, (permuted_states.shape[0], permuted_states.shape[1], permuted_states.shape[1], 1))
+            permuted_states, (permuted_states.shape[0], permuted_states.shape[1], permuted_states.shape[2], 1))
 
         # train on permutations
         neural_net.train(states=permuted_states, heads=permuted_heads,
-                         predictions=permuted_predictions, generation=generation)
+                         predictions=permuted_predictions, generation=generation, verbose=verbose)
     return neural_net
 
 

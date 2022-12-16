@@ -11,7 +11,7 @@ from numpy import typing as npt
 
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
                              NUM_TRAINING_GAMES, SAVE_INTERVAL, SCORE_PER_FOOD,
-                             Direction, get_size)
+                             gen_histogram, get_size)
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayBig
 from training.trainer import train
@@ -72,10 +72,10 @@ class TrainRL:
                 generation, self.game_states, self.game_heads, self.moves)
             self.gen_status_plot(generation)
             if generation % SAVE_INTERVAL == 0:
-                p = Path(f"./media/saves/generation_{generation}.ckpt")
-                self.game_states.tofile(p/"states.bin")
-                self.game_heads.tofile(p/"heads.bin")
-                self.moves.tofile(p/"moves.bin")
+                gen_path = Path(f"./media/saves/generation_{generation}.ckpt")
+                self.game_states.tofile(gen_path/"states.bin")
+                self.game_heads.tofile(gen_path/"heads.bin")
+                self.moves.tofile(gen_path/"moves.bin")
 
             generation += 1
 
@@ -105,19 +105,6 @@ class TrainRL:
         fig.savefig('media/pictures/mostrecent.png')
         plt.close()
 
-    def gen_histogram(self, *, scores: Sequence[np.int32], generation: int) -> None:
-        """Plot histogram of game scores.
-
-        Args:
-            unique (npt.NDArray[np.int32]): Game scores
-            generation (int): Most recent generation.
-        """
-        fig = plt.figure()
-        plt.title(f'Generation {generation}')
-        plt.hist(scores, bins=np.arange(start=0, stop=1700, step=100))
-        fig.savefig(f'media/hists/generation_{generation}.png')
-        plt.close()
-
     def play_n_games(self, *, generation: int, num_games: int = NUM_SELF_PLAY_GAMES) -> None:
         """Play one generation worth of snake games.
 
@@ -132,11 +119,10 @@ class TrainRL:
         ids_l = []
         moves_l = []
 
-        spc = PlayBig(neural_network=self.neural_net)
-
+        # update minimum allowable score for this generation
         minimum_score = self.minimum if self.game_scores.size == 0 else self.game_scores.min()
 
-        # play one set with last neural net
+        # play one set with last neural net to check if best neural net has been created
         states, heads, scores, ids, moves, count = self.play_one_set_of_games(
             self.neural_net, minimum_score=minimum_score)
         state_l.append(states)
@@ -145,31 +131,33 @@ class TrainRL:
         ids_l.append(ids)
         moves_l.append(moves)
         counter += count
+
+        # compute mean score
         _, indices = np.unique(ids, return_index=True)
         mean_score = np.mean(scores[indices])
-        try:
-            max_score = max(self.mean_generation_scores)
-        except ValueError:
-            max_score = self.mean_score
+
+        # get maximum score
+        max_score = self.get_maximum_generation_score()
+
+        # consider updating best neural net
         if mean_score > max_score:
             LOGGER.info("New best neural net created (%02f -> %02f).",
                         max_score, mean_score)
             self.best_neural_net = self.neural_net
 
-        spc = PlayBig(neural_network=self.best_neural_net)
+        # run games until desired number of games above minimum score have been run
         while counter < num_games:
-            states, heads, scores, ids, moves = spc.play_games(
-                start_id=self.game_id, num_games=num_games, minimum_score=minimum_score, exploratory=True)
+            LOGGER.info("%d games so far.", counter)
+            states, heads, scores, ids, moves, num_added = self.play_one_set_of_games(
+                neural_net=self.best_neural_net, minimum_score=minimum_score)
 
-            counter += len(np.unique(ids))
-            self.game_id += counter
+            counter += num_added
 
             state_l.append(states)
             head_l.append(heads)
             scores_l.append(scores)
             ids_l.append(ids)
             moves_l.append(moves)
-            LOGGER.info("%d games so far.", counter)
 
         self.add_games_to_list(states=np.concatenate(state_l),
                                heads=np.concatenate(head_l),
@@ -177,6 +165,17 @@ class TrainRL:
                                ids=np.concatenate(ids_l),
                                moves=np.concatenate(moves_l),
                                generation=generation)
+
+    def get_maximum_generation_score(self) -> int:
+        """Return maximum score atained by a training of the neural network.
+
+        Returns:
+            int: Maximum score.
+        """
+        try:
+            return max(self.mean_generation_scores)
+        except ValueError:
+            return self.mean_score
 
     def play_one_set_of_games(self, neural_net: NeuralNetwork, *, minimum_score: int) -> Tuple[npt.NDArray[np.int32],
                                                                                                npt.NDArray[np.bool8],
@@ -190,8 +189,6 @@ class TrainRL:
             neural_net: (NeuralNetwork):
             generation (int): Generation number.
         """
-        # spc = PlayGames(neural_net)
-
         spc = PlayBig(neural_network=neural_net)
 
         states, heads, scores, ids, moves = spc.play_games(
@@ -226,7 +223,7 @@ class TrainRL:
         self.mean_score = np.mean(scores[indices])
 
         if make_histogram:
-            self.gen_histogram(scores=scores[indices], generation=generation)
+            gen_histogram(scores=scores[indices], generation=generation)
 
         self.game_states = np.concatenate(
             (self.game_states, states))

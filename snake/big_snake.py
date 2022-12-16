@@ -43,6 +43,8 @@ class ParSnake:
         self.grid0 = np.arange(num_games, dtype=np.int32)  # for indexing grid0
         self.lengths = np.zeros((num_games,), dtype=np.int32)
         self.grid[self.grid0, self.heads_y, self.heads_x] = GridEnum.HEAD.value
+        # Last move taken (-1 means no move taken)
+        self.last_move = np.full_like(self.lengths, -1)
 
         # scoring
         self.scores = np.zeros_like(self.lengths)
@@ -101,6 +103,8 @@ class ParSnake:
         Args:
             directions (npt.NDArray[np.int32]): Direction for each snake to move.
         """
+        self.last_move = directions.copy()
+
         self._snake_head_tracker_update(directions)
 
         if self.games_over:
@@ -201,6 +205,7 @@ class ParSnake:
         self.heads_x = self.heads_x[games_to_keep]
         self.heads_y = self.heads_y[games_to_keep]
         self.lengths = self.lengths[games_to_keep]
+        self.last_move = self.last_move[games_to_keep]
         self.scores = self.scores[games_to_keep]
         self.num_moves = self.num_moves[games_to_keep]
         self.moves_since_food = self.moves_since_food[games_to_keep]
@@ -307,23 +312,27 @@ class ParSnake:
         left_ok = np.logical_and(self.heads_x > 0,
                                  self.grid[self.grid0, self.heads_y,
                                            self.heads_x-1] < GridEnum.HEAD.value)
+        left_ok = left_ok & (self.last_move != Direction.RIGHT.value)
         is_free[left_ok, Direction.LEFT.value] = 1
 
         # is right empty or food
         right_ok = self.heads_x < self.grid_size_x - 1
         right_ok[right_ok] = self.grid[self.grid0[right_ok], self.heads_y[right_ok],
                                        self.heads_x[right_ok]+1] < GridEnum.HEAD.value
+        right_ok = right_ok & (self.last_move != Direction.LEFT.value)
         is_free[right_ok, Direction.RIGHT.value] = 1
 
         # is above empty or food
         up_ok = np.logical_and(self.heads_y > 0, self.grid[self.grid0, self.heads_y -
                                                            1, self.heads_x] < GridEnum.HEAD.value)
+        up_ok = up_ok & (self.last_move != Direction.DOWN.value)
         is_free[up_ok, Direction.UP.value] = 1
 
         # is below empty or food
         down_ok = self.heads_y < self.grid_size_y - 1
         down_ok[down_ok] = self.grid[self.grid0[down_ok], self.heads_y[down_ok]+1,
                                      self.heads_x[down_ok]] < GridEnum.HEAD.value
+        down_ok = down_ok & (self.last_move != Direction.UP.value)
         is_free[down_ok, Direction.DOWN.value] = 1
 
         return is_free

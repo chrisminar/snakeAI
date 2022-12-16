@@ -92,7 +92,8 @@ class NeuralNetwork:
               states: npt.NDArray[np.int32],
               heads: npt.NDArray[np.bool8],
               predictions: npt.NDArray[np.float32],
-              generation: int) -> None:
+              generation: int,
+              verbose:int) -> None:
         """Train the weights and biases of the neural network.
 
         Args:
@@ -101,14 +102,17 @@ class NeuralNetwork:
             predictions (npt.NDArray[np.float32]): The move that was chosen at each state.
             generation (int): Neural net generation for this training session.
         """
-        callback = tf.keras.callbacks.EarlyStopping(
-            monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1)
-        self.model.fit({'input_game_state': states, 'input_head': heads}, {'mult': predictions},
+        if not 0 <= verbose <= 2:
+            raise ValueError("Verbosity must be 0,1,or 2.")
+        #callback = tf.keras.callbacks.EarlyStopping(
+        #    monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1)
+        history=self.model.fit({'input_game_state': states, 'input_head': heads}, {'mult': predictions},
                        batch_size=BATCH_SIZE,
                        epochs=EPOCHS,
                        validation_split=VALIDATION_SPLIT,
-                       verbose=0,
-                       callbacks=[callback])
+                       verbose=verbose)#,
+                       #callbacks=[callback])
+        
         self.save(generation)
 
     def disp_model(self) -> None:
@@ -135,3 +139,4 @@ class NeuralNetwork:
             path (Path): Path to neural network save file.
         """
         self.model = keras.models.load_model(path)
+        

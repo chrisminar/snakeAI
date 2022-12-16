@@ -9,6 +9,7 @@ from numpy import typing as npt
 from snake.big_snake import (ParSnake, choose_valids, directions_to_tuples,
                              get_random_valid)
 from training.helper import GRID_X, GRID_Y, SCORE_PER_FOOD, Direction, GridEnum
+from training.neural_net import NeuralNetwork
 
 XMAX = GRID_X-1
 YMAX = GRID_Y-1
@@ -223,3 +224,35 @@ def test_update_head() -> None:
 
     assert snake.lengths.size == 1
     assert snake.grid[0, 0, 0] == GridEnum.HEAD.value
+
+
+@pytest.mark.parametrize("direction", list(Direction))
+def test_no_loop_one(direction: Direction) -> None:
+    snake = ParSnake(neural_net=NeuralNetwork(),
+                     num_games=5, grid_size_x=5, grid_size_y=5)
+
+    # food out of the way, head in the middle
+    snake._reset(head_x=2, head_y=2, food_x=0, food_y=0)
+
+    # every move should be valid
+    heads = snake.convert_heads()
+    assert np.all(heads == 1)
+
+    directions = np.full((5,), direction.value)
+    snake.step_time(directions)
+
+    # reversing is now not valid
+    heads = snake.convert_heads()
+    if direction == Direction.UP:
+        bad = Direction.DOWN
+    elif direction == Direction.DOWN:
+        bad = Direction.UP
+    elif direction == Direction.RIGHT:
+        bad = Direction.LEFT
+    else:
+        bad = Direction.RIGHT
+    for a_dir in Direction:
+        if a_dir is bad:
+            assert np.all(heads[:, a_dir.value] == 0)
+        else:
+            assert np.all(heads[:, a_dir.value] == 1)

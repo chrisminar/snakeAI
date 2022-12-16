@@ -43,14 +43,14 @@ def run_a_sample(checkpoint: Path) -> None:
     plt.show()
 
 
-def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383)) -> None:
+def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383), n=50) -> None:
     """Compare multiple generations."""
     states = []
     for i, generation in enumerate(generations):
         neural_net = NeuralNetwork()
         neural_net.load(Path(f'media/saves/generation_{generation}.ckpt'))
         spc = PlayGames(neural_net)
-        state, _, score, ids, _ = spc.play_games(num_games=50)
+        state, _, score, ids, _ = spc.play_games(num_games=n)
         state = find_best(states=state, scores=score, ids=ids)
         states.append(state)
         LOGGER.info("Done with generation %d", generation)
@@ -98,5 +98,5 @@ def find_best(*, states: npt.NDArray[np.int32],
 from pathlib import Path
 
 from training.visualize import gen_compare
-gen_compare((0, 0, 25, 25))
+gen_compare((40, 40, 40, 40))
 """

@@ -8,9 +8,9 @@ from numpy import typing as npt
 
 from snake.big_snake import ParSnake as BigSnake
 from snake.snake_reinforcement_learning import SnakeRL as snake
-from training.helper import (GENERATION_SIZE, GRID_X, GRID_Y,
+from training.helper import (GRID_X, GRID_Y, NUM_GAMES_PER_BATCH,
                              NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
-                             USE_EXPLORATION_CUTOFF, GridEnum, grid_2_nn)
+                             USE_EXPLORATION_CUTOFF, get_perf, grid_2_nn)
 from training.neural_net import NeuralNetwork
 
 LOGGER = logging.getLogger("terminal")
@@ -104,11 +104,12 @@ class PlayBig:
                    start_id: int = 0,
                    minimum_score: Optional[float] = None,
                    exploratory: bool = False,
-                   **kwargs) -> Tuple[npt.NDArray[np.int32],
-                                      npt.NDArray[np.bool8],
-                                      npt.NDArray[np.int32],
-                                      npt.NDArray[np.int32],
-                                      npt.NDArray[np.float32]]:
+                   num_games: int = NUM_GAMES_PER_BATCH
+                   ) -> Tuple[npt.NDArray[np.int32],
+                              npt.NDArray[np.bool8],
+                              npt.NDArray[np.int32],
+                              npt.NDArray[np.int32],
+                              npt.NDArray[np.float32]]:
         """Play some games.
 
         Args:
@@ -127,12 +128,15 @@ class PlayBig:
         game_player = BigSnake(neural_net=self.neural_net,
                                exploratory=exploratory and (
                                    minimum_score is not None and minimum_score < USE_EXPLORATION_CUTOFF),
-                               num_games=GENERATION_SIZE)
+                               num_games=num_games)
         game_player.play()
         state, head, score, game_id, move = game_player.aggregate_results()
 
         if minimum_score is not None:
             idx_above_minimum_score = score > minimum_score
+
+            LOGGER.info("Mean score before purging is %02f", get_perf(
+                scores=score, ids=game_id, gen=0, plot=False))
 
             state = state[idx_above_minimum_score]
             head = head[idx_above_minimum_score]
@@ -143,4 +147,4 @@ class PlayBig:
         LOGGER.debug(
             "Played %d games above minimum score(%02f) in %d attempts", np.unique(game_id).size, minimum_score, NUM_TRAINING_GAMES)
 
-        return state, head, score, game_id, move.astype(np.float32)
+        return grid_2_nn(state), head, score, game_id, move.astype(np.float32)
