@@ -107,7 +107,8 @@ class PlayBig:
                               npt.NDArray[np.bool8],
                               npt.NDArray[np.int32],
                               npt.NDArray[np.int32],
-                              npt.NDArray[np.float32]]:
+                              npt.NDArray[np.float32],
+                              float]:
         """Play some games.
 
         Args:
@@ -122,6 +123,7 @@ class PlayBig:
             (npt.NDArray[np.int32]): scores
             (npt.NDArray[np.int32]): game ids
             (npt.NDArray[np.float32]): predictions
+            (float): performance
         """
         game_player = BigSnake(neural_net=self.neural_net,
                                exploratory=exploratory and (
@@ -130,11 +132,12 @@ class PlayBig:
         game_player.play()
         state, head, score, game_id, move = game_player.aggregate_results()
 
+        pre_purge_score = get_perf(
+            scores=score, ids=game_id, gen=0, plot=False)
+        LOGGER.info("Mean score before purging is %02f", pre_purge_score)
+
         if minimum_score is not None:
             idx_above_minimum_score = score > minimum_score
-
-            LOGGER.info("Mean score before purging is %02f", get_perf(
-                scores=score, ids=game_id, gen=0, plot=False))
 
             state = state[idx_above_minimum_score]
             head = head[idx_above_minimum_score]
@@ -145,4 +148,4 @@ class PlayBig:
         LOGGER.debug(
             "Played %d games above minimum score(%02f) in %d attempts", np.unique(game_id).size, minimum_score, NUM_TRAINING_GAMES)
 
-        return state, head, score, game_id, move.astype(np.float32)
+        return state, head, score, game_id, move.astype(np.float32), pre_purge_score

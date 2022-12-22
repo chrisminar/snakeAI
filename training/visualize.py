@@ -24,7 +24,7 @@ def run_a_sample(checkpoint: Path) -> None:
     neural_net = NeuralNetwork()
     neural_net.load(checkpoint)
     spc = PlayGames(neural_net)
-    states, _, _, _, _ = spc.play_games(num_games=1)
+    states, _, _, _, _, _ = spc.play_games(num_games=1)
 
     fig = plt.figure()
     axis = plt.axes(xlim=(-0.5, 3.5), ylim=(-0.5, 3.5))
@@ -50,7 +50,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383), n=5
         neural_net = NeuralNetwork()
         neural_net.load(Path(f'media/saves/generation_{generation}.ckpt'))
         spc = PlayGames(neural_net)
-        state, _, score, ids, _ = spc.play_games(num_games=n)
+        state, _, score, ids, _, _ = spc.play_games(num_games=n)
         state = find_best(states=state, scores=score, ids=ids)
         states.append(state)
         LOGGER.info("Done with generation %d", generation)

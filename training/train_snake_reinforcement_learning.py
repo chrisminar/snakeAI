@@ -44,8 +44,8 @@ class TrainRL:
             LOGGER.debug("Loaded checkpoint %d", biggest_generation)
         self.game_id = 0
         # mean score of all games in training set
-        self.mean_training_score = -SCORE_PER_FOOD
-        self.mean_score = -SCORE_PER_FOOD  # mean score of the last set of games
+        # mean score of the last set of games
+        self.mean_generation_score = -SCORE_PER_FOOD
         # mean scores of each set of games
         self.mean_generation_scores: List[int] = []
         # mean score of all games in training set
@@ -120,8 +120,9 @@ class TrainRL:
         minimum_score = self.minimum if self.game_scores.size == 0 else self.game_scores.min()
 
         # play one set with last neural net to check if best neural net has been created
-        states, heads, scores, ids, moves, count = self.play_one_set_of_games(
+        states, heads, scores, ids, moves, count, performance = self.play_one_set_of_games(
             self.neural_net, minimum_score=minimum_score)
+        self.mean_generation_score = performance
         state_l.append(states)
         head_l.append(heads)
         scores_l.append(scores)
@@ -129,23 +130,19 @@ class TrainRL:
         moves_l.append(moves)
         counter += count
 
-        # compute mean score
-        _, indices = np.unique(ids, return_index=True)
-        mean_score = np.mean(scores[indices])
-
         # get maximum score
         max_score = self.get_maximum_generation_score()
 
         # consider updating best neural net
-        if mean_score > max_score:
+        if performance > max_score:
             LOGGER.info("New best neural net created (%02f -> %02f).",
-                        max_score, mean_score)
+                        max_score, performance)
             self.best_neural_net = self.neural_net
 
         # run games until desired number of games above minimum score have been run
         while counter < num_games:
             LOGGER.info("%d games so far.", counter)
-            states, heads, scores, ids, moves, num_added = self.play_one_set_of_games(
+            states, heads, scores, ids, moves, num_added, _ = self.play_one_set_of_games(
                 neural_net=self.best_neural_net, minimum_score=minimum_score)
 
             counter += num_added
@@ -172,29 +169,39 @@ class TrainRL:
         try:
             return max(self.mean_generation_scores)
         except ValueError:
-            return self.mean_score
+            return self.mean_generation_score
 
     def play_one_set_of_games(self, neural_net: NeuralNetwork, *, minimum_score: int) -> Tuple[npt.NDArray[np.int32],
                                                                                                npt.NDArray[np.bool8],
                                                                                                npt.NDArray[np.int32],
                                                                                                npt.NDArray[np.int32],
                                                                                                npt.NDArray[np.float32],
-                                                                                               int]:
+                                                                                               int,
+                                                                                               float]:
         """Play one generation worth of snake games.
 
         Args:
             neural_net: (NeuralNetwork):
             generation (int): Generation number.
+
+        Returns:
+            (npt.NDArray[np.uint32]): game states
+            (npt.NDArray[npt.bool8]): heads
+            (npt.NDArray[np.int32]): scores
+            (npt.NDArray[np.int32]): game ids
+            (npt.NDArray[np.float32]): predictions
+            (int): number of games
+            (float): performance
         """
         spc = PlayBig(neural_network=neural_net)
 
-        states, heads, scores, ids, moves = spc.play_games(
+        states, heads, scores, ids, moves, performance = spc.play_games(
             start_id=self.game_id, minimum_score=minimum_score, exploratory=True)
 
         counter = len(np.unique(ids))
 
         self.game_id += counter
-        return states, heads, scores, ids, moves, counter
+        return states, heads, scores, ids, moves, counter, performance
 
     def add_games_to_list(self,
                           *,
@@ -217,7 +224,6 @@ class TrainRL:
             make_histogram (bool): Make a histogram for this set of games.
         """
         _, indices = np.unique(ids, return_index=True)
-        self.mean_score = np.mean(scores[indices])
 
         if make_histogram:
             gen_histogram(scores=scores[indices], generation=generation)
@@ -255,7 +261,7 @@ class TrainRL:
         # update tracking statistics
         uni, indices = np.unique(self.game_ids, return_index=True)
         number_of_games = len(uni)
-        self.mean_generation_scores.append(self.mean_score)
+        self.mean_generation_scores.append(self.mean_generation_score)
         self.training_mean_scores.append(np.mean(self.game_scores[indices]))
         self.games_used.append(number_of_games)
         self.max_scores.append(np.max(self.game_scores))

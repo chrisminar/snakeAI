@@ -62,21 +62,22 @@ def play_once(neural_net: NeuralNetwork = NeuralNetwork()) -> Tuple[npt.NDArray[
     """
     spc = PlayBig(neural_network=neural_net)
 
-    _, __, scores, ids, ____ = spc.play_games(
+    _, __, scores, ids, ____, ____ = spc.play_games(
         start_id=0, minimum_score=-1000, num_games=10_000, exploratory=False)
     return scores, ids
 
 
-def test_tensorboard():
+def test_training(num_attempts: int = 2):
+    """Test training of the nerual net.
+
+    Args:
+        num_attempts (int, optional): Number of attempts to train on. Defaults to 2.
+    """
     states, heads, moves = load_training()
 
-    for _ in range(2):
-        #neural_net = NeuralNetwork()
-        # neural_net.train(states=states, heads=heads,
-        #                 predictions=moves, generation=0, verbose=1)
+    for _ in range(num_attempts):
         neural_net = train(generation=0, game_states=states,
-                           heads=heads, move_predictions=moves, verbose=1)
-        # neural_net.disp_model()
+                           heads=heads, move_predictions=moves, verbose=1, permute_input=False)
         scores, ids = play_once(neural_net)
         mean = get_perf(scores, ids, 0)
         LOGGER.info("Mean score of %02f", mean)

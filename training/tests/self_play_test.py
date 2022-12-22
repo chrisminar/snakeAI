@@ -10,7 +10,7 @@ from training.play_games import PlayGames
 def test_play_games() -> None:
     """Plame some games."""
     spc = PlayGames(NeuralNetwork())  # make self play class
-    state, _, score, ids, prediction = spc.play_games(num_games=2)
+    state, _, score, ids, prediction, _ = spc.play_games(num_games=2)
 
     print(state)
     print(score)

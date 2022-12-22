@@ -4,7 +4,7 @@ import logging
 
 import absl.logging
 
-from neural_net_improvement.neural_net_improvement_main import test_tensorboard
+from neural_net_improvement.neural_net_improvement_main import test_training
 from training.train_snake_reinforcement_learning import TrainRL
 
 # turns off annoying TF/keras warnings that break logger
@@ -24,6 +24,6 @@ LOGGER.propagate = False  # prevent keras from doing annoying things with the lo
 if __name__ == "__main__":
     #from training.visualize import gen_compare
     #gen_compare((40, 40, 40, 40), n=1)
-    test_tensorboard()
-    #trainer = TrainRL(0)
-    # trainer.train()
+    # test_training()
+    trainer = TrainRL(0)
+    trainer.train()

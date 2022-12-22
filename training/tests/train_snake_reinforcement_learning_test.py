@@ -19,7 +19,7 @@ def test_add_games_to_list() -> None:
     trainer = TrainRL()
     neural_network = NeuralNetwork()
     spc = PlayGames(neural_network)
-    states, heads, scores, ids, moves = spc.play_games(num_games=5)
+    states, heads, scores, ids, moves, _ = spc.play_games(num_games=5)
     trainer.add_games_to_list(states=states, heads=heads,
                               scores=scores, ids=ids, moves=moves, generation=0, make_histogram=False)
     assert np.max(trainer.game_ids) < 5
