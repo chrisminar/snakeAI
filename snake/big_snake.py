@@ -236,6 +236,7 @@ class ParSnake:
                 heads: (num_games,4) which directions the head can safely move
         """
         pre_processed_grid = grid_2_nn(self.grid)
+
         heads = self.convert_heads()
         policy = self.neural_net.evaluate(state=pre_processed_grid, head=heads)
 

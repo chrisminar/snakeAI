@@ -20,10 +20,11 @@ NUM_SELF_PLAY_GAMES: Final = 500  # number of self play games to play
 NUM_GAMES_PER_BATCH: Final = 10000
 NUM_TRAINING_GAMES: Final = 10000  # number of self play games to train on
 VALIDATION_SPLIT: Final = 0.15  # fraction of data to use for validation
-EPOCH_DELTA: Final = 0.0001
-MOMENTUM: Final = 0.9
+EPOCH_DELTA: Final = 0.001
+MOMENTUM: Final = 0.2
+LEARNING_RATE: Final = 0.001
 BATCH_SIZE: Final = 64
-EPOCHS: Final = 10
+EPOCHS: Final = 100
 MAXIMUM_MOVES_WITHOUT_EATING: Final = GRID_X * GRID_Y * 2
 MAXIMUM_TOTAL_MOVES: Final = MAXIMUM_MOVES_WITHOUT_EATING ** 2
 
@@ -174,6 +175,7 @@ def grid_val_to_neural_net(grid_val: np.int32) -> np.int32:
     Returns:
         int: Pre-processed grid cell value.
     """
+    return grid_val
     if grid_val == GridEnum.FOOD.value:
         return np.int32(PreProcessedGrid.FOOD.value)
     if grid_val == GridEnum.EMPTY.value:

@@ -7,8 +7,8 @@ from typing import Tuple
 import numpy as np
 from numpy import typing as npt
 
-from training.helper import get_perf
-from training.neural_net import NeuralNetwork
+from training.helper import GridEnum, get_perf
+from training.neural_net import NeuralNetwork, NeuralNetwork2
 from training.play_games import PlayBig
 from training.train_snake_reinforcement_learning import TrainRL
 from training.trainer import train
@@ -37,11 +37,11 @@ def load_training() -> Tuple[npt.NDArray[np.int32], npt.NDArray[np.bool8], npt.N
 
     trl = TrainRL()
 
-    states = np.fromfile(biggest_path/"states.bin",
+    states = np.fromfile(biggest_path/"states.npy",
                          dtype=trl.game_states.dtype).reshape((-1, *trl.game_states.shape[1:]))
-    heads = np.fromfile(biggest_path/"heads.bin",
+    heads = np.fromfile(biggest_path/"heads.npy",
                         dtype=trl.game_heads.dtype).reshape((-1, *trl.game_heads.shape[1:]))
-    moves = np.fromfile(biggest_path/"moves.bin",
+    moves = np.fromfile(biggest_path/"moves.npy",
                         dtype=trl.moves.dtype).reshape((-1, *trl.moves.shape[1:]))
 
     if not states.shape[0] == heads.shape[0] == moves.shape[0]:
@@ -63,32 +63,27 @@ def play_once(neural_net: NeuralNetwork = NeuralNetwork()) -> Tuple[npt.NDArray[
     spc = PlayBig(neural_network=neural_net)
 
     _, __, scores, ids, ____ = spc.play_games(
-        start_id=0, minimum_score=-1000, exploratory=False)
+        start_id=0, minimum_score=-1000, num_games=10_000, exploratory=False)
     return scores, ids
 
 
-def training_variance():
-    """Understand how re-training effects NN performance."""
+def test_tensorboard():
     states, heads, moves = load_training()
-    for i in range(5):
-        neural_net = train(generation=0, game_states=states,
-                           heads=heads, move_predictions=moves, verbose=2)
+
+    converted_states = np.zeros((*states.shape, 4), dtype=states.dtype)
+    converted_states[:, :, :, 0] = states == GridEnum.HEAD.value
+    converted_states[:, :, :, 1] = states == GridEnum.FOOD.value
+    converted_states[:, :, :, 2] = states == GridEnum.EMPTY.value
+    converted_states[:, :, :, 3] = states >= GridEnum.BODY.value
+
+    for _ in range(2):
+        neural_net = NeuralNetwork2()
+        # neural_net.disp_model()
+        neural_net.train(states=converted_states, heads=heads,
+                         predictions=moves, generation=0, verbose=1)
+        # neural_net = train(generation=0, game_states=states,
+        #                   heads=heads, move_predictions=moves, verbose=1)
+        # neural_net.disp_model()
         scores, ids = play_once(neural_net)
-        mean = get_perf(scores, ids, i)
+        mean = get_perf(scores, ids, 0)
         LOGGER.info("Mean score of %02f", mean)
-
-
-def test_a_nn():
-    states, heads, moves = load_training()
-    neural_net = NeuralNetwork()
-    neural_net.train(states=states, heads=heads,
-                     predictions=moves, generation=0, verbose=2)
-    #neural_net = train(generation=0, game_states=states, heads=heads, move_predictions=moves, verbose=2)
-    scores, ids = play_once(neural_net)
-    mean = get_perf(scores, ids, 0)
-    LOGGER.info("Mean score of %02f", mean)
-# 2
-# load everything
-# load a new NN config
-# run a training batch
-# check mean score

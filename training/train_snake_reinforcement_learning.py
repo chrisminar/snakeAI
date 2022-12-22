@@ -12,7 +12,7 @@ from numpy import typing as npt
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
                              NUM_TRAINING_GAMES, SAVE_INTERVAL, SCORE_PER_FOOD,
                              gen_histogram, get_size)
-from training.neural_net import NeuralNetwork
+from training.neural_net import NeuralNetwork2
 from training.play_games import PlayBig
 from training.trainer import train
 
@@ -30,8 +30,8 @@ class TrainRL:
         self.game_ids = np.zeros((0,), dtype=np.int32)
         self.moves = np.zeros((0, 4), dtype=np.float32)
         saves = list(Path("./media/saves").glob("*.ckpt"))
-        self.neural_net = NeuralNetwork()
-        self.best_neural_net = NeuralNetwork()
+        self.neural_net = NeuralNetwork2()
+        self.best_neural_net = NeuralNetwork2()
         self.generation = 0
         if len(saves) > 0:
             biggest_generation = max(
@@ -62,9 +62,6 @@ class TrainRL:
             LOGGER.info("Generation %d", generation)
             self.play_n_games(
                 generation=generation, num_games=NUM_SELF_PLAY_GAMES)
-            # purge_num = len(np.unique(self.game_ids)) * 2.5 / \
-            #    5 if ((generation+1) %
-            #          10) == 0 else max(len(np.unique(self.game_ids)) - NUM_TRAINING_GAMES, NUM_SELF_PLAY_GAMES)
             purge_num = max(len(np.unique(self.game_ids)) -
                             NUM_TRAINING_GAMES, NUM_SELF_PLAY_GAMES)
             self.trim_game_list(int(purge_num))
@@ -73,9 +70,9 @@ class TrainRL:
             self.gen_status_plot(generation)
             if generation % SAVE_INTERVAL == 0:
                 gen_path = Path(f"./media/saves/generation_{generation}.ckpt")
-                self.game_states.tofile(gen_path/"states.bin")
-                self.game_heads.tofile(gen_path/"heads.bin")
-                self.moves.tofile(gen_path/"moves.bin")
+                self.game_states.tofile(gen_path/"states.npy")
+                self.game_heads.tofile(gen_path/"heads.npy")
+                self.moves.tofile(gen_path/"moves.npy")
 
             generation += 1
 

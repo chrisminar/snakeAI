@@ -12,7 +12,7 @@ def train(generation: int,
           game_states: npt.NDArray[np.int32],
           heads: npt.NDArray[np.bool8],
           move_predictions: npt.NDArray[np.float32],
-          verbose: int = 0) -> NeuralNetwork:
+          verbose: int = 2) -> NeuralNetwork:
     """Permute input data and train on it.
 
     Args:

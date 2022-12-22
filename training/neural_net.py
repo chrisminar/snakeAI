@@ -1,4 +1,5 @@
 """Handle the neural network."""
+import datetime
 from pathlib import Path
 
 import numpy as np
@@ -8,7 +9,8 @@ from numpy import typing as npt
 from tensorflow import keras
 
 from training.helper import (BATCH_SIZE, EPOCH_DELTA, EPOCHS, GRID_X, GRID_Y,
-                             MOMENTUM, SAVE_INTERVAL, VALIDATION_SPLIT)
+                             LEARNING_RATE, MOMENTUM, SAVE_INTERVAL,
+                             VALIDATION_SPLIT, GridEnum)
 
 
 class NeuralNetwork:
@@ -19,45 +21,46 @@ class NeuralNetwork:
         initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=1.0)
 
         # head side
-        head_input = keras.Input(shape=(4, ), name='input_head')
+        head_input = keras.Input(shape=(4, ), name='head_input')
 
-        l2_head = layers.Dense(
-            32, activation='relu', name='l2_head', kernel_initializer=initializer)(head_input)
+        head_1 = layers.Dense(
+            32, activation='relu', name='head_1', kernel_initializer=initializer)(head_input)
 
-        l3_head = layers.Dense(
-            4, activation='relu', name='l3_head', kernel_initializer=initializer)(l2_head)
+        head_2 = layers.Dense(
+            4, activation='relu', name='head_2', kernel_initializer=initializer)(head_1)
 
-        l4_head = layers.BatchNormalization(name='head_norm')(l3_head)
+        head_norm = layers.BatchNormalization(name='head_norm')(head_2)
 
         # grid side
-        block_input = keras.Input(
-            shape=(y_size, x_size, 1), name='input_game_state')
+        grid_input = keras.Input(
+            shape=(y_size, x_size, 1), name='grid_input')
 
-        layer_1 = layers.Conv2D(16, 3, padding='same', activation='relu',
-                                name='l1', kernel_initializer=initializer)(block_input)
+        grid_1 = layers.Conv2D(16, 3, padding='same', activation='relu',
+                               name='grid_1', kernel_initializer=initializer)(grid_input)
 
-        layer_2 = layers.Conv2D(16, 3, padding='same', activation='relu',
-                                name='l2', kernel_initializer=initializer)(layer_1)
+        grid_2 = layers.Conv2D(16, 3, padding='same', activation='relu',
+                               name='grid_2', kernel_initializer=initializer)(grid_1)
 
-        layer_3 = layers.Conv2D(4, 1, padding='same', activation='relu',
-                                name='l4', kernel_initializer=initializer)(layer_2)
+        grid_3 = layers.Conv2D(4, 1, padding='same', activation='relu',
+                               name='grid_3', kernel_initializer=initializer)(grid_2)
 
-        layer_4 = layers.GlobalAveragePooling2D(name='pool')(layer_3)
+        grid_pool = layers.GlobalAveragePooling2D(name='grid_pool')(grid_3)
 
-        layer_5 = layers.BatchNormalization(name='norm')(layer_4)
+        grid_norm = layers.BatchNormalization(name='grid_norm')(grid_pool)
 
         # combine
-        layer_6 = layers.add([layer_5, l4_head], name='add')
+        both_add = layers.add([grid_norm, head_norm], name='both_add')
 
-        layer_y = layers.Dense(4,  activation='relu', name='last_fully_connected',
-                               kernel_initializer=initializer)(layer_6)
+        both_1 = layers.Dense(4,  activation='relu', name='both_1',
+                              kernel_initializer=initializer)(both_add)
 
-        layer_8 = layers.Softmax(name='policy')(layer_y)
+        both_softmax = layers.Softmax(name='both_softmax')(both_1)
 
-        layer_9 = layers.Multiply(name='mult')([layer_8, head_input])
+        output_layer = layers.Multiply(
+            name='output_layer')([both_softmax, head_input])
 
         self.model = keras.Model(
-            inputs=[block_input, head_input], outputs=layer_9)
+            inputs=[grid_input, head_input], outputs=output_layer)
         self.compile()
 
     def evaluate(self, *, state: npt.NDArray[np.int32], head: npt.NDArray[np.bool8]) -> npt.NDArray[np.float32]:
@@ -84,7 +87,8 @@ class NeuralNetwork:
         """Compile the neural network."""
         self.model.compile(loss=keras.losses.CategoricalCrossentropy(from_logits=True),
                            optimizer=keras.optimizers.SGD(
-                               momentum=MOMENTUM),
+                               momentum=MOMENTUM,
+                               learning_rate=LEARNING_RATE),
                            metrics=['accuracy'])
 
     def train(self,
@@ -93,7 +97,7 @@ class NeuralNetwork:
               heads: npt.NDArray[np.bool8],
               predictions: npt.NDArray[np.float32],
               generation: int,
-              verbose:int) -> None:
+              verbose: int) -> None:
         """Train the weights and biases of the neural network.
 
         Args:
@@ -104,15 +108,24 @@ class NeuralNetwork:
         """
         if not 0 <= verbose <= 2:
             raise ValueError("Verbosity must be 0,1,or 2.")
-        #callback = tf.keras.callbacks.EarlyStopping(
-        #    monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1)
-        history=self.model.fit({'input_game_state': states, 'input_head': heads}, {'mult': predictions},
-                       batch_size=BATCH_SIZE,
-                       epochs=EPOCHS,
-                       validation_split=VALIDATION_SPLIT,
-                       verbose=verbose)#,
-                       #callbacks=[callback])
-        
+        callback1 = tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss', min_delta=EPOCH_DELTA, verbose=1, patience=10, restore_best_weights=True)
+        log_dir = "media/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        callback2 = tf.keras.callbacks.TensorBoard(
+            log_dir=log_dir, histogram_freq=1)
+
+        history = self.model.fit({'grid_input': states, 'head_input': heads}, {'output_layer': predictions},
+                                 batch_size=BATCH_SIZE,
+                                 epochs=EPOCHS,
+                                 validation_split=VALIDATION_SPLIT,
+                                 verbose=verbose,
+                                 callbacks=[callback1, callback2])
+
+        #model_path = f'media/saves/generation_TEST.ckpt'
+        # self.model.save(model_path)
+        #reconstructed_model = keras.models.load_model(model_path)
+        #np.testing.assert_allclose(self.model.predict([states, heads], verbose=2), reconstructed_model.predict([states, heads], verbose=2))
+        # print("success")
         self.save(generation)
 
     def disp_model(self) -> None:
@@ -139,4 +152,65 @@ class NeuralNetwork:
             path (Path): Path to neural network save file.
         """
         self.model = keras.models.load_model(path)
-        
+
+
+class NeuralNetwork2(NeuralNetwork):
+    """Neural network to run snake."""
+
+    def __init__(self, x_size: int = GRID_X, y_size: int = GRID_Y) -> None:
+        # weight initializer
+        initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=1.0)
+
+        # head
+        head_input = keras.Input(shape=(4, ), name='head_input')
+
+        # grid side
+        grid_input = keras.Input(
+            shape=(y_size, x_size, 4), name='grid_input')
+
+        grid_1 = layers.Conv2D(64, 4, 2, padding='same', activation='relu',
+                               name='grid_1', kernel_initializer=initializer)(grid_input)
+
+        grid_2 = layers.Conv2D(64, 2, 2, padding='same', activation='relu',
+                               name='grid_2', kernel_initializer=initializer)(grid_1)
+
+        # grid_3 = layers.Conv2D(64, 2, 2, padding='same', activation='relu',
+        #                       name='grid_3', kernel_initializer=initializer)(grid_2)
+
+        reshape_layer = layers.Reshape((-1,))(grid_2)
+
+        grid_4 = layers.Dense(
+            512, activation='relu', name='grid_4', kernel_initializer=initializer)(reshape_layer)
+
+        grid_5 = layers.Dense(4, name='grid_5',
+                              kernel_initializer=initializer)(grid_4)
+
+        output_layer = layers.Multiply(
+            name='output_layer')([grid_5, head_input])
+
+        self.model = keras.Model(
+            inputs=[grid_input, head_input], outputs=output_layer)
+        self.compile()
+
+    def evaluate(self, *, state: npt.NDArray[np.int32], head: npt.NDArray[np.bool8]) -> npt.NDArray[np.float32]:
+        """Evaluate inputs on neural network.
+
+        Args:
+            state (npt.NDArray[np.int32]): Grid cells.
+            head (npt.NDArray[np.bool8]): Array of if it's valid to move in a given direction.
+
+        Returns:
+            npt.NDArray[np.float32]: Confidence that each direction is the best choice.
+        """
+        converted_states = np.zeros((*state.shape, 4), dtype=state.dtype)
+        converted_states[:, :, :, 0] = state == GridEnum.HEAD.value
+        converted_states[:, :, :, 1] = state == GridEnum.FOOD.value
+        converted_states[:, :, :, 2] = state == GridEnum.EMPTY.value
+        converted_states[:, :, :, 3] = state >= GridEnum.BODY.value
+
+        if converted_states.ndim == 4:  # evaluating more than one
+            head_in = head.reshape(*head.shape, 1).astype(np.float32)
+        else:
+            head_in = head.reshape(1, 4).astype(np.float32)
+
+        return self.model.predict([converted_states.astype(np.float32), head_in], verbose=0)
