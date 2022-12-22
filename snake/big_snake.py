@@ -9,8 +9,7 @@ from training.helper import (EXPLORATORY_MOVE_FRACTION, GRID_X, GRID_Y,
                              MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES,
                              NUM_SELF_PLAY_GAMES, SCORE_FOR_GAME_WIN,
                              SCORE_PENALTY_FOR_FAILURE, SCORE_PER_FOOD,
-                             SCORE_PER_MOVE, Direction, GridEnum, Timer,
-                             grid_2_nn)
+                             SCORE_PER_MOVE, Direction, GridEnum, Timer)
 from training.neural_net import NeuralNetwork
 
 _RNG: Final = np.random.default_rng()
@@ -235,10 +234,8 @@ class ParSnake:
                 next_direction_array: (num_games, 4) new direction bools for each direction 1 = chosen
                 heads: (num_games,4) which directions the head can safely move
         """
-        pre_processed_grid = grid_2_nn(self.grid)
-
         heads = self.convert_heads()
-        policy = self.neural_net.evaluate(state=pre_processed_grid, head=heads)
+        policy = self.neural_net.evaluate(state=self.grid, head=heads)
 
         # account for invalid choices from NN
         # true if no valid options from NN

@@ -12,7 +12,7 @@ from numpy import typing as npt
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
                              NUM_TRAINING_GAMES, SAVE_INTERVAL, SCORE_PER_FOOD,
                              gen_histogram, get_size)
-from training.neural_net import NeuralNetwork2
+from training.neural_net import NeuralNetwork
 from training.play_games import PlayBig
 from training.trainer import train
 
@@ -30,8 +30,8 @@ class TrainRL:
         self.game_ids = np.zeros((0,), dtype=np.int32)
         self.moves = np.zeros((0, 4), dtype=np.float32)
         saves = list(Path("./media/saves").glob("*.ckpt"))
-        self.neural_net = NeuralNetwork2()
-        self.best_neural_net = NeuralNetwork2()
+        self.neural_net = NeuralNetwork()
+        self.best_neural_net = NeuralNetwork()
         self.generation = 0
         if len(saves) > 0:
             biggest_generation = max(

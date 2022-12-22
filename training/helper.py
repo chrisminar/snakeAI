@@ -21,7 +21,7 @@ NUM_GAMES_PER_BATCH: Final = 10000
 NUM_TRAINING_GAMES: Final = 10000  # number of self play games to train on
 VALIDATION_SPLIT: Final = 0.15  # fraction of data to use for validation
 EPOCH_DELTA: Final = 0.001
-MOMENTUM: Final = 0.2
+MOMENTUM: Final = 0.25
 LEARNING_RATE: Final = 0.001
 BATCH_SIZE: Final = 64
 EPOCHS: Final = 100
@@ -164,23 +164,3 @@ class Timer:
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
         LOGGER.info('%s elapsed time %03f', self.name, self.secs)
-
-
-def grid_val_to_neural_net(grid_val: np.int32) -> np.int32:
-    """Convert input snake grid value to nn value.
-
-    Args:
-        grid_val (int): Value from grid cell.
-
-    Returns:
-        int: Pre-processed grid cell value.
-    """
-    return grid_val
-    if grid_val == GridEnum.FOOD.value:
-        return np.int32(PreProcessedGrid.FOOD.value)
-    if grid_val == GridEnum.EMPTY.value:
-        return np.int32(PreProcessedGrid.EMPTY.value)
-    return np.int32(PreProcessedGrid.SNAKE.value)
-
-
-grid_2_nn = np.vectorize(grid_val_to_neural_net)

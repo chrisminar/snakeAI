@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from snake.snake_reinforcement_learning import SnakeRL
-from training.helper import GRID_X, GRID_Y, Direction, GridEnum, grid_2_nn
+from training.helper import GRID_X, GRID_Y, Direction, GridEnum
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayGames
 
@@ -104,7 +104,7 @@ def test_victory(_: int) -> None:
                            [-1, 7, 8, 9],
                            [-1, 12, 11, 10]], dtype=np.int32)
     snake.length = 12
-    new_direction, __, ___ = snake.evaluate_next_step(grid_2_nn)
+    new_direction, __, ___ = snake.evaluate_next_step()
     x_dir, y_dir = snake.direction_to_tuple(new_direction)
     assert x_dir == 0
     assert y_dir == 1
@@ -115,14 +115,14 @@ def test_victory(_: int) -> None:
     snake.food_y = 2
     snake.grid[snake.food_y, snake.food_x] = GridEnum.FOOD.value
     snake.grid[3, 0] = GridEnum.EMPTY.value
-    new_direction, __, ___ = snake.evaluate_next_step(grid_2_nn)
+    new_direction, __, ___ = snake.evaluate_next_step()
     x_dir, y_dir = snake.direction_to_tuple(new_direction)
     assert x_dir == 0
     assert y_dir == 1
     snake.run_single(x_dir, y_dir)
     assert not snake.game_over
 
-    new_direction, __, ___ = snake.evaluate_next_step(grid_2_nn)
+    new_direction, __, ___ = snake.evaluate_next_step()
     x_dir, y_dir = snake.direction_to_tuple(new_direction)
     assert x_dir == 0
     assert y_dir == 1

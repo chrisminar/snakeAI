@@ -8,7 +8,7 @@ import numpy as np
 from numpy import typing as npt
 
 from training.helper import GridEnum, get_perf
-from training.neural_net import NeuralNetwork, NeuralNetwork2
+from training.neural_net import NeuralNetwork
 from training.play_games import PlayBig
 from training.train_snake_reinforcement_learning import TrainRL
 from training.trainer import train
@@ -70,19 +70,12 @@ def play_once(neural_net: NeuralNetwork = NeuralNetwork()) -> Tuple[npt.NDArray[
 def test_tensorboard():
     states, heads, moves = load_training()
 
-    converted_states = np.zeros((*states.shape, 4), dtype=states.dtype)
-    converted_states[:, :, :, 0] = states == GridEnum.HEAD.value
-    converted_states[:, :, :, 1] = states == GridEnum.FOOD.value
-    converted_states[:, :, :, 2] = states == GridEnum.EMPTY.value
-    converted_states[:, :, :, 3] = states >= GridEnum.BODY.value
-
     for _ in range(2):
-        neural_net = NeuralNetwork2()
-        # neural_net.disp_model()
-        neural_net.train(states=converted_states, heads=heads,
-                         predictions=moves, generation=0, verbose=1)
-        # neural_net = train(generation=0, game_states=states,
-        #                   heads=heads, move_predictions=moves, verbose=1)
+        #neural_net = NeuralNetwork()
+        # neural_net.train(states=states, heads=heads,
+        #                 predictions=moves, generation=0, verbose=1)
+        neural_net = train(generation=0, game_states=states,
+                           heads=heads, move_predictions=moves, verbose=1)
         # neural_net.disp_model()
         scores, ids = play_once(neural_net)
         mean = get_perf(scores, ids, 0)

@@ -10,7 +10,7 @@ from snake.big_snake import ParSnake as BigSnake
 from snake.snake_reinforcement_learning import SnakeRL as snake
 from training.helper import (GRID_X, GRID_Y, NUM_GAMES_PER_BATCH,
                              NUM_SELF_PLAY_GAMES, NUM_TRAINING_GAMES,
-                             USE_EXPLORATION_CUTOFF, get_perf, grid_2_nn)
+                             USE_EXPLORATION_CUTOFF, get_perf)
 from training.neural_net import NeuralNetwork
 
 LOGGER = logging.getLogger("terminal")
@@ -31,8 +31,6 @@ class PlayGames:
         self.scores: List[npt.NDArray[np.int32]] = []
         self.heads: List[npt.NDArray[np.bool8]] = []
         self.neural_net = neural_network
-        self.gamestate_to_nn: Callable[[npt.NDArray[np.int32]],
-                                       npt.NDArray[np.int32]] = grid_2_nn
 
     def play_games(self,
                    *,
@@ -65,7 +63,7 @@ class PlayGames:
             games = snake(neural_net=self.neural_net,
                           exploratory=exploratory,
                           x_grid_size=GRID_X, y_grid_size=GRID_Y)
-            games.play(self.gamestate_to_nn)
+            games.play()
             num_played += 1
             if minimum_score is None or games.score > minimum_score:
                 if len(games.move_list) == 1:
@@ -81,7 +79,7 @@ class PlayGames:
         LOGGER.info(
             "Played %d games above minimum score in %d attempts", num_accepted, num_played)
 
-        return (self.gamestate_to_nn(np.concatenate(self.game_states)),
+        return (np.concatenate(self.game_states),
                 np.concatenate(self.heads),
                 np.concatenate(self.scores),
                 np.concatenate(self.game_id),
@@ -147,4 +145,4 @@ class PlayBig:
         LOGGER.debug(
             "Played %d games above minimum score(%02f) in %d attempts", np.unique(game_id).size, minimum_score, NUM_TRAINING_GAMES)
 
-        return grid_2_nn(state), head, score, game_id, move.astype(np.float32)
+        return state, head, score, game_id, move.astype(np.float32)
