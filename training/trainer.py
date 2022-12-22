@@ -9,18 +9,18 @@ from training.neural_net import NeuralNetwork
 
 
 def train(generation: int,
-          game_states: npt.NDArray[np.int32],
+          states: npt.NDArray[np.int32],
           heads: npt.NDArray[np.bool8],
-          move_predictions: npt.NDArray[np.float32],
-          verbose: int = 2,
+          predictions: npt.NDArray[np.float32],
+          verbose: int = 1,
           permute_input: bool = False) -> NeuralNetwork:
     """Permute input data and train on it.
 
     Args:
         generation (int): Generation number
-        game_states (npt.NDArray[np.int32]): grids
+        states (npt.NDArray[np.int32]): grids
         heads (npt.NDArray[np.int32]): head availiblity
-        move_predictions (npt.NDArray[np.int32]): predicted moves
+        predictions (npt.NDArray[np.int32]): predicted moves
         permute_input (bool): If true permute inputs, will create 8x samples by rotating and flipping.
 
     Returns:
@@ -30,14 +30,12 @@ def train(generation: int,
 
     with Timer(name="Training"):
         if permute_input:
-            # get all permutations
-            permuted_states, permuted_heads, permuted_predictions = permute_inputs(
-                states=game_states, predictions=move_predictions, heads=heads)
+            states, heads, predictions = permute_inputs(
+                states=states, predictions=predictions, heads=heads)
 
-        # train on permutations
-        neural_net.train(states=permuted_states if permute_input else game_states,
-                         heads=permuted_heads if permute_input else heads,
-                         predictions=permuted_predictions if permute_input else move_predictions,
+        neural_net.train(states=states,
+                         heads=heads,
+                         predictions=predictions,
                          generation=generation,
                          verbose=verbose)
     return neural_net
