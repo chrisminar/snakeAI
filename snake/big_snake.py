@@ -5,12 +5,11 @@ from typing import Final, List, Optional, Tuple
 import numpy as np
 from numpy import typing as npt
 
-from training.helper import (EXPLORATORY_MOVE_FRACTION, GRID_X, GRID_Y,
-                             MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES,
-                             NUM_SELF_PLAY_GAMES, SCORE_FOR_GAME_WIN,
-                             SCORE_PENALTY_FOR_FAILURE, SCORE_PER_FOOD,
-                             SCORE_PER_MOVE, Direction, GridEnum, Timer,
-                             explore_fraction)
+from training.helper import (GRID_X, GRID_Y, MAXIMUM_MOVES_WITHOUT_EATING,
+                             MAXIMUM_TOTAL_MOVES, NUM_SELF_PLAY_GAMES,
+                             SCORE_FOR_GAME_WIN, SCORE_PENALTY_FOR_FAILURE,
+                             SCORE_PER_FOOD, SCORE_PER_MOVE, Direction,
+                             GridEnum, Timer, explore_fraction)
 from training.neural_net import NeuralNetwork
 
 _RNG: Final = np.random.default_rng()

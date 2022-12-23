@@ -110,7 +110,7 @@ class NeuralNetwork:
         """Pre process snake grid.
 
         (n, x, y) -> (n, x, y, 4)
-        Where each new layer is a boolean value where a 1 means 
+        Where each new layer is a boolean value where a 1 represents a grid type (see GridEnum).
 
         Args:
             states (npt.NDArray[np.int32]): (n,x,y) of snake game states.

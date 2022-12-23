@@ -3,7 +3,7 @@
 import logging
 import re
 from pathlib import Path
-from typing import List, Sequence, Tuple
+from typing import List, Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -44,7 +44,7 @@ class TrainRL:
             LOGGER.debug("Loaded checkpoint %d", biggest_generation)
         self.game_id = 0
         # mean score of the last set of games
-        self.mean_generation_score = -SCORE_PER_FOOD
+        self.mean_generation_score: float = -SCORE_PER_FOOD
         # mean scores of each set of games
         self.mean_generation_scores: List[float] = []
         # mean score of all games in training set
@@ -67,7 +67,7 @@ class TrainRL:
                                 NUM_TRAINING_GAMES, NUM_SELF_PLAY_GAMES)
                 self.trim_game_list(int(purge_num))
                 self.neural_net = train(
-                    generation, self.game_states, self.game_heads, self.moves, verbose=0)
+                    generation, self.game_states, self.game_heads, self.moves, verbose=1)
             self.times.append(t.secs)
             self.gen_status_plot(generation)
             if generation % SAVE_INTERVAL == 0:
@@ -102,7 +102,7 @@ class TrainRL:
 
         plt.subplot(3, 1, 3)
         plt.plot(self.times)
-        plt.title('Time(s)')
+        plt.xlabel('Time(s)')
 
         plt.suptitle(f'Generation: {generation}')
 
@@ -167,7 +167,7 @@ class TrainRL:
                                moves=np.concatenate(moves_l),
                                generation=generation)
 
-    def get_maximum_generation_score(self) -> int:
+    def get_maximum_generation_score(self) -> float:
         """Return maximum score atained by a training of the neural network.
 
         Returns:

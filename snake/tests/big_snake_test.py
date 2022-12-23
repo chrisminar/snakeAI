@@ -79,7 +79,7 @@ def test_choose_valids() -> None:
 ])
 def test_convert_heads(headx: int, heady: int, truth: Tuple[int, ...], foodx: int, foody: int) -> None:
     """Convert head with no food and some walls."""
-    snake = ParSnake(num_games=5)
+    snake = ParSnake(NeuralNetwork(), num_games=5)
     # make grid empty
     snake.grid.fill(-1)
 
@@ -99,7 +99,7 @@ def test_convert_heads(headx: int, heady: int, truth: Tuple[int, ...], foodx: in
 @pytest.mark.parametrize("direction", list(Direction))
 def test_head_tracker(direction: Direction) -> None:
     """Move snake right until game over."""
-    snake = ParSnake(num_games=5)
+    snake = ParSnake(NeuralNetwork(), num_games=5)
 
     xy_index = directions_to_tuples(np.full((5,), direction.value))
 
@@ -119,7 +119,7 @@ def test_ate_this_turn(ate: bool) -> None:
     Args:
         ate (bool): Did the snake eat?
     """
-    snake = ParSnake(num_games=5)
+    snake = ParSnake(NeuralNetwork(), num_games=5)
 
     food_x = 2 if ate else 3
     food_y = 1
@@ -149,7 +149,7 @@ def test_update_grid(ate) -> None:
     Args:
         ate (_type_): Did the snake eat?
     """
-    snake = ParSnake(num_games=5)
+    snake = ParSnake(NeuralNetwork(), num_games=5)
     food_x = 2 if ate else 3
     food_y = 1
     snake._reset(head_x=1, head_y=1, food_x=food_x, food_y=food_y)
@@ -178,7 +178,7 @@ def test_update_grid(ate) -> None:
 
 def test_spawn_food() -> None:
     """Food spawned in valid locations."""
-    snake = ParSnake(num_games=36)
+    snake = ParSnake(NeuralNetwork(), num_games=36)
     snake._reset(head_x=XMAX, head_y=YMAX, food_x=XMAX, food_y=YMAX-1)
 
     for x_idx in range(XMAX):
@@ -212,7 +212,7 @@ def test_spawn_food() -> None:
 
 def test_update_head() -> None:
     """Head postion updated after move."""
-    snake = ParSnake(num_games=5)
+    snake = ParSnake(NeuralNetwork(), num_games=5)
     snake.grid.fill(GridEnum.EMPTY.value)
     head_xs = [0, 0, XMAX+1, -1, 0]
     head_ys = [YMAX+1, -1, 0, 0, 0]
@@ -228,6 +228,11 @@ def test_update_head() -> None:
 
 @pytest.mark.parametrize("direction", list(Direction))
 def test_no_loop_one(direction: Direction) -> None:
+    """Test that snake can't jitter back and forth.
+
+    Args:
+        direction (Direction): First direction to travel.
+    """
     snake = ParSnake(neural_net=NeuralNetwork(),
                      num_games=5, grid_size_x=5, grid_size_y=5)
 

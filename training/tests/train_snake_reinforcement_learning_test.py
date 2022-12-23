@@ -5,7 +5,7 @@ import numpy as np
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
                              NUM_TRAINING_GAMES)
 from training.neural_net import NeuralNetwork
-from training.play_games import PlayGames
+from training.play_games import PlayBig
 from training.train_snake_reinforcement_learning import TrainRL
 
 
@@ -18,7 +18,7 @@ def test_add_games_to_list() -> None:
     """Add games to list works."""
     trainer = TrainRL()
     neural_network = NeuralNetwork()
-    spc = PlayGames(neural_network)
+    spc = PlayBig(neural_network)
     states, heads, scores, ids, moves, _ = spc.play_games(num_games=5)
     trainer.add_games_to_list(states=states, heads=heads,
                               scores=scores, ids=ids, moves=moves, generation=0, make_histogram=False)
@@ -59,7 +59,7 @@ def test_trim_game_list_1() -> None:
                               scores=scores+100, ids=game_ids, moves=moves, generation=1, make_histogram=False)
 
     # lowest games will be removed
-    trainer.trim_game_list()
+    trainer.trim_game_list(purge_num=NUM_TRAINING_GAMES-1)
 
     # all arrays have the correct size after trimming
     assert NUM_TRAINING_GAMES * \
@@ -94,7 +94,7 @@ def test_trim_game_list_2() -> None:
     trainer.game_scores = scores
 
     # lowest NUM_SELF_PLAY_GAMES games will be removed
-    trainer.trim_game_list()
+    trainer.trim_game_list(purge_num=NUM_SELF_PLAY_GAMES)
 
     # all arrays have the correct size after trimming
     assert trainer.game_states.shape[0] == trainer.moves.shape[

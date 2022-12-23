@@ -1,4 +1,4 @@
-"""Test and improve neural net architecture."""
+"""Test and improve neural net architecture and hyperparameters."""
 import logging
 import re
 from pathlib import Path

@@ -10,7 +10,7 @@ from numpy import typing as npt
 
 from training.helper import GRID_X, GRID_Y, GridEnum
 from training.neural_net import NeuralNetwork
-from training.play_games import PlayBig as PlayGames
+from training.play_games import PlayBig
 
 LOGGER = logging.getLogger("terminal")
 
@@ -23,7 +23,7 @@ def run_a_sample(checkpoint: Path) -> None:
     """
     neural_net = NeuralNetwork()
     neural_net.load(checkpoint)
-    spc = PlayGames(neural_net)
+    spc = PlayBig(neural_net)
     states, _, _, _, _, _ = spc.play_games(num_games=1)
 
     fig = plt.figure()
@@ -49,7 +49,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383), n=5
     for i, generation in enumerate(generations):
         neural_net = NeuralNetwork()
         neural_net.load(Path(f'media/saves/generation_{generation}.ckpt'))
-        spc = PlayGames(neural_net)
+        spc = PlayBig(neural_net)
         state, _, score, ids, _, _ = spc.play_games(num_games=n)
         state = find_best(states=state, scores=score, ids=ids)
         state[state >= GridEnum.BODY.value] = GridEnum.BODY.value
@@ -67,10 +67,12 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383), n=5
             axis.axes.get_yaxis().set_visible(False)
             axis.axes.get_xaxis().set_visible(False)
             if i < game_length:
-                axis.imshow(states[j][i])
+                plt.imshow(states[j][i], vmin=min(
+                    [e.value for e in GridEnum]), vmax=max([e.value for e in GridEnum]))
                 plt.title(f'Generation {generations[j]}, move {i}')
             else:
-                axis.imshow(states[j][-1])
+                plt.imshow(states[j][-1], vmin=min(
+                    [e.value for e in GridEnum]), vmax=max([e.value for e in GridEnum]))
                 plt.title(f'Generation {generations[j]}, move {game_length}')
         fig.savefig(f'media/compare/compare{i}.png')
         plt.close()

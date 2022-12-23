@@ -2,17 +2,16 @@
 
 import pytest
 
-from snake.snake_reinforcement_learning import SnakeRL
+from snake.big_snake import ParSnake
 from training.helper import GRID_X, GRID_Y, Direction
 from training.neural_net import NeuralNetwork
-from training.play_games import PlayGames
 
 
 # pylint: disable=protected-access
 def test_init() -> None:
     """Initialize neural net and check output layer shape."""
     neural_net = NeuralNetwork()
-    assert neural_net.model.get_layer('policy').output_shape, (None, 4)
+    assert neural_net.model.get_layer('output_layer').output_shape, (None, 4)
 
 
 @pytest.mark.skip()
@@ -45,8 +44,8 @@ def test_evaluate(head_x: int, head_y: int, food: bool) -> None:
     """
     neural_net = NeuralNetwork()
 
-    snake = SnakeRL(neural_net=neural_net,
-                    x_grid_size=GRID_X, y_grid_size=GRID_Y)
+    snake = ParSnake(neural_net=neural_net,
+                     grid_size_x=GRID_X, grid_size_y=GRID_Y, num_games=1)
 
     food_x = head_x+1 if head_x == 0 else head_x-1
     if food:
@@ -56,17 +55,18 @@ def test_evaluate(head_x: int, head_y: int, food: bool) -> None:
 
     snake._reset(head_x=head_x, head_y=head_y, food_x=food_x, food_y=food_y)
 
-    pre_processed_grid = PlayGames(neural_net).gamestate_to_nn(snake.grid)
-    head_view = snake.convert_head()
+    head_view = snake.convert_heads()
 
-    assert head_view[Direction.UP.value] if head_y > 0 else not head_view[Direction.UP.value]
-    assert head_view[Direction.RIGHT.value] if head_x < GRID_X - \
-        1 else not head_view[Direction.RIGHT.value]
-    assert head_view[Direction.DOWN.value] if head_y < GRID_Y - \
-        1 else not head_view[Direction.DOWN.value]
-    assert head_view[Direction.LEFT.value] if head_x > 0 else not head_view[Direction.LEFT.value]
+    assert head_view[0, Direction.UP.value] if head_y > 0 else not head_view[0,
+                                                                             Direction.UP.value]
+    assert head_view[0, Direction.RIGHT.value] if head_x < GRID_X - \
+        1 else not head_view[0, Direction.RIGHT.value]
+    assert head_view[0, Direction.DOWN.value] if head_y < GRID_Y - \
+        1 else not head_view[0, Direction.DOWN.value]
+    assert head_view[0, Direction.LEFT.value] if head_x > 0 else not head_view[0,
+                                                                               Direction.LEFT.value]
 
-    policy = neural_net.evaluate(state=pre_processed_grid, head=head_view)[0]
+    policy = neural_net.evaluate(state=snake.grid, head=head_view)[0]
 
     assert policy[Direction.UP.value] == 0 if head_y == 0 else policy[Direction.UP.value] != 0
     assert policy[Direction.RIGHT.value] == 0 if head_x == GRID_X - \
