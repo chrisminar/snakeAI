@@ -102,7 +102,8 @@ class PlayBig:
                    start_id: int = 0,
                    minimum_score: Optional[float] = None,
                    exploratory: bool = False,
-                   num_games: int = NUM_GAMES_PER_BATCH
+                   num_games: int = NUM_GAMES_PER_BATCH,
+                   best_generation_score: float = 0.0
                    ) -> Tuple[npt.NDArray[np.int32],
                               npt.NDArray[np.bool8],
                               npt.NDArray[np.int32],
@@ -116,6 +117,7 @@ class PlayBig:
             neural_net (NeuralNetwork): Neural network to play games with.
             minimum_score (int, optional): Don't accept games below this score.
             exploratory (bool, optional): Should the snake preform exploratory moves?
+            best_generation_score (float, optional): Best score.
 
         Returns:
             (npt.NDArray[np.uint32]): game states
@@ -129,7 +131,7 @@ class PlayBig:
                                exploratory=exploratory and (
                                    minimum_score is not None and minimum_score < USE_EXPLORATION_CUTOFF),
                                num_games=num_games)
-        game_player.play()
+        game_player.play(best_generation_score=best_generation_score)
         state, head, score, game_id, move = game_player.aggregate_results()
 
         pre_purge_score = get_perf(

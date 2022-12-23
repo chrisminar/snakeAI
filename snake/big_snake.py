@@ -9,7 +9,8 @@ from training.helper import (EXPLORATORY_MOVE_FRACTION, GRID_X, GRID_Y,
                              MAXIMUM_MOVES_WITHOUT_EATING, MAXIMUM_TOTAL_MOVES,
                              NUM_SELF_PLAY_GAMES, SCORE_FOR_GAME_WIN,
                              SCORE_PENALTY_FOR_FAILURE, SCORE_PER_FOOD,
-                             SCORE_PER_MOVE, Direction, GridEnum, Timer)
+                             SCORE_PER_MOVE, Direction, GridEnum, Timer,
+                             explore_fraction)
 from training.neural_net import NeuralNetwork
 
 _RNG: Final = np.random.default_rng()
@@ -214,19 +215,23 @@ class ParSnake:
         self.food_ys = self.food_ys[games_to_keep]
         self.check_all_games_over()
 
-    def play(self) -> None:
+    def play(self, best_generation_score: float) -> None:
         """Play all snake games till completion."""
         with Timer("Played games"):
             while not self.games_over:
-                new_directions, new_moves, new_heads = self.evaluate()
+                new_directions, new_moves, new_heads = self.evaluate(
+                    best_generation_score)
                 self.states.append(self.grid.copy())
                 self.moves.append(new_moves.copy())
                 self.heads.append(new_heads.copy())
                 self.game_id_tracker.append(self.game_ids.copy())
                 self.step_time(new_directions)
 
-    def evaluate(self) -> Tuple[npt.NDArray[np.int32], npt.NDArray[np.int32], npt.NDArray[np.bool8]]:
+    def evaluate(self, best_score: float) -> Tuple[npt.NDArray[np.int32], npt.NDArray[np.int32], npt.NDArray[np.bool8]]:
         """Evaluate the current set of snake games.
+
+        Args:
+            best_score (float): Best generational score.
 
         Returns:
             Tuple[npt.NDArray[np.int32], npt.NDArray[np.int32], npt.NDArray[np.bool8]]:
@@ -252,7 +257,7 @@ class ParSnake:
         new_dir = np.argmax(policy, axis=1).astype(int)
         if self.exploratory:
             random_idx = np.random.rand(
-                *new_dir.shape) < EXPLORATORY_MOVE_FRACTION
+                *new_dir.shape) < explore_fraction(best_score, explore_fraction_at_score_0=0.15, explore_fraction_at_score_n=0.05)
             new_dir[random_idx] = choose_valids(
                 heads[random_idx])[:, 1]
 

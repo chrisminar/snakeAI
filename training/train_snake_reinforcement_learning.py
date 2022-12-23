@@ -11,7 +11,7 @@ from numpy import typing as npt
 
 from training.helper import (GRID_X, GRID_Y, NUM_SELF_PLAY_GAMES,
                              NUM_TRAINING_GAMES, SAVE_INTERVAL, SCORE_PER_FOOD,
-                             gen_histogram, get_size)
+                             Timer, gen_histogram, get_size)
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayBig
 from training.trainer import train
@@ -43,15 +43,15 @@ class TrainRL:
             self.generation = biggest_generation
             LOGGER.debug("Loaded checkpoint %d", biggest_generation)
         self.game_id = 0
-        # mean score of all games in training set
         # mean score of the last set of games
         self.mean_generation_score = -SCORE_PER_FOOD
         # mean scores of each set of games
-        self.mean_generation_scores: List[int] = []
+        self.mean_generation_scores: List[float] = []
         # mean score of all games in training set
-        self.training_mean_scores: List[int] = []
+        self.training_mean_scores: List[float] = []
         self.games_used: List[int] = []
         self.max_scores: List[int] = []
+        self.times: List[float] = []
 
     def train(self) -> None:
         """Training loop."""
@@ -60,13 +60,15 @@ class TrainRL:
             LOGGER.info("")
             LOGGER.info("")
             LOGGER.info("Generation %d", generation)
-            self.play_n_games(
-                generation=generation, num_games=NUM_SELF_PLAY_GAMES)
-            purge_num = max(len(np.unique(self.game_ids)) -
-                            NUM_TRAINING_GAMES, NUM_SELF_PLAY_GAMES)
-            self.trim_game_list(int(purge_num))
-            self.neural_net = train(
-                generation, self.game_states, self.game_heads, self.moves)
+            with Timer("Generation") as t:
+                self.play_n_games(
+                    generation=generation, num_games=NUM_SELF_PLAY_GAMES)
+                purge_num = max(len(np.unique(self.game_ids)) -
+                                NUM_TRAINING_GAMES, NUM_SELF_PLAY_GAMES)
+                self.trim_game_list(int(purge_num))
+                self.neural_net = train(
+                    generation, self.game_states, self.game_heads, self.moves, verbose=0)
+            self.times.append(t.secs)
             self.gen_status_plot(generation)
             if generation % SAVE_INTERVAL == 0:
                 gen_path = Path(f"./media/saves/generation_{generation}.ckpt")
@@ -89,13 +91,18 @@ class TrainRL:
         plt.legend(loc="best")
         plt.title('Mean Score')
 
-        plt.subplot(3, 1, 2)
-        plt.plot(self.max_scores)
-        plt.title('Max Score')
+        ax1 = plt.subplot(3, 1, 2)
+        color = "#69b3a2"
+        ax1.plot(self.max_scores, color=color)
+        ax1.set_ylabel('Max Score', color=color)
+        ax1.tick_params(axis="y", labelcolor=color)
+        ax2 = ax1.twinx()
+        ax2.plot(self.games_used)
+        ax2.set_ylabel('Training Games')
 
         plt.subplot(3, 1, 3)
-        plt.plot(self.games_used)
-        plt.title('Training Games')
+        plt.plot(self.times)
+        plt.title('Time(s)')
 
         plt.suptitle(f'Generation: {generation}')
 
@@ -196,7 +203,7 @@ class TrainRL:
         spc = PlayBig(neural_network=neural_net)
 
         states, heads, scores, ids, moves, performance = spc.play_games(
-            start_id=self.game_id, minimum_score=minimum_score, exploratory=True)
+            start_id=self.game_id, minimum_score=minimum_score, exploratory=True, best_generation_score=self.get_maximum_generation_score())
 
         counter = len(np.unique(ids))
 
@@ -268,10 +275,6 @@ class TrainRL:
         try:
             LOGGER.info("Training mean score: %02f -> %02f",
                         self.training_mean_scores[-2], self.training_mean_scores[-1])
-            LOGGER.info("Generation mean score: %02f -> %02f",
-                        self.mean_generation_scores[-2], self.mean_generation_scores[-1])
-            LOGGER.info("Generation maximum score: %02f -> %02f",
-                        self.max_scores[-2], self.max_scores[-1])
         except IndexError:
             pass  # don't print previous score
 

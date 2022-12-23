@@ -23,7 +23,7 @@ LOGGER.propagate = False  # prevent keras from doing annoying things with the lo
 
 if __name__ == "__main__":
     #from training.visualize import gen_compare
-    #gen_compare((40, 40, 40, 40), n=1)
+    #gen_compare((0, 10, 10, 20), n=1)
     # test_training()
     trainer = TrainRL(0)
     trainer.train()

@@ -24,7 +24,7 @@ EPOCH_DELTA: Final = 0.001
 MOMENTUM: Final = 0.25
 LEARNING_RATE: Final = 0.001
 BATCH_SIZE: Final = 64
-EPOCHS: Final = 100
+EPOCHS: Final = 200
 MAXIMUM_MOVES_WITHOUT_EATING: Final = GRID_X * GRID_Y * 2
 MAXIMUM_TOTAL_MOVES: Final = MAXIMUM_MOVES_WITHOUT_EATING ** 2
 
@@ -36,7 +36,7 @@ SCORE_FOR_GAME_WIN: Final = 100  # get this many points for winning the game
 # Odds of taking a random move to explore while training
 EXPLORATORY_MOVE_FRACTION: Final = 0.1
 
-SAVE_INTERVAL: Final = 10  # save every x generations
+SAVE_INTERVAL: Final = 3  # save every x generations
 
 USE_EXPLORATION_CUTOFF: Final = 1000
 
@@ -163,4 +163,36 @@ class Timer:
         self.end = time.perf_counter()
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
-        LOGGER.info('%s elapsed time %03f', self.name, self.secs)
+        LOGGER.debug('%s elapsed time %03f', self.name, self.secs)
+
+
+def explore_fraction(current_score: float, *, explore_fraction_at_score_0: float = 1, explore_fraction_at_score_n: float = 0.1, score_n: int = GRID_X*GRID_Y*SCORE_PER_FOOD/2) -> float:
+    """Exploration fraction to use.
+
+    Args:
+        current_score (float): Most recent generation mean score.
+        explore_fraction_at_score_0 (float, optional): y_0 should be between 0 and 1. Defaults to 1.
+        explore_fraction_at_score_n (float, optional): y_n should be between 0 and y_0. Defaults to 0.1.
+        score_n (int, optional): x_n. Defaults to (GRID_X*GRID_Y-4)*SCORE_PER_FOOD.
+
+    Raises:
+        ValueError: If y_0 is invalid.
+        ValueError: If y_n is invalid.
+
+    Returns:
+        float: y_current_score
+    """
+    if current_score >= score_n:
+        return 0
+    if not 0 < explore_fraction_at_score_0 <= 1:
+        raise ValueError(
+            "Starting exploration fraction must be between 0 and 1.")
+    if not 0 < explore_fraction_at_score_n < explore_fraction_at_score_0:
+        raise ValueError(
+            f"Exploration fraction at last score must be between 0 and {explore_fraction_at_score_0}.")
+
+    a = (explore_fraction_at_score_0-explore_fraction_at_score_n)/2
+    b = np.pi / score_n
+    c = explore_fraction_at_score_0-a
+
+    return min(max(a*np.cos(b*current_score) + c, 0), 1)

@@ -8,7 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import typing as npt
 
-from training.helper import GRID_X, GRID_Y
+from training.helper import GRID_X, GRID_Y, GridEnum
 from training.neural_net import NeuralNetwork
 from training.play_games import PlayBig as PlayGames
 
@@ -52,6 +52,7 @@ def gen_compare(generations: Tuple[int, int, int, int] = (0, 100, 200, 383), n=5
         spc = PlayGames(neural_net)
         state, _, score, ids, _, _ = spc.play_games(num_games=n)
         state = find_best(states=state, scores=score, ids=ids)
+        state[state >= GridEnum.BODY.value] = GridEnum.BODY.value
         states.append(state)
         LOGGER.info("Done with generation %d", generation)
 
